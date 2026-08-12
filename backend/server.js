@@ -601,7 +601,7 @@ const INSTAGRAM_ACCESS_TOKEN =
 // CONFIG
 // =====================================================
 
-const DEFAULT_PROFILE_ID =
+const PROFILE_ID =
     process.env.PROFILE_ID ||
     "e61565b7-afa5-4f5d-8806-8dc833521cac";
 
@@ -785,11 +785,13 @@ function cleanServiceName(value) {
 
 
 // Find one active service from Supabase
-async function findServiceInDatabase(serviceName) {
+async function findServiceInDatabase(serviceName, profileId) {
 
     if (!serviceName) {
         return null;
     }
+
+    const resolvedProfileId = profileId || PROFILE_ID;
 
     const {
         data,
@@ -807,7 +809,7 @@ async function findServiceInDatabase(serviceName) {
         `)
         .eq(
             "profile_id",
-            PROFILE_ID
+            resolvedProfileId
         )
         .eq(
             "active",
@@ -884,11 +886,12 @@ async function getServicesFromDatabase() {
 
 
 // Get one service price from DB
-async function getServicePrice(serviceName) {
+async function getServicePrice(serviceName, profileId) {
 
     const service =
         await findServiceInDatabase(
-            serviceName
+            serviceName,
+            profileId
         );
 
     if (!service) {
@@ -1316,7 +1319,9 @@ if (!content) {
 // FIND PENDING BOOKING
 // =====================================================
 
-async function findPendingBooking(phone) {
+async function findPendingBooking(phone, profileId) {
+
+    const resolvedProfileId = profileId || PROFILE_ID;
 
     const {
         data,
@@ -1329,7 +1334,7 @@ async function findPendingBooking(phone) {
 
         .eq(
             "profile_id",
-            PROFILE_ID
+            resolvedProfileId
         )
 
         .eq(
@@ -1964,9 +1969,9 @@ app.post(
         try {
 
             // Dynamic profile routing: ?profile=PROFILE_ID in webhook URL
-            const PROFILE_ID =
+            const activeProfileId =
                 req.query.profile ||
-                DEFAULT_PROFILE_ID;
+                PROFILE_ID;
 
             const message =
                 (req.body.Body || "")
@@ -2176,7 +2181,8 @@ if (booking.service) {
 
     const dbService =
         await findServiceInDatabase(
-            booking.service
+            booking.service,
+            activeProfileId
         );
 
     if (dbService) {
@@ -2273,7 +2279,8 @@ Do not sound like a form.
 
                     const existingPending =
                         await findPendingBooking(
-                            phone
+                            phone,
+                            activeProfileId
                         );
 
 
@@ -2353,7 +2360,7 @@ Do NOT say the appointment is confirmed.
                             .insert({
 
                                 profile_id:
-                                    PROFILE_ID,
+                                    activeProfileId,
 
                                 customer_name:
                                     booking.customer_name ||
