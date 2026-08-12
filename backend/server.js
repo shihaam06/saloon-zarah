@@ -2195,6 +2195,7 @@ if (booking.service) {
 }
 
 
+                const service = booking.service;
                 const missing = [];
 
 
