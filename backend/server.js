@@ -601,7 +601,7 @@ const INSTAGRAM_ACCESS_TOKEN =
 // CONFIG
 // =====================================================
 
-const PROFILE_ID =
+const DEFAULT_PROFILE_ID =
     process.env.PROFILE_ID ||
     "e61565b7-afa5-4f5d-8806-8dc833521cac";
 
@@ -1962,6 +1962,11 @@ app.post(
     async (req, res) => {
 
         try {
+
+            // Dynamic profile routing: ?profile=PROFILE_ID in webhook URL
+            const PROFILE_ID =
+                req.query.profile ||
+                DEFAULT_PROFILE_ID;
 
             const message =
                 (req.body.Body || "")
