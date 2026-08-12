@@ -2127,7 +2127,7 @@ ${formatTimeForCustomer(
                     )}
 
 Total service price:
-₹${getServicePrice(
+₹${await getServicePrice(
                         confirmed.service
                     )}
 
@@ -2336,6 +2336,8 @@ Do NOT say the appointment is confirmed.
 
                     else {
 
+                        const servicePrice = await getServicePrice(service);
+
                         const {
                             data: createdBooking,
                             error
@@ -2381,26 +2383,26 @@ Do NOT say the appointment is confirmed.
                                     message,
 
                                 advance_required:
-    true,
+                                    true,
 
-advance_amount:
-    ADVANCE_AMOUNT,
+                                advance_amount:
+                                    ADVANCE_AMOUNT,
 
-advance_paid:
-    0,
+                                advance_paid:
+                                    0,
 
-advance_payment_method:
-    "Razorpay",
+                                advance_payment_method:
+                                    "Razorpay",
 
-advance_payment_status:
-    "Pending",
+                                advance_payment_status:
+                                    "Pending",
 
-balance_amount:
-    Math.max(
-        getServicePrice(service) -
-        ADVANCE_AMOUNT,
-        0
-    ),
+                                balance_amount:
+                                    Math.max(
+                                        servicePrice -
+                                        ADVANCE_AMOUNT,
+                                        0
+                                    ),
 
                             })
 
@@ -2470,7 +2472,7 @@ ${formatTimeForCustomer(
                             )}
 
 Service price:
-₹${getServicePrice(service)}
+₹${servicePrice}
 
 Advance:
 ₹${ADVANCE_AMOUNT}
@@ -2480,7 +2482,7 @@ ${paymentLink.short_url}
 
 Remaining balance after advance:
 ₹${Math.max(
-    getServicePrice(service) -
+    servicePrice -
     ADVANCE_AMOUNT,
     0
 )}
@@ -4223,7 +4225,7 @@ ${formatTimeForCustomer(
 )}
 
 Service price:
-₹${getServicePrice(service)}
+₹${await getServicePrice(service)}
 
 Advance:
 ₹${ADVANCE_AMOUNT}
@@ -4233,7 +4235,7 @@ ${paymentLink.short_url}
 
 Remaining balance after advance:
 ₹${Math.max(
-    getServicePrice(service) -
+    (await getServicePrice(service)) -
     ADVANCE_AMOUNT,
     0
 )}
