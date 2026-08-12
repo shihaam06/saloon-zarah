@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bill Receipt - Glamour Studio</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Inter, sans-serif;
+        }
+
+        body {
+            background: #f3f5f8;
+            color: #172033;
+        }
+
+        .page {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .back-btn {
+            border: none;
+            background: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .topbar h1 {
+            font-size: 22px;
+        }
+
+        .invoice {
+            background: white;
+            border: 1px solid #dfe4e9;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,.05);
+        }
+
+        .invoice-header {
+            padding: 32px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #edf0f3;
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .brand-icon {
+            font-size: 30px;
+            color: #e98272;
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .brand-sub {
+            color: #e98272;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-top: 3px;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h2 {
+            font-size: 24px;
+            margin-bottom: 7px;
+        }
+
+        .invoice-title p {
+            color: #8791a0;
+            font-size: 11px;
+        }
+
+        .customer-section {
+            padding: 25px 32px;
+            background: #fafbfc;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .label {
+            color: #8993a1;
+            font-size: 10px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .value {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .items {
+            padding: 28px 32px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            color: #8993a1;
+            font-size: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid #dfe4e9;
+        }
+
+        td {
+            padding: 15px 0;
+            border-bottom: 1px solid #edf0f3;
+            font-size: 12px;
+        }
+
+        th:last-child,
+        td:last-child {
+            text-align: right;
+        }
+
+        .item-type {
+            color: #8993a1;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .summary {
+            width: 330px;
+            margin-left: auto;
+            padding: 0 32px 30px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 9px 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .summary-row.total {
+            margin-top: 8px;
+            padding-top: 16px;
+            border-top: 1px solid #dfe4e9;
+            color: #172033;
+            font-size: 21px;
+            font-weight: 800;
+        }
+        .business-details {
+    margin-top: 8px;
+    color: #8993a1;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+
+.business-details span {
+    color: #59616d;
+    font-weight: 600;
+}
+
+
+.gst-section {
+    margin-top: 4px;
+}
+
+
+.gst-section .summary-row {
+    font-size: 11px;
+    padding: 6px 0;
+}
+
+
+#totalTax {
+    font-weight: 600;
+    color: #172033;
+}
+
+        .payment {
+            margin: 0 32px 30px;
+            padding: 16px 18px;
+            border-radius: 10px;
+            background: #f5faf7;
+            border: 1px solid #dcefe3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .payment-label {
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .payment-method {
+            color: #24945a;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+
+        .paid {
+            color: #24945a;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .footer {
+            padding: 25px 32px;
+            border-top: 1px solid #edf0f3;
+            text-align: center;
+            color: #8993a1;
+            font-size: 11px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+        }
+
+        .print-btn {
+            background: white;
+            border: 1px solid #dce1e7;
+            color: #172033;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: #8993a1;
+        }
+
+        @media(max-width:650px) {
+
+            .invoice-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .invoice-title {
+                text-align: left;
+            }
+
+            .customer-section {
+                grid-template-columns: 1fr;
+            }
+
+            .summary {
+                width: auto;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+        }
+
+        @media print {
+
+            body {
+                background: white;
+            }
+
+            .page {
+                margin: 0;
+                max-width: none;
+            }
+
+            .topbar,
+            .actions {
+                display: none;
+            }
+
+            .invoice {
+                border: none;
+                box-shadow: none;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="topbar">
+
+        <div>
+
+            <button
+                class="back-btn"
+                onclick="history.back()"
+            >
+                ← Back
+            </button>
+
+        </div>
+
+        <h1>
+            E-Bill
+        </h1>
+
+    </div>
+
+
+    <div id="loading" class="loading">
+        Loading bill...
+    </div>
+
+
+    <div
+        id="invoice"
+        class="invoice"
+        style="display:none;"
+    >
+
+        <!-- HEADER -->
+
+        <div class="invoice-header">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    ✦
+                </div>
+
+                <div>
+
+                    <div
+                        class="brand-name"
+                        id="businessName"
+                    >
+                        Glamour Studio
+                    </div>
+
+                    <div class="brand-sub">
+                        AI RECEPTIONIST
+                    </div>
+                    <div
+    class="business-details"
+>
+
+    <div id="businessAddress"></div>
+
+    <div id="businessPhone"></div>
+
+    <div>
+        GSTIN:
+        <span id="sellerGstin">
+            Not provided
+        </span>
+    </div>
+
+    <div>
+        State:
+        <span id="sellerState">
+            Not provided
+        </span>
+    </div>
+
+</div>
+
+                </div>
+
+            </div>
+
+
+            <div class="invoice-title">
+
+                <h2>
+                    INVOICE
+                </h2>
+
+                <p>
+                    Bill #<span id="billNumber">-</span>
+                </p>
+
+                <p id="billDate">
+                    -
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- CUSTOMER -->
+
+        <div class="customer-section">
+
+            <div>
+
+                <div class="label">
+                    Billed To
+                </div>
+
+                <div
+                    class="value"
+                    id="customerName"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div class="label">
+                    WhatsApp
+                </div>
+
+                <div
+                    class="value"
+                    id="customerPhone"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div class="label">
+                    Appointment
+                </div>
+
+                <div
+                    class="value"
+                    id="appointment"
+                >
+                    -
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ITEMS -->
+
+        <div class="items">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            DESCRIPTION
+                        </th>
+
+                        <th>
+                            AMOUNT
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="items">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div class="summary">
+
+    <div class="summary-row">
+        <span>Subtotal</span>
+        <span id="subtotal">₹0.00</span>
+    </div>
+
+
+    <div class="summary-row">
+        <span>Add-ons</span>
+        <span id="addonTotal">₹0.00</span>
+    </div>
+
+
+    <div class="summary-row">
+        <span>Discount</span>
+        <span id="discount">-₹0.00</span>
+    </div>
+
+
+    <div class="summary-row">
+
+        <span>
+            Taxable Amount
+        </span>
+
+        <span id="taxableAmount">
+            ₹0.00
+        </span>
+
+    </div>
+
+
+    <!-- =========================
+         GST
+    ========================== -->
+
+    <div
+        id="gstSection"
+        class="gst-section"
+    >
+
+        <div class="summary-row">
+
+            <span>
+                CGST
+            </span>
+
+            <span id="cgstAmount">
+                ₹0.00
+            </span>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+                SGST
+            </span>
+
+            <span id="sgstAmount">
+                ₹0.00
+            </span>
+
+        </div>
+
+
+        <div
+            class="summary-row"
+            id="igstRow"
+        >
+
+            <span>
+                IGST
+            </span>
+
+            <span id="igstAmount">
+                ₹0.00
+            </span>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+                Total GST
+            </span>
+
+            <span id="totalTax">
+                ₹0.00
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         GRAND TOTAL
+    ========================== -->
+
+    <div class="summary-row total">
+
+        <span>
+            Total
+        </span>
+
+        <span id="total">
+            ₹0.00
+        </span>
+
+    </div>
+
+</div>
+
+        <!-- PAYMENT -->
+
+        <div class="payment">
+
+            <div>
+
+                <div class="payment-label">
+                    PAYMENT METHOD
+                </div>
+
+                <div
+                    class="payment-method"
+                    id="paymentMethod"
+                >
+                    -
+                </div>
+
+            </div>
+
+            <div class="paid">
+                ✓ PAID
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            Thank you for visiting
+            <strong id="footerBusiness">
+                Glamour Studio
+            </strong>.
+
+            <br>
+
+            We look forward to seeing you again.
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+
+    <div
+        id="actions"
+        class="actions"
+        style="display:none;"
+    >
+
+        <button
+            class="action-btn whatsapp-btn"
+            id="whatsappBtn"
+        >
+            💬 Send on WhatsApp
+        </button>
+
+        <button
+            class="action-btn print-btn"
+            onclick="window.print()"
+        >
+            🖨 Print / Save PDF
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+<script src="js/invoice.js"></script>
+
+</body>
+
+</html>

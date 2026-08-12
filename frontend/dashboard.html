@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BookFlow Dashboard</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Inter, sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            color: #172033;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 280px;
+            background: #10171d;
+            color: white;
+            padding: 28px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 18px;
+            margin-bottom: 42px;
+        }
+
+        .brand-icon {
+            color: #e98272;
+            font-size: 28px;
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand-sub {
+            color: #e98272;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-top: 3px;
+        }
+ /* ================================
+   ACTIONS DROPDOWN
+================================ */
+
+.action-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-width: 88px;
+    height: 36px;
+
+    padding: 0 13px;
+
+    background: #ffffff;
+    color: #334155;
+
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.18s ease;
+}
+
+.action-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.action-btn:active {
+    transform: translateY(1px);
+}
+
+.action-chevron {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.action-wrapper.open .action-chevron {
+    transform: rotate(180deg);
+}
+
+
+/* ================================
+   DROPDOWN
+================================ */
+
+.action-menu {
+    position: absolute;
+
+    top: calc(100% + 7px);
+    right: 0;
+
+    width: 170px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    padding: 5px;
+
+    box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.10),
+        0 2px 6px rgba(15, 23, 42, 0.05);
+
+    z-index: 1000;
+
+    display: none;
+
+    animation: actionMenuIn 0.15s ease;
+}
+
+.action-wrapper.open .action-menu {
+    display: block;
+}
+
+@keyframes actionMenuIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* ================================
+   MENU ITEMS
+================================ */
+
+.action-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 11px;
+
+    border: none;
+    background: transparent;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    color: #334155;
+
+    transition: background 0.15s ease;
+}
+
+.action-item:hover {
+    background: #f8fafc;
+}
+
+
+/* BILL */
+
+.action-item.bill {
+    color: #334155;
+}
+
+.action-item.bill:hover {
+    background: #fff5f2;
+    color: #d96f60;
+}
+
+
+/* CANCEL */
+
+.action-item.cancel {
+    color: #dc4b4b;
+}
+
+.action-item.cancel:hover {
+    background: #fff1f1;
+}
+
+
+/* ICON */
+
+.action-icon {
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+}
+
+.bill .action-icon {
+    background: #fff1ed;
+    color: #e98272;
+}
+
+.cancel .action-icon {
+    background: #fff0f0;
+    color: #dc4b4b;
+}
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #d9dee5;
+            padding: 15px 20px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .nav a:hover {
+            background: #202830;
+        }
+
+        .nav a.active {
+            background: #e98272;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .whatsapp-box {
+            background: #172027;
+            border: 1px solid #29333c;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        .whatsapp-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .whatsapp-status {
+            color: #4ade80;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .logout {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 9px;
+            background: #202830;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 36px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 25px;
+            color: #121923;
+        }
+        .action-item.delete {
+    color: #dc2626;
+}
+
+.action-item.delete:hover {
+    background: #fef2f2;
+}
+
+        .welcome h1 span {
+            color: #e98272;
+        }
+
+        .welcome p {
+            color: #8993a1;
+            margin-top: 7px;
+            font-size: 13px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .date-btn,
+        .refresh-btn {
+            border: 1px solid #dce1e7;
+            background: white;
+            padding: 12px 17px;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        .refresh-btn {
+            background: #e98272;
+            border: none;
+            color: white;
+        }
+
+        /* ================= KPI ================= */
+
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .kpi {
+            background: white;
+            border: 1px solid #dfe4e9;
+            border-radius: 13px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-height: 125px;
+        }
+
+        .kpi-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            flex-shrink: 0;
+        }
+
+        .pink {
+            background: #fff0ed;
+            color: #ef7161;
+        }
+
+        .green {
+            background: #eaf8ee;
+            color: #30ad69;
+        }
+
+        .purple {
+            background: #f0eaff;
+            color: #8362dc;
+        }
+
+        .yellow {
+            background: #fff4df;
+            color: #d99b28;
+        }
+
+        .kpi-label {
+            color: #718096;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .kpi-value {
+            font-size: 29px;
+            font-weight: 700;
+            color: #121923;
+        }
+
+        .kpi-sub {
+            color: #38a169;
+            font-size: 10px;
+            margin-top: 6px;
+        }
+
+        .kpi-muted {
+            color: #98a1ad;
+            font-size: 10px;
+            margin-top: 6px;
+        }
+
+        /* ================= CONTENT GRID ================= */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 3fr) minmax(300px, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #dfe4e9;
+            border-radius: 13px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9e7e3;
+            color: #c86658;
+            border-radius: 20px;
+            min-width: 23px;
+            height: 21px;
+            font-size: 10px;
+            margin-left: 6px;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-tools {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search {
+            width: 260px;
+            border: 1px solid #dce1e7;
+            border-radius: 9px;
+            padding: 10px 13px;
+            outline: none;
+        }
+
+        .filter-btn {
+            border: 1px solid #dce1e7;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+        .filter-wrapper {
+    position: relative;
+}
+
+.filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.filter-chevron {
+    font-size: 11px;
+    margin-left: 3px;
+    transition: .2s;
+}
+
+.filter-wrapper.open .filter-chevron {
+    transform: rotate(180deg);
+}
+
+.filter-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+
+    width: 180px;
+
+    background: #ffffff;
+
+    border: 1px solid #dce1e7;
+    border-radius: 10px;
+
+    padding: 6px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, .12);
+
+    z-index: 1000;
+
+    display: none;
+}
+
+.filter-wrapper.open .filter-menu {
+    display: block;
+}
+
+.filter-menu button {
+    width: 100%;
+
+    border: none;
+    background: transparent;
+
+    padding: 9px 11px;
+
+    text-align: left;
+
+    border-radius: 7px;
+
+    color: #334155;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: .15s;
+}
+
+.filter-menu button:hover {
+    background: #fff1ed;
+    color: #d96f60;
+}
+
+.filter-menu button.active {
+    background: #fff0ed;
+    color: #d96f60;
+    font-weight: 700;
+}
+
+.filter-divider {
+    height: 1px;
+    background: #edf0f3;
+    margin: 5px 4px;
+}
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #fbfcfd;
+            color: #718096;
+            font-size: 10px;
+            font-weight: 600;
+            text-align: left;
+            padding: 13px 16px;
+            border-top: 1px solid #e7ebef;
+            border-bottom: 1px solid #e7ebef;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #edf0f3;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        tr:hover {
+            background: #fafbfc;
+        }
+
+        .customer {
+            font-weight: 600;
+            color: #172033;
+        }
+
+        .service-tag {
+            background: #fff0ed;
+            color: #c76558;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .status {
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .status-confirmed {
+            background: #eaf8ee;
+            color: #24945a;
+        }
+
+        .status-pending {
+            background: #fff4df;
+            color: #c48517;
+        }
+
+        .status-cancelled {
+            background: #ffe9e9;
+            color: #d94b4b;
+        }
+
+        .cancel-btn,
+        .restore-btn {
+            border: none;
+            border-radius: 7px;
+            padding: 6px 9px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .cancel-btn {
+            background: #ffe8e5;
+            color: #d65d50;
+        }
+
+        .restore-btn {
+            background: #e6f8ec;
+            color: #229957;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px;
+            color: #98a1ad;
+        }
+
+        /* ================= RIGHT COLUMN ================= */
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .appointments {
+            padding-bottom: 5px;
+        }
+
+        .appointment {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 17px;
+            border-top: 1px solid #edf0f3;
+        }
+
+        .appointment-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ed7770;
+        }
+
+        .appointment-time {
+            width: 60px;
+            font-size: 10px;
+            color: #596273;
+        }
+
+        .appointment-info {
+            flex: 1;
+        }
+
+        .appointment-name {
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .appointment-service {
+            color: #8993a1;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        .arrow {
+            color: #9ca3af;
+        }
+
+        /* ================= CHARTS ================= */
+
+        .chart-card {
+            margin-top: 18px;
+        }
+
+        .chart-container {
+            height: 280px;
+            padding: 0 18px 18px;
+        }
+
+        .chart-container-small {
+            height: 250px;
+            padding: 0 18px 18px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width:1200px) {
+            .kpis {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:800px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 10px;
+            }
+
+            .brand-name,
+            .brand-sub,
+            .nav a span:not(.nav-icon),
+            .whatsapp-box,
+            .logout {
+                display: none;
+            }
+
+            .brand {
+                padding: 0;
+                justify-content: center;
+            }
+
+            .nav a {
+                justify-content: center;
+                padding: 14px;
+            }
+
+            .main {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+                padding: 20px;
+            }
+
+            .kpis {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .search {
+                width: 100%;
+            }
+
+            .table-tools {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="brand-icon">✦</div>
+
+                <div>
+                    <div class="brand-name" id="sidebarBusinessName">
+                        Glamour Studio
+                    </div>
+
+                    <div class="brand-sub">
+                        AI RECEPTIONIST
+                    </div>
+                </div>
+            </div>
+
+            <nav class="nav">
+
+                <a class="active">
+                    <span class="nav-icon">▦</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a>
+                    <span class="nav-icon">□</span>
+                    <span>Appointments</span>
+                </a>
+
+                <a>
+                    <span class="nav-icon">▤</span>
+                    <span>Calendar</span>
+                </a>
+
+                <a>
+                    <span class="nav-icon">◉</span>
+                    <span>Customers</span>
+                </a>
+
+                <a href="services.html">
+    <span class="nav-icon">◇</span>
+    <span>Services</span>
+</a>
+
+                <a>
+                    <span class="nav-icon">♧</span>
+                    <span>Staff</span>
+                </a>
+
+                <a>
+                    <span class="nav-icon">▥</span>
+                    <span>Analytics</span>
+                </a>
+
+                <a href="settings.html">
+    <span class="nav-icon">⚙</span>
+    <span>Settings</span>
+</a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <div class="whatsapp-box">
+                    <div class="whatsapp-title">
+                        🟢 WhatsApp Connected
+                    </div>
+
+                    <div class="whatsapp-status">
+                        ● Live & Receiving
+                    </div>
+                </div>
+
+                <button id="logoutBtn" class="logout">
+                    Logout
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================= MAIN ================= -->
+
+        <main class="main">
+
+            <!-- TOP -->
+
+            <div class="topbar">
+
+                <div class="welcome">
+
+                    <h1>
+                        Welcome,
+                        <span id="businessNameTop">
+                            Admin
+                        </span>
+                        👋
+                    </h1>
+
+                    <p>
+                        Here's what's happening with your bookings today.
+                    </p>
+
+                </div>
+
+                <div class="top-actions">
+
+                    <button class="date-btn" id="dateBtn">
+                        ▣
+                        <span id="currentDate"></span>
+                        ˅
+                    </button>
+
+                    <button class="refresh-btn" id="refreshBtn">
+                        ↻ &nbsp; Refresh
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= KPI ================= -->
+
+            <div class="kpis">
+
+                <div class="kpi">
+
+                    <div class="kpi-icon pink">
+                        ▣
+                    </div>
+
+                    <div>
+                        <div class="kpi-label">
+                            Total Bookings
+                        </div>
+
+                        <div class="kpi-value" id="totalBookings">
+                            0
+                        </div>
+
+                        <div class="kpi-sub">
+                            ↑ Booking activity
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi">
+
+                    <div class="kpi-icon green">
+                        ✧
+                    </div>
+
+                    <div>
+                        <div class="kpi-label">
+                            Today's Bookings
+                        </div>
+
+                        <div class="kpi-value" id="todayBookings">
+                            0
+                        </div>
+
+                        <div class="kpi-sub">
+                            ↑ Today's activity
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi">
+
+                    <div class="kpi-icon purple">
+                        ◷
+                    </div>
+
+                    <div>
+                        <div class="kpi-label">
+                            Upcoming Bookings
+                        </div>
+
+                        <div class="kpi-value" id="upcomingBookings">
+                            0
+                        </div>
+
+                        <div class="kpi-muted">
+                            Future appointments
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi">
+
+                    <div class="kpi-icon yellow">
+                        ♙
+                    </div>
+
+                    <div>
+                        <div class="kpi-label">
+                            Most Popular
+                        </div>
+
+                        <div class="kpi-value" id="mostPopular">
+                            -
+                        </div>
+
+                        <div class="kpi-muted">
+                            Most booked service
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= GRID ================= -->
+
+            <div class="dashboard-grid">
+
+                <!-- LEFT -->
+
+                <div>
+
+                    <!-- BOOKINGS -->
+
+                    <div class="card">
+
+                        <div class="card-header">
+
+                            <div class="card-title">
+                                All Appointments
+                                <span class="count" id="bookingCount">
+                                    0
+                                </span>
+                            </div>
+
+                            <div class="table-tools">
+
+                                <input
+                                    class="search"
+                                    id="searchInput"
+                                    placeholder="Search customer or phone..."
+                                >
+
+                                <div class="filter-wrapper">
+
+    <button
+        class="filter-btn"
+        id="filterBtn"
+        type="button"
+    >
+        ♢ &nbsp; Filter
+        <span class="filter-chevron">⌄</span>
+    </button>
+
+    <div
+        class="filter-menu"
+        id="filterMenu"
+    >
+
+        <button data-filter="all">
+            All bookings
+        </button>
+
+        <button data-filter="today">
+            Today
+        </button>
+
+        <button data-filter="yesterday">
+            Yesterday
+        </button>
+
+        <button data-filter="tomorrow">
+            Tomorrow
+        </button>
+
+        <button data-filter="upcoming">
+            Upcoming
+        </button>
+
+        <button data-filter="past">
+            Past
+        </button>
+
+        <div class="filter-divider"></div>
+
+        <button data-filter="cancelled">
+            Cancelled
+        </button>
+
+    </div>
+
+</div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            <table>
+
+                                <thead>
+
+                                    <tr>
+                                        <th>#</th>
+                                        <th>CUSTOMER</th>
+                                        <th>PHONE</th>
+                                        <th>SERVICE</th>
+                                        <th>STAFF</th>
+                                        <th>DATE</th>
+                                        <th>TIME SLOT</th>
+                                        <th>STATUS</th>
+                                        <th>ACTIONS</th>
+                                        
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="bookingTable">
+
+                                    <tr>
+                                        <td colspan="8" class="empty">
+                                            Loading bookings...
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BOOKING CHART -->
+
+                    <div class="card chart-card">
+
+                        <div class="card-header">
+
+                            <div class="card-title">
+                                Bookings Overview
+                            </div>
+
+                            <select id="chartPeriod"
+                                style="border:1px solid #dce1e7;padding:8px 12px;border-radius:8px;background:white;">
+                                <option>This Week</option>
+                                <option>This Month</option>
+                            </select>
+
+                        </div>
+
+                        <div class="chart-container">
+
+                            <canvas id="bookingChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- REVENUE -->
+
+                    <div class="card chart-card">
+
+                        <div class="card-header">
+
+                            <div class="card-title">
+                                Revenue Trend
+                            </div>
+
+                        </div>
+
+                        <div class="chart-container">
+
+                            <canvas id="revenueChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RIGHT -->
+
+                <div class="right-column">
+
+
+                    <!-- TODAY -->
+
+                    <div class="card">
+
+                        <div class="card-header">
+
+                            <div class="card-title">
+                                Today's Appointments
+
+                                <span class="count" id="todayAppointmentCount">
+                                    0
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="appointments"
+                            id="todayAppointments">
+
+                            <div class="empty">
+                                Loading...
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SERVICES -->
+
+                    <div class="card">
+
+                        <div class="card-header">
+
+                            <div class="card-title">
+                                Popular Services
+                            </div>
+
+                            <span>•</span>
+
+                        </div>
+
+                        <div class="chart-container-small">
+
+                            <canvas id="serviceChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="card">
+
+                        <div class="card-header">
+
+                            <div class="card-title">
+                                Booking Status
+                            </div>
+
+                        </div>
+
+                        <div class="chart-container-small">
+
+                            <canvas id="statusChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- ================= LIBRARIES ================= -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="js/supabase.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="js/auth.js"></script>
+
+
+    <!-- ================= DASHBOARD LIVE LOGIC ================= -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const dateElement =
+                document.getElementById("currentDate");
+
+            const now = new Date();
+
+            dateElement.textContent =
+                now.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric"
+                });
+
+
+            document
+                .getElementById("refreshBtn")
+                ?.addEventListener("click", function () {
+
+                    if (typeof loadBookings === "function") {
+                        loadBookings();
+                    }
+
+                });
+
+        });
+        async function markAdvancePaid(bookingId, amount = 500) {
+
+    const confirmed =
+        confirm(
+            `Mark ₹${amount} advance as paid?`
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/mark-advance-paid",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        bookingId:
+                            bookingId,
+
+                        amount:
+                            amount,
+
+                        paymentMethod:
+                            "UPI"
+
+                    })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.error ||
+                "Payment update failed."
+            );
+
+        }
+
+
+        alert(
+            `₹${amount} advance marked as paid. Booking confirmed.`
+        );
+
+
+        if (
+            typeof loadBookings ===
+            "function"
+        ) {
+
+            await loadBookings();
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Advance payment error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to update payment."
+        );
+
+    }
+
+}
+
+    </script>
+
+</body>
+
+</html>

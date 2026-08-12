@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BookFlow | Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+
+background:#0F1117;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+color:white;
+
+}
+
+body::before{
+
+content:"";
+position:absolute;
+width:500px;
+height:500px;
+background:#6D5DF6;
+border-radius:50%;
+filter:blur(140px);
+top:-180px;
+left:-180px;
+opacity:.35;
+
+}
+
+body::after{
+
+content:"";
+position:absolute;
+width:450px;
+height:450px;
+background:#8B5CF6;
+border-radius:50%;
+filter:blur(140px);
+bottom:-180px;
+right:-180px;
+opacity:.35;
+
+}
+
+.card{
+
+width:430px;
+
+background:rgba(23,26,33,.82);
+
+backdrop-filter:blur(18px);
+
+border:1px solid rgba(255,255,255,.08);
+
+border-radius:24px;
+
+padding:45px;
+
+box-shadow:
+0 25px 60px rgba(0,0,0,.45);
+
+position:relative;
+z-index:10;
+
+}
+
+.logo{
+
+width:75px;
+height:75px;
+
+margin:auto;
+
+border-radius:20px;
+
+background:linear-gradient(135deg,#6D5DF6,#8B5CF6);
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+font-size:34px;
+
+margin-bottom:20px;
+
+box-shadow:0 10px 35px rgba(109,93,246,.45);
+
+}
+
+h1{
+
+text-align:center;
+font-size:34px;
+
+}
+
+.subtitle{
+
+text-align:center;
+
+color:#9CA3AF;
+
+margin-top:8px;
+margin-bottom:35px;
+
+font-size:15px;
+
+}
+
+.input{
+
+width:100%;
+
+padding:16px 18px;
+
+border-radius:14px;
+
+background:#11151F;
+
+border:1px solid #2B3240;
+
+color:white;
+
+font-size:15px;
+
+margin-bottom:18px;
+
+transition:.3s;
+
+}
+
+.input:focus{
+
+outline:none;
+
+border-color:#6D5DF6;
+
+box-shadow:0 0 0 4px rgba(109,93,246,.18);
+
+}
+
+.row{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:28px;
+
+font-size:14px;
+
+color:#9CA3AF;
+
+}
+
+.row a{
+
+color:#8B5CF6;
+
+text-decoration:none;
+
+}
+
+button{
+
+width:100%;
+
+padding:16px;
+
+border:none;
+
+border-radius:14px;
+
+font-size:16px;
+
+font-weight:600;
+
+cursor:pointer;
+
+color:white;
+
+background:linear-gradient(135deg,#6D5DF6,#8B5CF6);
+
+transition:.3s;
+
+}
+
+button:hover{
+
+transform:translateY(-2px);
+
+box-shadow:0 15px 35px rgba(109,93,246,.35);
+
+}
+
+.bottom{
+
+margin-top:30px;
+
+text-align:center;
+
+color:#9CA3AF;
+
+}
+
+.bottom a{
+
+text-decoration:none;
+
+color:#8B5CF6;
+
+font-weight:600;
+
+}
+
+.footer{
+
+margin-top:28px;
+
+display:flex;
+
+justify-content:center;
+
+gap:12px;
+
+flex-wrap:wrap;
+
+}
+
+.tag{
+
+padding:8px 14px;
+
+border-radius:999px;
+
+background:#11151F;
+
+border:1px solid #2B3240;
+
+font-size:12px;
+
+color:#9CA3AF;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="logo">
+📅
+</div>
+
+<h1>BookFlow</h1>
+
+<div class="subtitle">
+
+AI-Powered Appointment Management
+
+</div>
+
+<input
+type="email"
+id="email"
+class="input"
+placeholder="Email Address">
+
+<input
+type="password"
+id="password"
+class="input"
+placeholder="Password">
+
+<div class="row">
+
+<label>
+
+<input type="checkbox">
+
+ Remember me
+
+</label>
+
+<a href="#">
+
+Forgot Password?
+
+</a>
+
+</div>
+
+<button id="loginBtn">
+
+Sign In
+
+</button>
+
+<div class="bottom">
+
+Don't have an account?
+
+<a href="register.html">
+
+Create Account
+
+</a>
+
+</div>
+
+<div class="footer">
+
+<div class="tag">
+WhatsApp
+</div>
+
+<div class="tag">
+AI Powered
+</div>
+
+<div class="tag">
+Cloud
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+
+</body>
+</html>

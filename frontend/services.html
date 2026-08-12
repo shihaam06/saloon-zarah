@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Services | BookFlow</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,sans-serif;
+}
+
+body{
+    background:#f5f7fa;
+    color:#0f172a;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:280px;
+    background:#10171d;
+    color:white;
+    padding:28px 18px;
+    position:fixed;
+    inset:0 auto 0 0;
+    display:flex;
+    flex-direction:column;
+}
+
+.logo{
+    padding:0 14px;
+    margin-bottom:42px;
+}
+
+.logo h2{
+    font-size:22px;
+    font-weight:800;
+}
+
+.logo span{
+    color:#ef8172;
+}
+
+.logo small{
+    display:block;
+    margin-top:4px;
+    color:#ef8172;
+    font-size:11px;
+    letter-spacing:.8px;
+}
+
+nav{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+nav a{
+    text-decoration:none;
+    color:#d8dee5;
+    padding:13px 16px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:500;
+}
+
+nav a:hover{
+    background:#1c252d;
+}
+
+nav a.active{
+    background:#e98272;
+    color:white;
+}
+
+.bottom{
+    margin-top:auto;
+}
+
+.whatsapp{
+    border:1px solid #293640;
+    background:#151f27;
+    border-radius:14px;
+    padding:15px;
+}
+
+.whatsapp strong{
+    display:block;
+    margin-bottom:5px;
+}
+
+.whatsapp small{
+    color:#22c55e;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:280px;
+    width:calc(100% - 280px);
+    padding:38px 40px;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+.page-header h1{
+    font-size:28px;
+}
+
+.page-header p{
+    color:#64748b;
+    margin-top:7px;
+    font-size:14px;
+}
+
+.add-btn{
+    border:none;
+    background:#e98272;
+    color:white;
+    padding:12px 20px;
+    border-radius:9px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.add-btn:hover{
+    background:#d96f60;
+}
+
+/* TOOLBAR */
+
+.toolbar{
+    background:white;
+    border:1px solid #dce2e8;
+    border-radius:14px;
+    padding:16px;
+    display:flex;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.search{
+    flex:1;
+    border:1px solid #d7dee6;
+    border-radius:8px;
+    padding:11px 13px;
+    outline:none;
+}
+
+.search:focus{
+    border-color:#e98272;
+}
+
+.filter{
+    border:1px solid #d7dee6;
+    background:white;
+    border-radius:8px;
+    padding:0 15px;
+    cursor:pointer;
+}
+
+/* TABLE */
+
+.card{
+    background:white;
+    border:1px solid #dce2e8;
+    border-radius:14px;
+    overflow:hidden;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+    background:#fafbfc;
+}
+
+th{
+    text-align:left;
+    padding:15px 18px;
+    font-size:11px;
+    color:#64748b;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    border-bottom:1px solid #e2e8f0;
+}
+
+td{
+    padding:17px 18px;
+    border-bottom:1px solid #edf0f3;
+    font-size:13px;
+}
+
+tbody tr:hover{
+    background:#fcfcfd;
+}
+
+.name{
+    font-weight:600;
+}
+
+.type-badge{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+}
+
+.service{
+    background:#fff0ed;
+    color:#e46f60;
+}
+
+.product{
+    background:#f0ebff;
+    color:#7258d9;
+}
+
+.gst{
+    color:#15803d;
+    background:#ecfdf3;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+}
+
+.status{
+    color:#15803d;
+    background:#ecfdf3;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+}
+
+.status.inactive{
+    color:#64748b;
+    background:#f1f5f9;
+}
+
+.actions{
+    display:flex;
+    gap:7px;
+}
+
+.action-btn{
+    border:1px solid #d7dee6;
+    background:white;
+    padding:7px 10px;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:11px;
+}
+
+.action-btn:hover{
+    background:#f8fafc;
+}
+
+.delete-btn{
+    color:#dc2626;
+}
+
+/* EMPTY */
+
+.empty{
+    padding:60px 20px;
+    text-align:center;
+    color:#94a3b8;
+}
+
+/* MODAL */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.45);
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:520px;
+    max-width:calc(100% - 30px);
+    background:white;
+    border-radius:15px;
+    padding:26px;
+    box-shadow:0 20px 50px rgba(0,0,0,.15);
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
+}
+
+.modal-header h2{
+    font-size:19px;
+}
+
+.close{
+    border:none;
+    background:none;
+    font-size:22px;
+    cursor:pointer;
+    color:#64748b;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.form-group.full{
+    grid-column:1 / -1;
+}
+
+label{
+    font-size:12px;
+    font-weight:600;
+    color:#475569;
+}
+
+input,
+select{
+    width:100%;
+    border:1px solid #d7dee6;
+    padding:11px 12px;
+    border-radius:8px;
+    outline:none;
+    font-size:13px;
+}
+
+input:focus,
+select:focus{
+    border-color:#e98272;
+    box-shadow:0 0 0 3px rgba(233,130,114,.1);
+}
+
+.modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:25px;
+}
+
+.cancel-btn{
+    border:1px solid #d7dee6;
+    background:white;
+    padding:11px 18px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.save-btn{
+    border:none;
+    background:#e98272;
+    color:white;
+    padding:11px 20px;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.save-btn:hover{
+    background:#d96f60;
+}
+
+.message{
+    margin-top:15px;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:12px;
+    display:none;
+}
+
+.message.success{
+    display:block;
+    color:#15803d;
+    background:#ecfdf3;
+}
+
+.message.error{
+    display:block;
+    color:#dc2626;
+    background:#fff1f2;
+}
+
+@media(max-width:900px){
+
+    .sidebar{
+        width:220px;
+    }
+
+    .main{
+        margin-left:220px;
+        width:calc(100% - 220px);
+        padding:25px;
+    }
+
+}
+
+@media(max-width:700px){
+
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+        margin-left:0;
+        width:100%;
+        padding:20px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-group.full{
+        grid-column:auto;
+    }
+
+    .toolbar{
+        flex-direction:column;
+    }
+
+    .table-wrap{
+        overflow-x:auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<aside class="sidebar">
+
+    <div class="logo">
+        <h2>✦ <span id="businessNameSide">abcdef</span></h2>
+        <small>AI RECEPTIONIST</small>
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">▦ &nbsp; Dashboard</a>
+        <a href="appointments.html">▣ &nbsp; Appointments</a>
+        <a href="calendar.html">▤ &nbsp; Calendar</a>
+        <a href="customers.html">◉ &nbsp; Customers</a>
+        <a href="services.html" class="active">♢ &nbsp; Services</a>
+        <a href="staff.html">♧ &nbsp; Staff</a>
+        <a href="analytics.html">▥ &nbsp; Analytics</a>
+        <a href="settings.html">⚙ &nbsp; Settings</a>
+
+    </nav>
+
+    <div class="bottom">
+        <div class="whatsapp">
+            <strong>🟢 WhatsApp Connected</strong>
+            <small>● Live & Receiving</small>
+        </div>
+    </div>
+
+</aside>
+
+
+<main class="main">
+
+    <div class="page-header">
+
+        <div>
+            <h1>Services & Products</h1>
+            <p>Manage your salon services, products and GST settings.</p>
+        </div>
+
+        <button
+            class="add-btn"
+            id="addBtn"
+        >
+            + Add Service
+        </button>
+
+    </div>
+
+
+    <div class="toolbar">
+
+        <input
+            id="search"
+            class="search"
+            type="text"
+            placeholder="Search service or product..."
+        >
+
+        <select
+            id="filter"
+            class="filter"
+        >
+            <option value="all">All</option>
+            <option value="service">Services</option>
+            <option value="product">Products</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>GST</th>
+                        <th>HSN / SAC</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="servicesTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div
+            id="empty"
+            class="empty"
+            style="display:none;"
+        >
+            No services or products found.
+        </div>
+
+    </div>
+
+</main>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div
+    class="modal"
+    id="modal"
+>
+
+<div class="modal-box">
+
+    <div class="modal-header">
+
+        <h2 id="modalTitle">
+            Add Service
+        </h2>
+
+        <button
+            class="close"
+            id="closeModal"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <div class="form-grid">
+
+        <div class="form-group full">
+
+            <label>
+                Name
+            </label>
+
+            <input
+                id="name"
+                type="text"
+                placeholder="e.g. Haircut"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Type
+            </label>
+
+            <select id="itemType">
+
+                <option value="service">
+                    Service
+                </option>
+
+                <option value="product">
+                    Product
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Price
+            </label>
+
+            <input
+                id="price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="400"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                HSN / SAC
+            </label>
+
+            <input
+                id="hsnSac"
+                type="text"
+                placeholder="Enter HSN / SAC"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                GST Rate
+            </label>
+
+            <select id="gstRate">
+
+                <option value="0">0%</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18">18%</option>
+                <option value="28">28%</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="message"
+        class="message"
+    ></div>
+
+
+    <div class="modal-actions">
+
+        <button
+            class="cancel-btn"
+            id="cancelBtn"
+        >
+            Cancel
+        </button>
+
+        <button
+            class="save-btn"
+            id="saveServiceBtn"
+        >
+            Save Service
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function(){
+
+        const client = window.client;
+
+        let currentUser = null;
+
+        let editingId = null;
+
+        let allServices = [];
+
+
+        const modal =
+            document.getElementById("modal");
+
+        const table =
+            document.getElementById("servicesTable");
+
+        const empty =
+            document.getElementById("empty");
+
+        const search =
+            document.getElementById("search");
+
+        const filter =
+            document.getElementById("filter");
+
+
+        /* =========================
+           USER
+        ========================= */
+
+        async function getUser(){
+
+            const {
+                data,
+                error
+            } =
+                await client.auth.getUser();
+
+            if(error || !data.user){
+
+                throw new Error(
+                    "User not logged in."
+                );
+
+            }
+
+            currentUser = data.user;
+
+        }
+
+
+        /* =========================
+           LOAD BUSINESS NAME
+        ========================= */
+
+        async function loadProfile(){
+
+            const {
+                data
+            } =
+                await client
+                    .from("profiles")
+                    .select("business_name")
+                    .eq(
+                        "id",
+                        currentUser.id
+                    )
+                    .single();
+
+            if(data){
+
+                document
+                    .getElementById(
+                        "businessNameSide"
+                    )
+                    .textContent =
+                    data.business_name ||
+                    "abcdef";
+
+            }
+
+        }
+
+
+        /* =========================
+           LOAD SERVICES
+        ========================= */
+
+        async function loadServices(){
+
+            const {
+                data,
+                error
+            } =
+                await client
+                    .from("services")
+                    .select("*")
+                    .eq(
+                        "profile_id",
+                        currentUser.id
+                    )
+                    .order(
+                        "created_at",
+                        {
+                            ascending:false
+                        }
+                    );
+
+
+            if(error){
+
+                console.error(error);
+
+                return;
+
+            }
+
+
+            allServices = data || [];
+
+            render();
+
+        }
+
+
+        /* =========================
+           RENDER
+        ========================= */
+
+        function render(){
+
+            const query =
+                search
+                    .value
+                    .toLowerCase()
+                    .trim();
+
+            const selectedFilter =
+                filter.value;
+
+
+            const filtered =
+                allServices.filter(
+                    item => {
+
+                        const matchesSearch =
+                            item.name
+                                .toLowerCase()
+                                .includes(query);
+
+
+                        let matchesFilter = true;
+
+
+                        if(
+                            selectedFilter ===
+                            "service"
+                        ){
+
+                            matchesFilter =
+                                item.item_type ===
+                                "service";
+
+                        }
+
+
+                        if(
+                            selectedFilter ===
+                            "product"
+                        ){
+
+                            matchesFilter =
+                                item.item_type ===
+                                "product";
+
+                        }
+
+
+                        if(
+                            selectedFilter ===
+                            "active"
+                        ){
+
+                            matchesFilter =
+                                item.active === true;
+
+                        }
+
+
+                        if(
+                            selectedFilter ===
+                            "inactive"
+                        ){
+
+                            matchesFilter =
+                                item.active === false;
+
+                        }
+
+
+                        return (
+                            matchesSearch &&
+                            matchesFilter
+                        );
+
+                    }
+                );
+
+
+            table.innerHTML = "";
+
+
+            if(filtered.length === 0){
+
+                empty.style.display =
+                    "block";
+
+                return;
+
+            }
+
+
+            empty.style.display =
+                "none";
+
+
+            filtered.forEach(
+                item => {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            <span class="name">
+                                ${escapeHtml(item.name)}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="type-badge ${
+                                item.item_type ===
+                                "product"
+                                ? "product"
+                                : "service"
+                            }">
+                                ${
+                                    item.item_type ===
+                                    "product"
+                                    ? "Product"
+                                    : "Service"
+                                }
+                            </span>
+                        </td>
+
+                        <td>
+                            ₹${Number(
+                                item.price || 0
+                            ).toLocaleString(
+                                "en-IN",
+                                {
+                                    minimumFractionDigits:2
+                                }
+                            )}
+                        </td>
+
+                        <td>
+                            <span class="gst">
+                                ${Number(
+                                    item.gst_rate || 0
+                                )}%
+                            </span>
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                item.hsn_sac ||
+                                "—"
+                            )}
+                        </td>
+
+                        <td>
+
+                            <span class="status ${
+                                item.active
+                                ? ""
+                                : "inactive"
+                            }">
+
+                                ${
+                                    item.active
+                                    ? "Active"
+                                    : "Inactive"
+                                }
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <div class="actions">
+
+                                <button
+                                    class="action-btn"
+                                    onclick="editService('${item.id}')"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    class="action-btn delete-btn"
+                                    onclick="toggleService('${item.id}', ${item.active})"
+                                >
+                                    ${
+                                        item.active
+                                        ? "Disable"
+                                        : "Enable"
+                                    }
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    `;
+
+
+                    table.appendChild(row);
+
+                }
+            );
+
+        }
+
+
+        /* =========================
+           ADD
+        ========================= */
+
+        document
+            .getElementById("addBtn")
+            .addEventListener(
+                "click",
+                function(){
+
+                    editingId = null;
+
+                    document
+                        .getElementById(
+                            "modalTitle"
+                        )
+                        .textContent =
+                        "Add Service";
+
+
+                    document
+                        .getElementById(
+                            "saveServiceBtn"
+                        )
+                        .textContent =
+                        "Save Service";
+
+
+                    clearForm();
+
+                    modal.classList.add(
+                        "show"
+                    );
+
+                }
+            );
+
+
+        /* =========================
+           EDIT
+        ========================= */
+
+        window.editService =
+            function(id){
+
+                const item =
+                    allServices.find(
+                        x => x.id === id
+                    );
+
+
+                if(!item){
+
+                    return;
+
+                }
+
+
+                editingId = id;
+
+
+                document
+                    .getElementById(
+                        "modalTitle"
+                    )
+                    .textContent =
+                    "Edit Service";
+
+
+                document
+                    .getElementById(
+                        "saveServiceBtn"
+                    )
+                    .textContent =
+                    "Save Changes";
+
+
+                document
+                    .getElementById(
+                        "name"
+                    )
+                    .value =
+                    item.name || "";
+
+
+                document
+                    .getElementById(
+                        "itemType"
+                    )
+                    .value =
+                    item.item_type || "service";
+
+
+                document
+                    .getElementById(
+                        "price"
+                    )
+                    .value =
+                    item.price || 0;
+
+
+                document
+                    .getElementById(
+                        "hsnSac"
+                    )
+                    .value =
+                    item.hsn_sac || "";
+
+
+                document
+                    .getElementById(
+                        "gstRate"
+                    )
+                    .value =
+                    item.gst_rate || 0;
+
+
+                modal.classList.add(
+                    "show"
+                );
+
+            };
+
+
+        /* =========================
+           SAVE
+        ========================= */
+
+        document
+            .getElementById(
+                "saveServiceBtn"
+            )
+            .addEventListener(
+                "click",
+                async function(){
+
+                    const name =
+                        document
+                            .getElementById(
+                                "name"
+                            )
+                            .value
+                            .trim();
+
+
+                    const itemType =
+                        document
+                            .getElementById(
+                                "itemType"
+                            )
+                            .value;
+
+
+                    const price =
+                        Number(
+                            document
+                                .getElementById(
+                                    "price"
+                                )
+                                .value
+                        );
+
+
+                    const hsnSac =
+                        document
+                            .getElementById(
+                                "hsnSac"
+                            )
+                            .value
+                            .trim();
+
+
+                    const gstRate =
+                        Number(
+                            document
+                                .getElementById(
+                                    "gstRate"
+                                )
+                                .value
+                        );
+
+
+                    if(!name){
+
+                        showMessage(
+                            "Please enter a name.",
+                            "error"
+                        );
+
+                        return;
+
+                    }
+
+
+                    if(
+                        isNaN(price) ||
+                        price < 0
+                    ){
+
+                        showMessage(
+                            "Please enter a valid price.",
+                            "error"
+                        );
+
+                        return;
+
+                    }
+
+
+                    const payload = {
+
+                        profile_id:
+                            currentUser.id,
+
+                        name:
+
+                            name,
+
+                        item_type:
+                            itemType,
+
+                        price:
+                            price,
+
+                        hsn_sac:
+                            hsnSac || null,
+
+                        gst_rate:
+                            gstRate,
+
+                        active:
+                            true
+
+                    };
+
+
+                    const button =
+                        document
+                            .getElementById(
+                                "saveServiceBtn"
+                            );
+
+
+                    button.disabled =
+                        true;
+
+                    button.textContent =
+                        "Saving...";
+
+
+                    try{
+
+                        let error;
+
+
+                        if(editingId){
+
+                            const result =
+                                await client
+                                    .from(
+                                        "services"
+                                    )
+                                    .update(
+                                        payload
+                                    )
+                                    .eq(
+                                        "id",
+                                        editingId
+                                    );
+
+                            error =
+                                result.error;
+
+                        }
+                        else{
+
+                            const result =
+                                await client
+                                    .from(
+                                        "services"
+                                    )
+                                    .insert(
+                                        payload
+                                    );
+
+                            error =
+                                result.error;
+
+                        }
+
+
+                        if(error){
+
+                            throw error;
+
+                        }
+
+
+                        closeModal();
+
+                        await loadServices();
+
+                    }
+                    catch(error){
+
+                        console.error(
+                            error
+                        );
+
+                        showMessage(
+                            error.message ||
+                            "Could not save.",
+                            "error"
+                        );
+
+                    }
+                    finally{
+
+                        button.disabled =
+                            false;
+
+                        button.textContent =
+                            editingId
+                            ? "Save Changes"
+                            : "Save Service";
+
+                    }
+
+                }
+            );
+
+
+        /* =========================
+           ENABLE / DISABLE
+        ========================= */
+
+        window.toggleService =
+            async function(
+                id,
+                currentStatus
+            ){
+
+                const {
+                    error
+                } =
+                    await client
+                        .from("services")
+                        .update({
+                            active:
+                                !currentStatus
+                        })
+                        .eq("id", id)
+.eq("profile_id", currentUser.id)
+
+
+                if(error){
+
+                    console.error(error);
+
+                    alert(
+                        "Could not update service."
+                    );
+
+                    return;
+
+                }
+
+
+                await loadServices();
+
+            };
+
+
+        /* =========================
+           MODAL
+        ========================= */
+
+        function clearForm(){
+
+            document
+                .getElementById("name")
+                .value = "";
+
+            document
+                .getElementById("itemType")
+                .value = "service";
+
+            document
+                .getElementById("price")
+                .value = "";
+
+            document
+                .getElementById("hsnSac")
+                .value = "";
+
+            document
+                .getElementById("gstRate")
+                .value = "0";
+
+        }
+
+
+        function closeModal(){
+
+            modal.classList.remove(
+                "show"
+            );
+
+            editingId = null;
+
+        }
+
+
+        document
+            .getElementById(
+                "closeModal"
+            )
+            .addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        document
+            .getElementById(
+                "cancelBtn"
+            )
+            .addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        modal.addEventListener(
+            "click",
+            function(e){
+
+                if(e.target === modal){
+
+                    closeModal();
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           SEARCH / FILTER
+        ========================= */
+
+        search.addEventListener(
+            "input",
+            render
+        );
+
+        filter.addEventListener(
+            "change",
+            render
+        );
+
+
+        /* =========================
+           SECURITY
+        ========================= */
+
+        function escapeHtml(value){
+
+            return String(value)
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        }
+
+
+        function showMessage(
+            text,
+            type
+        ){
+
+            const message =
+                document
+                    .getElementById(
+                        "message"
+                    );
+
+            message.textContent =
+                text;
+
+            message.className =
+                "message " + type;
+
+        }
+
+
+        /* =========================
+           START
+        ========================= */
+
+        try{
+
+            await getUser();
+
+            await loadProfile();
+
+            await loadServices();
+
+        }
+        catch(error){
+
+            console.error(error);
+
+            alert(
+                "Please login first."
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>

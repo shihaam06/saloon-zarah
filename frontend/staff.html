@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Staff | Zarah Elite</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Inter, sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            color: #172033;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 280px;
+            background: #10171d;
+            color: white;
+            padding: 28px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 18px;
+            margin-bottom: 42px;
+        }
+
+        .brand-icon {
+            color: #e98272;
+            font-size: 28px;
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand-sub {
+            color: #e98272;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-top: 3px;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #d9dee5;
+            padding: 15px 20px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .nav a:hover {
+            background: #202830;
+        }
+
+        .nav a.active {
+            background: #e98272;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .whatsapp-box {
+            background: #172027;
+            border: 1px solid #29333c;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        .whatsapp-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .whatsapp-status {
+            color: #4ade80;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .logout {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 9px;
+            background: #202830;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 36px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 25px;
+            color: #121923;
+        }
+
+        .welcome h1 span {
+            color: #e98272;
+        }
+
+        .welcome p {
+            color: #8993a1;
+            margin-top: 7px;
+            font-size: 13px;
+        }
+
+        .add-btn {
+            background: #e98272;
+            border: none;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .add-btn:hover {
+            opacity: .92;
+        }
+
+        /* ================= CARD ================= */
+
+        .card {
+            background: white;
+            border: 1px solid #dfe4e9;
+            border-radius: 13px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9e7e3;
+            color: #c86658;
+            border-radius: 20px;
+            min-width: 23px;
+            height: 21px;
+            font-size: 10px;
+            margin-left: 6px;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #fbfcfd;
+            color: #718096;
+            font-size: 10px;
+            font-weight: 600;
+            text-align: left;
+            padding: 13px 16px;
+            border-top: 1px solid #e7ebef;
+            border-bottom: 1px solid #e7ebef;
+        }
+
+        td {
+            padding: 15px 16px;
+            border-bottom: 1px solid #edf0f3;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        tr:hover {
+            background: #fafbfc;
+        }
+
+        .staff-name {
+            font-weight: 700;
+            color: #172033;
+        }
+
+        .role {
+            color: #718096;
+        }
+
+        .status {
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .active-status {
+            background: #eaf8ee;
+            color: #24945a;
+        }
+
+        .inactive-status {
+            background: #ffe9e9;
+            color: #d94b4b;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .edit-btn,
+        .toggle-btn,
+        .delete-btn {
+            border: none;
+            border-radius: 7px;
+            padding: 7px 10px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .edit-btn {
+            background: #fff0ed;
+            color: #d65d50;
+        }
+
+        .toggle-btn {
+            background: #eaf8ee;
+            color: #229957;
+        }
+
+        .delete-btn {
+            background: #ffe9e9;
+            color: #d94b4b;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 45px;
+            color: #98a1ad;
+        }
+
+        /* ================= MODAL ================= */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 620px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, .18);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #edf0f3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            border: none;
+            background: #f3f4f6;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        .modal-body {
+            padding: 22px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #dce1e7;
+            border-radius: 8px;
+            padding: 0 12px;
+            outline: none;
+            font-size: 12px;
+            color: #334155;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #e98272;
+        }
+
+        .days {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .day {
+            border: 1px solid #dce1e7;
+            background: white;
+            padding: 8px 10px;
+            border-radius: 7px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .day.selected {
+            background: #fff0ed;
+            border-color: #e98272;
+            color: #d65d50;
+            font-weight: 600;
+        }
+
+        .modal-footer {
+            padding: 16px 22px;
+            border-top: 1px solid #edf0f3;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .cancel-modal-btn,
+        .save-btn {
+            border: none;
+            padding: 10px 17px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .cancel-modal-btn {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .save-btn {
+            background: #e98272;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 35px;
+            color: #98a1ad;
+            font-size: 12px;
+        }
+
+        @media(max-width: 800px) {
+
+            .sidebar {
+                width: 80px;
+                padding: 20px 10px;
+            }
+
+            .brand-name,
+            .brand-sub,
+            .nav a span:not(.nav-icon),
+            .whatsapp-box,
+            .logout {
+                display: none;
+            }
+
+            .brand {
+                padding: 0;
+                justify-content: center;
+            }
+
+            .nav a {
+                justify-content: center;
+                padding: 14px;
+            }
+
+            .main {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+                padding: 20px;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ✦
+            </div>
+
+            <div>
+
+                <div
+                    class="brand-name"
+                    id="sidebarBusinessName"
+                >
+                    Zarah Elite
+                </div>
+
+                <div class="brand-sub">
+                    AI RECEPTIONIST
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <a href="dashboard.html">
+                <span class="nav-icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="appointments.html">
+                <span class="nav-icon">□</span>
+                <span>Appointments</span>
+            </a>
+
+            <a href="calendar.html">
+                <span class="nav-icon">▤</span>
+                <span>Calendar</span>
+            </a>
+
+            <a href="customers.html">
+                <span class="nav-icon">◉</span>
+                <span>Customers</span>
+            </a>
+
+            <a href="services.html">
+                <span class="nav-icon">◇</span>
+                <span>Services</span>
+            </a>
+
+            <a class="active">
+                <span class="nav-icon">♧</span>
+                <span>Staff</span>
+            </a>
+
+            <a href="analytics.html">
+                <span class="nav-icon">▥</span>
+                <span>Analytics</span>
+            </a>
+
+            <a href="settings.html">
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="whatsapp-box">
+
+                <div class="whatsapp-title">
+                    🟢 WhatsApp Connected
+                </div>
+
+                <div class="whatsapp-status">
+                    ● Live & Receiving
+                </div>
+
+            </div>
+
+            <button
+                id="logoutBtn"
+                class="logout"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <div class="welcome">
+
+                <h1>
+                    Staff
+                    <span>Management</span>
+                </h1>
+
+                <p>
+                    Manage your salon staff and working schedules.
+                </p>
+
+            </div>
+
+            <button
+                class="add-btn"
+                id="addStaffBtn"
+            >
+                + Add Staff
+            </button>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+
+                    All Staff
+
+                    <span
+                        class="count"
+                        id="staffCount"
+                    >
+                        0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                STAFF
+                            </th>
+
+                            <th>
+                                ROLE
+                            </th>
+
+                            <th>
+                                PHONE
+                            </th>
+
+                            <th>
+                                EMAIL
+                            </th>
+
+                            <th>
+                                WORKING HOURS
+                            </th>
+
+                            <th>
+                                STATUS
+                            </th>
+
+                            <th>
+                                ACTIONS
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="staffTable">
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="loading"
+                            >
+                                Loading staff...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- ================= MODAL ================= -->
+
+<div
+    class="modal-overlay"
+    id="staffModal"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div
+                class="modal-title"
+                id="modalTitle"
+            >
+                Add Staff
+            </div>
+
+            <button
+                class="close-btn"
+                id="closeModalBtn"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="staffName"
+                        placeholder="e.g. Aisha"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Role *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="staffRole"
+                        placeholder="e.g. Hair Stylist"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Phone
+                    </label>
+
+                    <input
+                        type="text"
+                        id="staffPhone"
+                        placeholder="e.g. 9876543210"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="staffEmail"
+                        placeholder="staff@example.com"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Start Time
+                    </label>
+
+                    <input
+                        type="time"
+                        id="staffStartTime"
+                        value="09:00"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        End Time
+                    </label>
+
+                    <input
+                        type="time"
+                        id="staffEndTime"
+                        value="18:00"
+                    >
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label>
+                        Working Days
+                    </label>
+
+                    <div class="days">
+
+                        <button
+                            type="button"
+                            class="day selected"
+                            data-day="Monday"
+                        >
+                            Mon
+                        </button>
+
+                        <button
+                            type="button"
+                            class="day selected"
+                            data-day="Tuesday"
+                        >
+                            Tue
+                        </button>
+
+                        <button
+                            type="button"
+                            class="day selected"
+                            data-day="Wednesday"
+                        >
+                            Wed
+                        </button>
+
+                        <button
+                            type="button"
+                            class="day selected"
+                            data-day="Thursday"
+                        >
+                            Thu
+                        </button>
+
+                        <button
+                            type="button"
+                            class="day selected"
+                            data-day="Friday"
+                        >
+                            Fri
+                        </button>
+
+                        <button
+                            type="button"
+                            class="day selected"
+                            data-day="Saturday"
+                        >
+                            Sat
+                        </button>
+
+                        <button
+                            type="button"
+                            class="day selected"
+                            data-day="Sunday"
+                        >
+                            Sun
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <select id="staffActive">
+
+                        <option value="true">
+                            Active
+                        </option>
+
+                        <option value="false">
+                            Inactive
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                class="cancel-modal-btn"
+                id="cancelModalBtn"
+            >
+                Cancel
+            </button>
+
+            <button
+                class="save-btn"
+                id="saveStaffBtn"
+            >
+                Save Staff
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= LIBRARIES ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+<script src="js/auth.js"></script>
+
+
+<script>
+
+let staffList = [];
+
+let editingStaffId = null;
+
+
+// ==========================================
+// LOAD PROFILE
+// ==========================================
+
+async function loadProfile() {
+
+    const {
+        data: {
+            user
+        }
+    } = await client.auth.getUser();
+
+
+    if (!user) {
+
+        window.location.href =
+            "login.html";
+
+        return null;
+
+    }
+
+
+    const {
+        data,
+        error
+    } = await client
+        .from("profiles")
+        .select("business_name")
+        .eq("id", user.id)
+        .single();
+
+
+    if (!error && data) {
+
+        document.getElementById(
+            "sidebarBusinessName"
+        ).textContent =
+            data.business_name ||
+            "Zarah Elite";
+
+    }
+
+
+    return user;
+
+}
+
+
+// ==========================================
+// LOAD STAFF
+// ==========================================
+
+async function loadStaff() {
+
+    const user =
+        await loadProfile();
+
+
+    if (!user) return;
+
+
+    const {
+        data,
+        error
+    } = await client
+
+        .from("staff")
+
+        .select("*")
+
+        .eq(
+            "profile_id",
+            user.id
+        )
+
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Staff loading error:",
+            error
+        );
+
+        document.getElementById(
+            "staffTable"
+        ).innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="7"
+                    class="empty"
+                >
+                    Unable to load staff.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    staffList =
+        data || [];
+
+
+    renderStaff();
+
+}
+
+
+// ==========================================
+// RENDER STAFF
+// ==========================================
+
+function renderStaff() {
+
+    const table =
+        document.getElementById(
+            "staffTable"
+        );
+
+
+    document.getElementById(
+        "staffCount"
+    ).textContent =
+        staffList.length;
+
+
+    if (!staffList.length) {
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="7"
+                    class="empty"
+                >
+                    No staff added yet.
+                    Click "+ Add Staff" to add your first staff member.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    table.innerHTML =
+        staffList
+            .map(
+                staff => {
+
+                    const workingHours =
+                        staff.start_time &&
+                        staff.end_time
+
+                            ?
+
+                        `${formatTime(staff.start_time)}
+                         - ${formatTime(staff.end_time)}`
+
+                            :
+
+                        "Not set";
+
+
+                    return `
+
+                        <tr>
+
+                            <td>
+
+                                <div class="staff-name">
+                                    ${escapeHtml(staff.name)}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="role">
+                                    ${escapeHtml(staff.role)}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                ${escapeHtml(
+                                    staff.phone || "-"
+                                )}
+
+                            </td>
+
+
+                            <td>
+
+                                ${escapeHtml(
+                                    staff.email || "-"
+                                )}
+
+                            </td>
+
+
+                            <td>
+
+                                ${workingHours}
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="status ${
+                                        staff.active
+                                            ? "active-status"
+                                            : "inactive-status"
+                                    }"
+                                >
+
+                                    ${
+                                        staff.active
+                                            ? "Active"
+                                            : "Inactive"
+                                    }
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="actions">
+
+                                    <button
+                                        class="edit-btn"
+                                        onclick="editStaff('${staff.id}')"
+                                    >
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        class="toggle-btn"
+                                        onclick="toggleStaff('${staff.id}')"
+                                    >
+                                        ${
+                                            staff.active
+                                                ? "Disable"
+                                                : "Enable"
+                                        }
+                                    </button>
+
+                                    <button
+                                        class="delete-btn"
+                                        onclick="deleteStaff('${staff.id}')"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+// ==========================================
+// FORMAT TIME
+// ==========================================
+
+function formatTime(time) {
+
+    if (!time) return "-";
+
+
+    const parts =
+        time.split(":");
+
+
+    const hour =
+        Number(parts[0]);
+
+
+    const minute =
+        parts[1];
+
+
+    const suffix =
+        hour >= 12
+            ? "PM"
+            : "AM";
+
+
+    const displayHour =
+        hour % 12 || 12;
+
+
+    return `${displayHour}:${minute} ${suffix}`;
+
+}
+
+
+// ==========================================
+// OPEN MODAL
+// ==========================================
+
+function openModal(staff = null) {
+
+    editingStaffId =
+        staff?.id || null;
+
+
+    document.getElementById(
+        "modalTitle"
+    ).textContent =
+        staff
+            ? "Edit Staff"
+            : "Add Staff";
+
+
+    document.getElementById(
+        "staffName"
+    ).value =
+        staff?.name || "";
+
+
+    document.getElementById(
+        "staffRole"
+    ).value =
+        staff?.role || "";
+
+
+    document.getElementById(
+        "staffPhone"
+    ).value =
+        staff?.phone || "";
+
+
+    document.getElementById(
+        "staffEmail"
+    ).value =
+        staff?.email || "";
+
+
+    document.getElementById(
+        "staffStartTime"
+    ).value =
+        staff?.start_time
+            ? staff.start_time.substring(0, 5)
+            : "09:00";
+
+
+    document.getElementById(
+        "staffEndTime"
+    ).value =
+        staff?.end_time
+            ? staff.end_time.substring(0, 5)
+            : "18:00";
+
+
+    document.getElementById(
+        "staffActive"
+    ).value =
+        String(
+            staff?.active !== false
+        );
+
+
+    document
+        .querySelectorAll(".day")
+        .forEach(
+            button => {
+
+                button.classList.toggle(
+                    "selected",
+                    staff?.working_days
+                        ? staff.working_days.includes(
+                            button.dataset.day
+                        )
+                        : true
+                );
+
+            }
+        );
+
+
+    document.getElementById(
+        "staffModal"
+    ).classList.add("show");
+
+}
+
+
+// ==========================================
+// CLOSE MODAL
+// ==========================================
+
+function closeModal() {
+
+    document.getElementById(
+        "staffModal"
+    ).classList.remove("show");
+
+    editingStaffId = null;
+
+}
+
+
+// ==========================================
+// ADD STAFF
+// ==========================================
+
+document
+    .getElementById("addStaffBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            openModal();
+
+        }
+    );
+
+
+// ==========================================
+// CLOSE BUTTONS
+// ==========================================
+
+document
+    .getElementById("closeModalBtn")
+    .addEventListener(
+        "click",
+        closeModal
+    );
+
+
+document
+    .getElementById("cancelModalBtn")
+    .addEventListener(
+        "click",
+        closeModal
+    );
+
+
+// ==========================================
+// DAY SELECTION
+// ==========================================
+
+document
+    .querySelectorAll(".day")
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    button.classList.toggle(
+                        "selected"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+// ==========================================
+// SAVE STAFF
+// ==========================================
+
+document
+    .getElementById("saveStaffBtn")
+    .addEventListener(
+        "click",
+        async () => {
+
+            const name =
+                document.getElementById(
+                    "staffName"
+                ).value.trim();
+
+
+            const role =
+                document.getElementById(
+                    "staffRole"
+                ).value.trim();
+
+
+            if (!name) {
+
+                alert(
+                    "Please enter the staff name."
+                );
+
+                return;
+
+            }
+
+
+            if (!role) {
+
+                alert(
+                    "Please enter the staff role."
+                );
+
+                return;
+
+            }
+
+
+            const {
+                data: {
+                    user
+                }
+            } =
+                await client.auth.getUser();
+
+
+            if (!user) {
+
+                alert(
+                    "Session expired."
+                );
+
+                window.location.href =
+                    "login.html";
+
+                return;
+
+            }
+
+
+            const workingDays =
+                Array.from(
+                    document.querySelectorAll(
+                        ".day.selected"
+                    )
+                )
+                .map(
+                    button =>
+                        button.dataset.day
+                );
+
+
+            const staffData = {
+
+                profile_id:
+                    user.id,
+
+                name:
+                    name,
+
+                role:
+                    role,
+
+                phone:
+                    document.getElementById(
+                        "staffPhone"
+                    ).value.trim() || null,
+
+                email:
+                    document.getElementById(
+                        "staffEmail"
+                    ).value.trim() || null,
+
+                working_days:
+                    workingDays,
+
+                start_time:
+                    document.getElementById(
+                        "staffStartTime"
+                    ).value || null,
+
+                end_time:
+                    document.getElementById(
+                        "staffEndTime"
+                    ).value || null,
+
+                active:
+                    document.getElementById(
+                        "staffActive"
+                    ).value === "true"
+
+            };
+
+
+            const saveButton =
+                document.getElementById(
+                    "saveStaffBtn"
+                );
+
+
+            saveButton.disabled =
+                true;
+
+
+            saveButton.textContent =
+                "Saving...";
+
+
+            let result;
+
+
+            if (editingStaffId) {
+
+                result =
+                    await client
+
+                        .from("staff")
+
+                        .update(
+                            staffData
+                        )
+
+                        .eq(
+                            "id",
+                            editingStaffId
+                        )
+
+                        .eq(
+                            "profile_id",
+                            user.id
+                        );
+
+            }
+
+            else {
+
+                result =
+                    await client
+
+                        .from("staff")
+
+                        .insert(
+                            staffData
+                        );
+
+            }
+
+
+            saveButton.disabled =
+                false;
+
+
+            saveButton.textContent =
+                "Save Staff";
+
+
+            if (result.error) {
+
+                console.error(
+                    "Staff save error:",
+                    result.error
+                );
+
+                alert(
+                    "Unable to save staff."
+                );
+
+                return;
+
+            }
+
+
+            closeModal();
+
+            await loadStaff();
+
+        }
+    );
+
+
+// ==========================================
+// EDIT STAFF
+// ==========================================
+
+function editStaff(id) {
+
+    const staff =
+        staffList.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!staff) return;
+
+
+    openModal(staff);
+
+}
+
+
+// ==========================================
+// TOGGLE STAFF
+// ==========================================
+
+async function toggleStaff(id) {
+
+    const staff =
+        staffList.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!staff) return;
+
+
+    const {
+        data: {
+            user
+        }
+    } =
+        await client.auth.getUser();
+
+
+    if (!user) return;
+
+
+    const {
+        error
+    } =
+        await client
+
+            .from("staff")
+
+            .update({
+
+                active:
+                    !staff.active
+
+            })
+
+            .eq(
+                "id",
+                id
+            )
+
+            .eq(
+                "profile_id",
+                user.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        alert(
+            "Unable to update staff."
+        );
+
+        return;
+
+    }
+
+
+    await loadStaff();
+
+}
+
+
+// ==========================================
+// DELETE STAFF
+// ==========================================
+
+async function deleteStaff(id) {
+
+    const staff =
+        staffList.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!staff) return;
+
+
+    const confirmed =
+        confirm(
+            `Delete ${staff.name}?`
+        );
+
+
+    if (!confirmed) return;
+
+
+    const {
+        data: {
+            user
+        }
+    } =
+        await client.auth.getUser();
+
+
+    if (!user) return;
+
+
+    const {
+        error
+    } =
+        await client
+
+            .from("staff")
+
+            .delete()
+
+            .eq(
+                "id",
+                id
+            )
+
+            .eq(
+                "profile_id",
+                user.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        alert(
+            "Unable to delete staff."
+        );
+
+        return;
+
+    }
+
+
+    await loadStaff();
+
+}
+
+
+// ==========================================
+// ESCAPE HTML
+// ==========================================
+
+function escapeHtml(value) {
+
+    return String(value || "")
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// ==========================================
+// LOGOUT
+// ==========================================
+
+document
+    .getElementById("logoutBtn")
+    ?.addEventListener(
+        "click",
+        async () => {
+
+            await client.auth.signOut();
+
+            window.location.href =
+                "login.html";
+
+        }
+    );
+
+
+// ==========================================
+// START
+// ==========================================
+
+loadStaff();
+
+</script>
+
+</body>
+
+</html>

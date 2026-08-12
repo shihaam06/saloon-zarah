@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Settings | BookFlow</title>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,sans-serif;
+}
+
+body{
+    background:#f5f7fa;
+    color:#0f172a;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+    width:280px;
+    background:#10171d;
+    color:white;
+    padding:28px 18px;
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    display:flex;
+    flex-direction:column;
+}
+
+.logo{
+    padding:0 14px;
+    margin-bottom:42px;
+}
+
+.logo h2{
+    font-size:22px;
+    font-weight:800;
+}
+
+.logo span{
+    color:#ef8172;
+}
+
+.logo small{
+    display:block;
+    margin-top:4px;
+    color:#ef8172;
+    font-size:11px;
+    letter-spacing:.8px;
+}
+
+nav{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+nav a{
+    text-decoration:none;
+    color:#d8dee5;
+    padding:13px 16px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:500;
+    transition:.2s;
+}
+
+nav a:hover{
+    background:#1c252d;
+}
+
+nav a.active{
+    background:#e98272;
+    color:white;
+}
+
+.bottom{
+    margin-top:auto;
+}
+
+.whatsapp{
+    border:1px solid #293640;
+    background:#151f27;
+    border-radius:14px;
+    padding:15px;
+}
+
+.whatsapp strong{
+    display:block;
+    margin-bottom:5px;
+}
+
+.whatsapp small{
+    color:#22c55e;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+    margin-left:280px;
+    width:calc(100% - 280px);
+    padding:38px 40px;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.page-header h1{
+    font-size:28px;
+}
+
+.page-header p{
+    color:#64748b;
+    margin-top:7px;
+    font-size:14px;
+}
+
+.save-btn{
+    background:#e98272;
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:9px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.save-btn:hover{
+    background:#d96f60;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.settings-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.card{
+    background:white;
+    border:1px solid #dce2e8;
+    border-radius:14px;
+    padding:25px;
+}
+
+.card.full{
+    grid-column:1 / -1;
+}
+
+.card-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:23px;
+}
+
+.card-icon{
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:19px;
+}
+
+.icon-business{
+    background:#fff0ed;
+}
+
+.icon-gst{
+    background:#edf9f0;
+}
+
+.icon-invoice{
+    background:#f0ebff;
+}
+
+.card-header h2{
+    font-size:17px;
+}
+
+.card-header p{
+    color:#64748b;
+    font-size:12px;
+    margin-top:4px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.form-group.full{
+    grid-column:1 / -1;
+}
+
+label{
+    font-size:12px;
+    font-weight:600;
+    color:#475569;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    border:1px solid #d7dee6;
+    background:#fff;
+    padding:12px 13px;
+    border-radius:8px;
+    outline:none;
+    color:#0f172a;
+    font-size:13px;
+    transition:.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#e98272;
+    box-shadow:0 0 0 3px rgba(233,130,114,.10);
+}
+
+textarea{
+    resize:vertical;
+    min-height:90px;
+}
+
+/* =========================
+   GST TOGGLE
+========================= */
+
+.gst-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:20px;
+}
+
+.gst-info strong{
+    display:block;
+    font-size:13px;
+}
+
+.gst-info span{
+    display:block;
+    color:#64748b;
+    font-size:11px;
+    margin-top:4px;
+}
+
+.switch{
+    position:relative;
+    width:44px;
+    height:24px;
+}
+
+.switch input{
+    opacity:0;
+    width:0;
+    height:0;
+}
+
+.slider{
+    position:absolute;
+    cursor:pointer;
+    inset:0;
+    background:#cbd5e1;
+    border-radius:30px;
+    transition:.2s;
+}
+
+.slider:before{
+    content:"";
+    position:absolute;
+    height:18px;
+    width:18px;
+    left:3px;
+    top:3px;
+    background:white;
+    border-radius:50%;
+    transition:.2s;
+}
+
+.switch input:checked + .slider{
+    background:#22c55e;
+}
+
+.switch input:checked + .slider:before{
+    transform:translateX(20px);
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status{
+    margin-top:20px;
+    padding:12px 15px;
+    border-radius:8px;
+    font-size:12px;
+    display:none;
+}
+
+.status.success{
+    display:block;
+    background:#ecfdf3;
+    color:#15803d;
+    border:1px solid #bbf7d0;
+}
+
+.status.error{
+    display:block;
+    background:#fff1f2;
+    color:#dc2626;
+    border:1px solid #fecdd3;
+}
+
+/* =========================
+   GST NOTE
+========================= */
+
+.note{
+    margin-top:16px;
+    background:#fff8f6;
+    border:1px solid #f8d7d0;
+    border-radius:9px;
+    padding:12px 14px;
+    color:#7c4a42;
+    font-size:11px;
+    line-height:1.6;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+    .sidebar{
+        width:220px;
+    }
+
+    .main{
+        margin-left:220px;
+        width:calc(100% - 220px);
+        padding:25px;
+    }
+
+    .settings-grid{
+        grid-template-columns:1fr;
+    }
+
+    .card.full{
+        grid-column:auto;
+    }
+
+}
+
+@media(max-width:650px){
+
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+        margin-left:0;
+        width:100%;
+        padding:20px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-group.full{
+        grid-column:auto;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+
+        <h2>✦ <span id="sidebarBusinessName">
+            abcdef
+        </span></h2>
+
+        <small>AI RECEPTIONIST</small>
+
+    </div>
+
+
+    <nav>
+
+        <a href="dashboard.html">
+            ▦ &nbsp; Dashboard
+        </a>
+
+        <a href="appointments.html">
+            ▣ &nbsp; Appointments
+        </a>
+
+        <a href="calendar.html">
+            ▤ &nbsp; Calendar
+        </a>
+
+        <a href="customers.html">
+            ◉ &nbsp; Customers
+        </a>
+
+        <a href="services.html">
+            ♢ &nbsp; Services
+        </a>
+
+        <a href="staff.html">
+            ♧ &nbsp; Staff
+        </a>
+
+        <a href="analytics.html">
+            ▥ &nbsp; Analytics
+        </a>
+
+        <a
+            href="settings.html"
+            class="active"
+        >
+            ⚙ &nbsp; Settings
+        </a>
+
+    </nav>
+
+
+    <div class="bottom">
+
+        <div class="whatsapp">
+
+            <strong>
+                🟢 WhatsApp Connected
+            </strong>
+
+            <small>
+                ● Live & Receiving
+            </small>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Settings</h1>
+
+            <p>
+                Manage your business, GST and invoice settings.
+            </p>
+
+        </div>
+
+
+        <button
+            class="save-btn"
+            id="saveBtn"
+        >
+            Save Changes
+        </button>
+
+    </div>
+
+
+    <div class="settings-grid">
+
+
+        <!-- =========================
+             BUSINESS
+        ========================= -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-icon icon-business">
+                    🏢
+                </div>
+
+                <div>
+
+                    <h2>Business Profile</h2>
+
+                    <p>
+                        Basic information about your salon
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <div class="form-group full">
+
+                    <label>
+                        Business Name
+                    </label>
+
+                    <input
+                        id="businessName"
+                        type="text"
+                        placeholder="e.g. Glamour Studio"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Business Phone
+                    </label>
+
+                    <input
+                        id="businessPhone"
+                        type="text"
+                        placeholder="+91..."
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Business Email
+                    </label>
+
+                    <input
+                        id="businessEmail"
+                        type="email"
+                        placeholder="salon@example.com"
+                    >
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label>
+                        Business Address
+                    </label>
+
+                    <textarea
+                        id="businessAddress"
+                        placeholder="Full salon address"
+                    ></textarea>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =========================
+             GST
+        ========================= -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-icon icon-gst">
+                    ₹
+                </div>
+
+                <div>
+
+                    <h2>GST & Tax</h2>
+
+                    <p>
+                        Configure GST invoice information
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="gst-row">
+
+                <div class="gst-info">
+
+                    <strong>
+                        Enable GST Billing
+                    </strong>
+
+                    <span>
+                        Include GST information on invoices
+                    </span>
+
+                </div>
+
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="gstEnabled"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <div class="form-group full">
+
+                    <label>
+                        GSTIN
+                    </label>
+
+                    <input
+                        id="gstin"
+                        type="text"
+                        placeholder="29XXXXXXXXXXXXXX"
+                        maxlength="15"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Business State
+                    </label>
+
+                    <select id="businessState">
+
+                        <option value="">
+                            Select state
+                        </option>
+
+                        <option value="Karnataka">
+                            Karnataka
+                        </option>
+
+                        <option value="Maharashtra">
+                            Maharashtra
+                        </option>
+
+                        <option value="Tamil Nadu">
+                            Tamil Nadu
+                        </option>
+
+                        <option value="Kerala">
+                            Kerala
+                        </option>
+
+                        <option value="Telangana">
+                            Telangana
+                        </option>
+
+                        <option value="Andhra Pradesh">
+                            Andhra Pradesh
+                        </option>
+
+                        <option value="Delhi">
+                            Delhi
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        State Code
+                    </label>
+
+                    <input
+                        id="stateCode"
+                        type="text"
+                        placeholder="29"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <div class="note">
+
+                HSN/SAC and GST rates will be configured
+                separately for each service or product.
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =========================
+             INVOICE
+        ========================= -->
+
+        <div class="card full">
+
+            <div class="card-header">
+
+                <div class="card-icon icon-invoice">
+                    🧾
+                </div>
+
+                <div>
+
+                    <h2>Invoice Settings</h2>
+
+                    <p>
+                        Configure how your invoices are numbered
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <div class="form-group">
+
+                    <label>
+                        Invoice Prefix
+                    </label>
+
+                    <input
+                        id="invoicePrefix"
+                        type="text"
+                        placeholder="INV-"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Next Invoice Number
+                    </label>
+
+                    <input
+                        id="nextInvoiceNumber"
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                    >
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div
+        id="statusMessage"
+        class="status"
+    ></div>
+
+
+</main>
+
+</div>
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function(){
+
+        const client =
+            window.client;
+
+
+        const saveBtn =
+            document.getElementById(
+                "saveBtn"
+            );
+
+
+        const statusMessage =
+            document.getElementById(
+                "statusMessage"
+            );
+
+
+        async function loadSettings(){
+
+            try{
+
+                const {
+                    data: {
+                        user
+                    },
+                    error: userError
+                } =
+                    await client.auth.getUser();
+
+
+                if(
+                    userError ||
+                    !user
+                ){
+
+                    throw new Error(
+                        "User not logged in."
+                    );
+
+                }
+
+
+                const {
+                    data,
+                    error
+                } =
+                    await client
+                        .from("profiles")
+                        .select("*")
+                        .eq(
+                            "id",
+                            user.id
+                        )
+                        .single();
+
+
+                if(error){
+
+                    throw error;
+
+                }
+
+
+                if(!data){
+
+                    return;
+
+                }
+
+
+                document
+                    .getElementById(
+                        "businessName"
+                    )
+                    .value =
+                    data.business_name || "";
+
+
+                document
+                    .getElementById(
+                        "sidebarBusinessName"
+                    )
+                    .textContent =
+                    data.business_name ||
+                    "abcdef";
+
+
+                document
+                    .getElementById(
+                        "businessPhone"
+                    )
+                    .value =
+                    data.business_phone || "";
+
+
+                document
+                    .getElementById(
+                        "businessAddress"
+                    )
+                    .value =
+                    data.business_address || "";
+
+
+                document
+                    .getElementById(
+                        "gstEnabled"
+                    )
+                    .checked =
+                    data.gst_enabled || false;
+
+
+                document
+                    .getElementById(
+                        "gstin"
+                    )
+                    .value =
+                    data.gstin || "";
+
+
+                document
+                    .getElementById(
+                        "businessState"
+                    )
+                    .value =
+                    data.business_state || "";
+
+
+                document
+                    .getElementById(
+                        "stateCode"
+                    )
+                    .value =
+                    data.state_code || "";
+
+
+                document
+                    .getElementById(
+                        "invoicePrefix"
+                    )
+                    .value =
+                    data.invoice_prefix ||
+                    "INV-";
+
+
+                document
+                    .getElementById(
+                        "nextInvoiceNumber"
+                    )
+                    .value =
+                    data.next_invoice_number ||
+                    1;
+
+
+            }
+            catch(error){
+
+                console.error(
+                    "Settings load error:",
+                    error
+                );
+
+                showStatus(
+                    "Could not load settings.",
+                    "error"
+                );
+
+            }
+
+        }
+
+
+        async function saveSettings(){
+
+            saveBtn.disabled = true;
+
+            saveBtn.textContent =
+                "Saving...";
+
+
+            try{
+
+                const {
+                    data: {
+                        user
+                    },
+                    error: userError
+                } =
+                    await client.auth.getUser();
+
+
+                if(
+                    userError ||
+                    !user
+                ){
+
+                    throw new Error(
+                        "User not logged in."
+                    );
+
+                }
+
+
+                const updates = {
+
+                    business_name:
+                        document
+                            .getElementById(
+                                "businessName"
+                            )
+                            .value
+                            .trim(),
+
+                    business_phone:
+                        document
+                            .getElementById(
+                                "businessPhone"
+                            )
+                            .value
+                            .trim(),
+
+                    business_address:
+                        document
+                            .getElementById(
+                                "businessAddress"
+                            )
+                            .value
+                            .trim(),
+
+                    gst_enabled:
+                        document
+                            .getElementById(
+                                "gstEnabled"
+                            )
+                            .checked,
+
+                    gstin:
+                        document
+                            .getElementById(
+                                "gstin"
+                            )
+                            .value
+                            .trim()
+                            .toUpperCase(),
+
+                    business_state:
+                        document
+                            .getElementById(
+                                "businessState"
+                            )
+                            .value,
+
+                    state_code:
+                        document
+                            .getElementById(
+                                "stateCode"
+                            )
+                            .value
+                            .trim(),
+
+                    invoice_prefix:
+                        document
+                            .getElementById(
+                                "invoicePrefix"
+                            )
+                            .value
+                            .trim() ||
+                        "INV-",
+
+                    next_invoice_number:
+                        Number(
+                            document
+                                .getElementById(
+                                    "nextInvoiceNumber"
+                                )
+                                .value
+                        ) || 1
+
+                };
+
+
+                const {
+                    error
+                } =
+                    await client
+                        .from("profiles")
+                        .update(updates)
+                        .eq(
+                            "id",
+                            user.id
+                        );
+
+
+                if(error){
+
+                    throw error;
+
+                }
+
+
+                document
+                    .getElementById(
+                        "sidebarBusinessName"
+                    )
+                    .textContent =
+                    updates.business_name ||
+                    "abcdef";
+
+
+                showStatus(
+                    "Settings saved successfully.",
+                    "success"
+                );
+
+            }
+            catch(error){
+
+                console.error(
+                    "Settings save error:",
+                    error
+                );
+
+                showStatus(
+                    error.message ||
+                    "Could not save settings.",
+                    "error"
+                );
+
+            }
+            finally{
+
+                saveBtn.disabled = false;
+
+                saveBtn.textContent =
+                    "Save Changes";
+
+            }
+
+        }
+
+
+        function showStatus(
+            message,
+            type
+        ){
+
+            statusMessage.textContent =
+                message;
+
+            statusMessage.className =
+                "status " + type;
+
+
+            setTimeout(
+                function(){
+
+                    statusMessage.className =
+                        "status";
+
+                },
+                4000
+            );
+
+        }
+
+
+        saveBtn.addEventListener(
+            "click",
+            saveSettings
+        );
+
+
+        await loadSettings();
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
