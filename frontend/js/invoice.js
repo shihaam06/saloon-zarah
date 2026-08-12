@@ -783,7 +783,7 @@ document
 
                 const response =
                     await fetch(
-                        "http://localhost:3000/send-bill",
+                        "https://saloon-zarah.onrender.com/send-bill",
                         {
 
                             method: "POST",
