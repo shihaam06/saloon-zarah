@@ -622,7 +622,7 @@ const UPI_ID =
 
 const AI_MODEL =
     process.env.OPENROUTER_MODEL ||
-    "openai/gpt-oss-20b:free";
+    "openrouter/auto";
 
 
 // =====================================================
