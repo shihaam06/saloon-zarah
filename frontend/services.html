@@ -542,43 +542,81 @@ select:focus{
     </div>
 
 
-    <div class="card">
+    <!-- SERVICES -->
+<div class="card">
 
-        <div class="table-wrap">
+    <div style="padding:20px 20px 5px;">
+        <h2 style="margin:0;font-size:18px;">
+            Services
+        </h2>
 
-            <table>
+        <p style="margin:6px 0 0;color:#64748b;font-size:13px;">
+            Manage your salon services and pricing.
+        </p>
+    </div>
 
-                <thead>
+    <div class="table-wrap">
 
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Price</th>
-                        <th>GST</th>
-                        <th>HSN / SAC</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
+        <table>
 
-                </thead>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>GST</th>
+                    <th>SAC</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
 
-                <tbody id="servicesTable">
+            <tbody id="servicesTable">
+            </tbody>
 
-                </tbody>
-
-            </table>
-
-        </div>
-
-        <div
-            id="empty"
-            class="empty"
-            style="display:none;"
-        >
-            No services or products found.
-        </div>
+        </table>
 
     </div>
+
+</div>
+
+
+<!-- PRODUCTS -->
+<div class="card" style="margin-top:20px;">
+
+    <div style="padding:20px 20px 5px;">
+        <h2 style="margin:0;font-size:18px;">
+            Products & Stock
+        </h2>
+
+        <p style="margin:6px 0 0;color:#64748b;font-size:13px;">
+            Manage products, HSN codes, GST and inventory.
+        </p>
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>GST</th>
+                    <th>HSN</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="productsTable">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
 </main>
 
@@ -697,6 +735,20 @@ select:focus{
             </select>
 
         </div>
+        <div class="form-group" id="stockGroup">
+    <label>
+        Stock Quantity
+    </label>
+
+    <input
+        id="stockQuantity"
+        type="number"
+        min="0"
+        step="1"
+        value="0"
+        placeholder="0"
+    >
+</div>
 
     </div>
 
@@ -753,11 +805,11 @@ document.addEventListener(
         const modal =
             document.getElementById("modal");
 
-        const table =
-            document.getElementById("servicesTable");
+        const servicesTable =
+    document.getElementById("servicesTable");
 
-        const empty =
-            document.getElementById("empty");
+const productsTable =
+    document.getElementById("productsTable");
 
         const search =
             document.getElementById("search");
@@ -871,214 +923,260 @@ document.addEventListener(
 
         function render(){
 
-            const query =
-                search
-                    .value
+    const query =
+        search
+            .value
+            .toLowerCase()
+            .trim();
+
+    const selectedFilter =
+        filter.value;
+
+    servicesTable.innerHTML = "";
+    productsTable.innerHTML = "";
+
+    const filtered =
+        allServices.filter(item => {
+
+            const matchesSearch =
+                item.name
                     .toLowerCase()
-                    .trim();
+                    .includes(query);
 
-            const selectedFilter =
-                filter.value;
+            let matchesFilter = true;
 
-
-            const filtered =
-                allServices.filter(
-                    item => {
-
-                        const matchesSearch =
-                            item.name
-                                .toLowerCase()
-                                .includes(query);
-
-
-                        let matchesFilter = true;
-
-
-                        if(
-                            selectedFilter ===
-                            "service"
-                        ){
-
-                            matchesFilter =
-                                item.item_type ===
-                                "service";
-
-                        }
-
-
-                        if(
-                            selectedFilter ===
-                            "product"
-                        ){
-
-                            matchesFilter =
-                                item.item_type ===
-                                "product";
-
-                        }
-
-
-                        if(
-                            selectedFilter ===
-                            "active"
-                        ){
-
-                            matchesFilter =
-                                item.active === true;
-
-                        }
-
-
-                        if(
-                            selectedFilter ===
-                            "inactive"
-                        ){
-
-                            matchesFilter =
-                                item.active === false;
-
-                        }
-
-
-                        return (
-                            matchesSearch &&
-                            matchesFilter
-                        );
-
-                    }
-                );
-
-
-            table.innerHTML = "";
-
-
-            if(filtered.length === 0){
-
-                empty.style.display =
-                    "block";
-
-                return;
-
+            if(selectedFilter === "service"){
+                matchesFilter =
+                    item.item_type === "service";
             }
 
+            if(selectedFilter === "product"){
+                matchesFilter =
+                    item.item_type === "product";
+            }
 
-            empty.style.display =
-                "none";
+            if(selectedFilter === "active"){
+                matchesFilter =
+                    item.active === true;
+            }
 
+            if(selectedFilter === "inactive"){
+                matchesFilter =
+                    item.active === false;
+            }
 
-            filtered.forEach(
-                item => {
-
-                    const row =
-                        document.createElement(
-                            "tr"
-                        );
-
-
-                    row.innerHTML = `
-
-                        <td>
-                            <span class="name">
-                                ${escapeHtml(item.name)}
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="type-badge ${
-                                item.item_type ===
-                                "product"
-                                ? "product"
-                                : "service"
-                            }">
-                                ${
-                                    item.item_type ===
-                                    "product"
-                                    ? "Product"
-                                    : "Service"
-                                }
-                            </span>
-                        </td>
-
-                        <td>
-                            ₹${Number(
-                                item.price || 0
-                            ).toLocaleString(
-                                "en-IN",
-                                {
-                                    minimumFractionDigits:2
-                                }
-                            )}
-                        </td>
-
-                        <td>
-                            <span class="gst">
-                                ${Number(
-                                    item.gst_rate || 0
-                                )}%
-                            </span>
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                item.hsn_sac ||
-                                "—"
-                            )}
-                        </td>
-
-                        <td>
-
-                            <span class="status ${
-                                item.active
-                                ? ""
-                                : "inactive"
-                            }">
-
-                                ${
-                                    item.active
-                                    ? "Active"
-                                    : "Inactive"
-                                }
-
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            <div class="actions">
-
-                                <button
-                                    class="action-btn"
-                                    onclick="editService('${item.id}')"
-                                >
-                                    Edit
-                                </button>
-
-                                <button
-                                    class="action-btn delete-btn"
-                                    onclick="toggleService('${item.id}', ${item.active})"
-                                >
-                                    ${
-                                        item.active
-                                        ? "Disable"
-                                        : "Enable"
-                                    }
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    `;
-
-
-                    table.appendChild(row);
-
-                }
+            return (
+                matchesSearch &&
+                matchesFilter
             );
+
+        });
+
+
+    filtered.forEach(item => {
+
+        const row =
+            document.createElement("tr");
+
+
+        /* =========================
+           SERVICE
+        ========================= */
+
+        if(item.item_type === "service"){
+
+            row.innerHTML = `
+
+                <td>
+                    <span class="name">
+                        ${escapeHtml(item.name)}
+                    </span>
+                </td>
+
+                <td>
+                    ₹${Number(
+                        item.price || 0
+                    ).toLocaleString(
+                        "en-IN",
+                        {
+                            minimumFractionDigits:2
+                        }
+                    )}
+                </td>
+
+                <td>
+                    <span class="gst">
+                        ${Number(
+                            item.gst_rate || 0
+                        )}%
+                    </span>
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        item.hsn_sac || "—"
+                    )}
+                </td>
+
+                <td>
+
+                    <span class="status ${
+                        item.active
+                            ? ""
+                            : "inactive"
+                    }">
+
+                        ${
+                            item.active
+                                ? "Active"
+                                : "Inactive"
+                        }
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <div class="actions">
+
+                        <button
+                            class="action-btn"
+                            onclick="editService('${item.id}')"
+                        >
+                            Edit
+                        </button>
+
+                        <button
+                            class="action-btn delete-btn"
+                            onclick="toggleService(
+                                '${item.id}',
+                                ${item.active}
+                            )"
+                        >
+
+                            ${
+                                item.active
+                                    ? "Disable"
+                                    : "Enable"
+                            }
+
+                        </button>
+
+                    </div>
+
+                </td>
+
+            `;
+
+            servicesTable.appendChild(row);
 
         }
 
+
+        /* =========================
+           PRODUCT
+        ========================= */
+
+        if(item.item_type === "product"){
+
+            row.innerHTML = `
+
+                <td>
+                    <span class="name">
+                        ${escapeHtml(item.name)}
+                    </span>
+                </td>
+
+                <td>
+                    ₹${Number(
+                        item.price || 0
+                    ).toLocaleString(
+                        "en-IN",
+                        {
+                            minimumFractionDigits:2
+                        }
+                    )}
+                </td>
+
+                <td>
+                    <span class="gst">
+                        ${Number(
+                            item.gst_rate || 0
+                        )}%
+                    </span>
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        item.hsn_sac || "—"
+                    )}
+                </td>
+
+                <td>
+                    ${Number(
+                        item.stock_quantity || 0
+                    )}
+                </td>
+
+                <td>
+
+                    <span class="status ${
+                        item.active
+                            ? ""
+                            : "inactive"
+                    }">
+
+                        ${
+                            item.active
+                                ? "Active"
+                                : "Inactive"
+                        }
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <div class="actions">
+
+                        <button
+                            class="action-btn"
+                            onclick="editService('${item.id}')"
+                        >
+                            Edit
+                        </button>
+
+                        <button
+                            class="action-btn delete-btn"
+                            onclick="toggleService(
+                                '${item.id}',
+                                ${item.active}
+                            )"
+                        >
+
+                            ${
+                                item.active
+                                    ? "Disable"
+                                    : "Enable"
+                            }
+
+                        </button>
+
+                    </div>
+
+                </td>
+
+            `;
+
+            productsTable.appendChild(row);
+
+        }
+
+    });
+
+}
 
         /* =========================
            ADD
@@ -1195,6 +1293,12 @@ document.addEventListener(
                     )
                     .value =
                     item.gst_rate || 0;
+                    document
+    .getElementById(
+        "stockQuantity"
+    )
+    .value =
+    item.stock_quantity || 0;
 
 
                 modal.classList.add(
@@ -1260,6 +1364,14 @@ document.addEventListener(
                                 )
                                 .value
                         );
+                        const stockQuantity =
+    Number(
+        document
+            .getElementById(
+                "stockQuantity"
+            )
+            .value
+    ) || 0;
 
 
                     if(!name){
@@ -1290,30 +1402,32 @@ document.addEventListener(
 
 
                     const payload = {
+    profile_id:
+        currentUser.id,
 
-                        profile_id:
-                            currentUser.id,
+    name:
+        name,
 
-                        name:
+    item_type:
+        itemType,
 
-                            name,
+    price:
+        price,
 
-                        item_type:
-                            itemType,
+    hsn_sac:
+        hsnSac || null,
 
-                        price:
-                            price,
+    gst_rate:
+        gstRate,
 
-                        hsn_sac:
-                            hsnSac || null,
+    stock_quantity:
+        itemType === "product"
+            ? stockQuantity
+            : 0,
 
-                        gst_rate:
-                            gstRate,
-
-                        active:
-                            true
-
-                    };
+    active:
+        true
+};
 
 
                     const button =

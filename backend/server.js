@@ -901,6 +901,118 @@ async function getServicePrice(serviceName, profileId) {
 
 
 // =====================================================
+// CUSTOMER DATABASE HELPER
+// =====================================================
+
+async function findOrCreateCustomer({
+    profileId,
+    name,
+    phone
+}) {
+
+    if (!profileId || !phone) {
+        console.log(
+            "⚠️ Customer not created: missing profileId or phone"
+        );
+        return null;
+    }
+
+    const cleanPhone = String(phone).trim();
+
+    // Find existing customer
+    const {
+        data: existingCustomer,
+        error: findError
+    } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("profile_id", profileId)
+        .eq("phone", cleanPhone)
+        .maybeSingle();
+
+    if (findError) {
+
+        console.error(
+            "CUSTOMER LOOKUP ERROR:",
+            findError
+        );
+
+        return null;
+    }
+
+    // Customer already exists
+    if (existingCustomer) {
+
+        // Update name if we now have a better one
+        if (
+            name &&
+            name !== "Customer" &&
+            name !== "Instagram Customer"
+        ) {
+
+            await supabase
+                .from("customers")
+                .update({
+                    name: name
+                })
+                .eq(
+                    "id",
+                    existingCustomer.id
+                );
+        }
+
+        console.log(
+            "👤 Existing customer found:",
+            existingCustomer.name
+        );
+
+        return existingCustomer;
+    }
+
+    // Create new customer
+    const {
+        data: newCustomer,
+        error: createError
+    } = await supabase
+        .from("customers")
+        .insert({
+
+            profile_id: profileId,
+
+            name:
+                name ||
+                "Customer",
+
+            phone:
+                cleanPhone,
+
+            total_visits: 0,
+
+            total_spent: 0
+
+        })
+        .select()
+        .single();
+
+    if (createError) {
+
+        console.error(
+            "CUSTOMER CREATION ERROR:",
+            createError
+        );
+
+        return null;
+    }
+
+    console.log(
+        "👤 New customer created:",
+        newCustomer.name
+    );
+
+    return newCustomer;
+}
+
+// =====================================================
 // PAYMENT HELPERS
 // =====================================================
 
@@ -1262,31 +1374,23 @@ if (
 }
 
 
-let content =
-    completion
-        .choices[0]
-        .message
-        .content;
+console.log("🔍 INSTAGRAM HUMAN REPLY RAW AI RESPONSE:");
+console.log(JSON.stringify(completion, null, 2));
 
+let content =
+    completion?.choices?.[0]?.message?.content;
+
+console.log("🔍 INSTAGRAM HUMAN REPLY CONTENT:");
+console.log(content);
 
 if (!content) {
-
     console.error(
-        "❌ AI RESPONSE CONTENT IS EMPTY:"
-    );
-
-    console.error(
-        JSON.stringify(
-            completion,
-            null,
-            2
-        )
+        "❌ INSTAGRAM HUMAN REPLY CONTENT IS EMPTY"
     );
 
     throw new Error(
         "AI returned an empty response."
     );
-
 }
 
 
@@ -2350,6 +2454,15 @@ try again.
                                 "PENDING BOOKING CREATED:",
                                 createdBooking.id
                             );
+
+                            await findOrCreateCustomer({
+    profileId: activeProfileId,
+    name:
+        booking.customer_name ||
+        profileName ||
+        "Customer",
+    phone: phone
+});
 
 
                             const paymentLink =
@@ -4106,6 +4219,14 @@ Apologize naturally and ask the customer to try again.
                                     createdBooking.id
                                 );
 
+                                await findOrCreateCustomer({
+    profileId: PROFILE_ID,
+    name:
+        booking.customer_name ||
+        "Instagram Customer",
+    phone: booking.phone
+});
+
                                 // -----------------------------------------
                                 // CREATE RAZORPAY PAYMENT LINK
                                 // -----------------------------------------
@@ -4717,6 +4838,126 @@ const balanceDue =
     );
 
 }
+
+// =====================================================
+// VIEW BILL PDF
+// =====================================================
+
+app.get(
+    "/bill/:billId/pdf",
+    async (req, res) => {
+
+        try {
+
+            const {
+                billId
+            } = req.params;
+
+
+            // GET BILL
+            const {
+                data: bill,
+                error: billError
+            } = await supabase
+                .from("bills")
+                .select("*")
+                .eq(
+                    "id",
+                    billId
+                )
+                .single();
+
+
+            if (
+                billError ||
+                !bill
+            ) {
+
+                return res
+                    .status(404)
+                    .send(
+                        "Bill not found."
+                    );
+
+            }
+
+
+            // GET BILL ITEMS
+            const {
+                data: items,
+                error: itemsError
+            } = await supabase
+                .from("bill_items")
+                .select("*")
+                .eq(
+                    "bill_id",
+                    billId
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: true
+                    }
+                );
+
+
+            if (itemsError) {
+
+                console.error(
+                    "BILL ITEMS ERROR:",
+                    itemsError
+                );
+
+                return res
+                    .status(500)
+                    .send(
+                        "Unable to load bill items."
+                    );
+
+            }
+
+
+            // GENERATE PDF
+            const pdfBuffer =
+                await generateBillPDF(
+                    bill,
+                    items || []
+                );
+
+
+            res.setHeader(
+                "Content-Type",
+                "application/pdf"
+            );
+
+            res.setHeader(
+                "Content-Disposition",
+                `inline; filename="bill-${billId}.pdf"`
+            );
+
+
+            res.send(
+                pdfBuffer
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "VIEW BILL PDF ERROR:",
+                error
+            );
+
+            res
+                .status(500)
+                .send(
+                    "Unable to generate bill."
+                );
+
+        }
+
+    }
+);
 
 
 // =====================================================

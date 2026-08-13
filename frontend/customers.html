@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customers | SAGET</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f6f7f9;
+            color: #111827;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-top: 7px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 18px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .primary {
+            background: #ef806f;
+            color: white;
+        }
+
+        .search {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            width: 100%;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .name {
+            font-weight: 700;
+        }
+
+        .muted {
+            color: #6b7280;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px;
+            color: #6b7280;
+        }
+
+        /* MODAL */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-box {
+            background: white;
+            width: 500px;
+            max-width: 92%;
+            border-radius: 15px;
+            padding: 25px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            background: none;
+            font-size: 22px;
+        }
+
+        label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .save {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        /* CUSTOMER DETAILS */
+
+        .customer-info {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .stat {
+            background: white;
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .bill {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        @media(max-width:700px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="top">
+
+        <div>
+            <h1>Customers</h1>
+
+            <div class="subtitle">
+                Manage your salon customers and billing history.
+            </div>
+        </div>
+
+        <button
+            class="primary"
+            onclick="openAddCustomer()"
+        >
+            + Add Customer
+        </button>
+
+    </div>
+
+
+    <input
+        id="search"
+        class="search"
+        placeholder="Search customer by name or phone..."
+        oninput="renderCustomers()"
+    >
+
+
+    <div class="card">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Visits</th>
+                    <th>Total Spent</th>
+                    <th>Last Visit</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="customerTable"></tbody>
+
+        </table>
+
+        <div
+            id="empty"
+            class="empty"
+            style="display:none;"
+        >
+            No customers found.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ADD CUSTOMER MODAL -->
+
+<div
+    id="customerModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>Add Customer</h2>
+
+            <button
+                class="close"
+                onclick="closeModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <label>Name</label>
+
+        <input
+            id="customerName"
+            placeholder="Customer name"
+        >
+
+        <label>Phone</label>
+
+        <input
+            id="customerPhone"
+            placeholder="+91XXXXXXXXXX"
+        >
+
+        <label>Email</label>
+
+        <input
+            id="customerEmail"
+            placeholder="Optional"
+        >
+
+        <label>Notes</label>
+
+        <textarea
+            id="customerNotes"
+            placeholder="Customer preferences or notes..."
+        ></textarea>
+
+        <button
+            class="primary save"
+            onclick="saveCustomer()"
+        >
+            Save Customer
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- CUSTOMER DETAILS MODAL -->
+
+<div
+    id="detailsModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="detailsName">
+                Customer
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeDetails()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div id="customerDetails"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+    "https://mnhszkqbtxqvzntusmxp.supabase.co";
+
+const SUPABASE_ANON_KEY =
+    "sb_publishable_gVPcn3AyRRNxj1yGV54vNw_Y5_av5m-";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+
+let currentUser = null;
+let customers = [];
+
+
+/* =========================
+   INIT
+========================= */
+
+async function init(){
+
+    const {
+        data: {
+            user
+        }
+    } =
+    await supabaseClient
+        .auth
+        .getUser();
+
+    if(!user){
+
+        alert("Please login first.");
+
+        return;
+
+    }
+
+    currentUser = user;
+
+    await loadCustomers();
+
+}
+
+
+/* =========================
+   LOAD CUSTOMERS
+========================= */
+
+async function loadCustomers(){
+
+    const {
+        data,
+        error
+    } =
+    await supabaseClient
+        .from("customers")
+        .select("*")
+        .eq(
+            "profile_id",
+            currentUser.id
+        )
+        .order(
+            "created_at",
+            {
+                ascending:false
+            }
+        );
+
+    if(error){
+
+        console.error(error);
+
+        alert(
+            "Unable to load customers."
+        );
+
+        return;
+
+    }
+
+    customers = data || [];
+
+    await updateCustomerStats();
+
+    renderCustomers();
+
+}
+
+
+/* =========================
+   UPDATE STATS
+========================= */
+
+async function updateCustomerStats(){
+
+    for (const customer of customers) {
+
+        // =========================
+        // BOOKINGS / VISITS
+        // =========================
+
+        const {
+            data: bookings,
+            error: bookingError
+        } = await supabaseClient
+            .from("bookings")
+            .select(
+                "id, booking_date, status"
+            )
+            .eq(
+                "profile_id",
+                currentUser.id
+            )
+            .eq(
+                "phone",
+                customer.phone
+            )
+            .eq(
+                "status",
+                "Completed"
+            );
+
+        if (bookingError) {
+            console.error(
+                "CUSTOMER BOOKING STATS ERROR:",
+                bookingError
+            );
+        }
+
+
+        customer.total_visits =
+            bookings
+                ? bookings.length
+                : 0;
+
+
+        if (
+            bookings &&
+            bookings.length
+        ) {
+
+            const dates =
+                bookings
+                    .map(
+                        booking =>
+                            booking.booking_date
+                    )
+                    .filter(Boolean)
+                    .sort()
+                    .reverse();
+
+            customer.last_visit =
+                dates[0] || null;
+
+        }
+        else {
+
+            customer.last_visit =
+                null;
+
+        }
+
+
+        // =========================
+        // BILLING / TOTAL SPENT
+        // =========================
+
+        const {
+            data: bills,
+            error: billError
+        } = await supabaseClient
+            .from("bills")
+            .select(
+                "total"
+            )
+            .eq(
+                "profile_id",
+                currentUser.id
+            )
+            .eq(
+                "phone",
+                customer.phone
+            )
+            .eq(
+                "payment_status",
+                "Paid"
+            );
+
+
+        if (billError) {
+
+            console.error(
+                "CUSTOMER BILL STATS ERROR:",
+                billError
+            );
+
+        }
+
+
+        customer.total_spent =
+            (bills || [])
+                .reduce(
+                    (
+                        total,
+                        bill
+                    ) =>
+                        total +
+                        Number(
+                            bill.total || 0
+                        ),
+                    0
+                );
+
+
+        // =========================
+        // SAVE CURRENT STATS
+        // =========================
+
+        const {
+            error: updateError
+        } =
+        await supabaseClient
+            .from("customers")
+            .update({
+
+                total_visits:
+                    customer.total_visits,
+
+                total_spent:
+                    customer.total_spent,
+
+                last_visit:
+                    customer.last_visit
+
+            })
+            .eq(
+                "id",
+                customer.id
+            )
+            .eq(
+                "profile_id",
+                currentUser.id
+            );
+
+
+        if (updateError) {
+
+            console.error(
+                "CUSTOMER STATS UPDATE ERROR:",
+                updateError
+            );
+
+        }
+
+    }
+
+}
+
+/* =========================
+   RENDER
+========================= */
+
+function renderCustomers(){
+
+    const table =
+        document.getElementById(
+            "customerTable"
+        );
+
+    const empty =
+        document.getElementById(
+            "empty"
+        );
+
+    const query =
+        document
+            .getElementById("search")
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    table.innerHTML = "";
+
+
+    const filtered =
+        customers.filter(customer => {
+
+            return (
+                (customer.name || "")
+                    .toLowerCase()
+                    .includes(query)
+                ||
+                (customer.phone || "")
+                    .toLowerCase()
+                    .includes(query)
+            );
+
+        });
+
+
+    if(!filtered.length){
+
+        empty.style.display =
+            "block";
+
+        return;
+
+    }
+
+    empty.style.display =
+        "none";
+
+
+    filtered.forEach(
+        customer => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+            row.innerHTML = `
+
+                <td>
+                    <div class="name">
+                        ${escapeHtml(
+                            customer.name
+                        )}
+                    </div>
+
+                    ${
+                        customer.email
+                            ? `
+                                <div class="muted">
+                                    ${escapeHtml(
+                                        customer.email
+                                    )}
+                                </div>
+                              `
+                            : ""
+                    }
+                </td>
+
+                <td>
+                    ${
+                        escapeHtml(
+                            customer.phone || "—"
+                        )
+                    }
+                </td>
+
+                <td>
+                    ${
+                        customer.total_visits || 0
+                    }
+                </td>
+
+                <td>
+                    ₹${
+                        Number(
+                            customer.total_spent || 0
+                        ).toLocaleString(
+                            "en-IN",
+                            {
+                                minimumFractionDigits:2
+                            }
+                        )
+                    }
+                </td>
+
+                <td>
+                    ${
+                        customer.last_visit
+                            ? formatDate(
+                                customer.last_visit
+                              )
+                            : "—"
+                    }
+                </td>
+
+                <td>
+
+                    <div class="actions">
+
+                        <button
+                            class="view"
+                            onclick="viewCustomer(
+                                '${customer.id}'
+                            )"
+                        >
+                            View
+                        </button>
+
+                    </div>
+
+                </td>
+
+            `;
+
+            table.appendChild(row);
+
+        }
+    );
+
+}
+
+
+/* =========================
+   ADD CUSTOMER
+========================= */
+
+function openAddCustomer(){
+
+    document
+        .getElementById(
+            "customerModal"
+        )
+        .style.display =
+            "flex";
+
+}
+
+
+function closeModal(){
+
+    document
+        .getElementById(
+            "customerModal"
+        )
+        .style.display =
+            "none";
+
+}
+
+
+async function saveCustomer(){
+
+    const name =
+        document
+            .getElementById(
+                "customerName"
+            )
+            .value
+            .trim();
+
+    const phone =
+        document
+            .getElementById(
+                "customerPhone"
+            )
+            .value
+            .trim();
+
+    const email =
+        document
+            .getElementById(
+                "customerEmail"
+            )
+            .value
+            .trim();
+
+    const notes =
+        document
+            .getElementById(
+                "customerNotes"
+            )
+            .value
+            .trim();
+
+
+    if(!name){
+
+        alert(
+            "Customer name is required."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+    await supabaseClient
+        .from("customers")
+        .insert({
+
+            profile_id:
+                currentUser.id,
+
+            name:
+                name,
+
+            phone:
+                phone || null,
+
+            email:
+                email || null,
+
+            notes:
+                notes || null
+
+        });
+
+
+    if(error){
+
+        console.error(error);
+
+        alert(
+            "Unable to save customer."
+        );
+
+        return;
+
+    }
+
+
+    document
+        .getElementById(
+            "customerName"
+        )
+        .value = "";
+
+    document
+        .getElementById(
+            "customerPhone"
+        )
+        .value = "";
+
+    document
+        .getElementById(
+            "customerEmail"
+        )
+        .value = "";
+
+    document
+        .getElementById(
+            "customerNotes"
+        )
+        .value = "";
+
+
+    closeModal();
+
+    await loadCustomers();
+
+}
+
+
+/* =========================
+   CUSTOMER DETAILS
+========================= */
+
+async function viewCustomer(
+    customerId
+){
+
+    const customer =
+        customers.find(
+            c =>
+                c.id === customerId
+        );
+
+    if(!customer) return;
+
+
+    document
+        .getElementById(
+            "detailsName"
+        )
+        .textContent =
+            customer.name;
+
+
+    const {
+        data: bills,
+        error
+    } =
+    await supabaseClient
+        .from("bills")
+        .select("*")
+        .eq(
+            "profile_id",
+            currentUser.id
+        )
+        .eq(
+            "customer_name",
+            customer.name
+        )
+        .order(
+            "created_at",
+            {
+                ascending:false
+            }
+        );
+
+
+    if(error){
+
+        console.error(error);
+
+    }
+
+
+    const totalSpent =
+        (bills || [])
+            .reduce(
+                (
+                    total,
+                    bill
+                ) =>
+                    total +
+                    Number(
+                        bill.total_amount ||
+                        bill.grand_total ||
+                        bill.amount ||
+                        0
+                    ),
+                0
+            );
+
+
+    let html = `
+
+        <div class="customer-info">
+
+            <div>
+                <strong>
+                    Phone
+                </strong>
+
+                <div>
+                    ${
+                        escapeHtml(
+                            customer.phone || "—"
+                        )
+                    }
+                </div>
+            </div>
+
+            <div style="margin-top:10px;">
+                <strong>
+                    Email
+                </strong>
+
+                <div>
+                    ${
+                        escapeHtml(
+                            customer.email || "—"
+                        )
+                    }
+                </div>
+            </div>
+
+            <div style="margin-top:10px;">
+                <strong>
+                    Notes
+                </strong>
+
+                <div>
+                    ${
+                        escapeHtml(
+                            customer.notes || "—"
+                        )
+                    }
+                </div>
+            </div>
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="muted">
+                        Visits
+                    </div>
+
+                    <div class="stat-value">
+                        ${
+                            customer.total_visits || 0
+                        }
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="muted">
+                        Total Spent
+                    </div>
+
+                    <div class="stat-value">
+                        ₹${
+                            totalSpent.toLocaleString(
+                                "en-IN",
+                                {
+                                    minimumFractionDigits:2
+                                }
+                            )
+                        }
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="muted">
+                        Last Visit
+                    </div>
+
+                    <div class="stat-value">
+
+                        ${
+                            customer.last_visit
+                                ? formatDate(
+                                    customer.last_visit
+                                  )
+                                : "—"
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <h3>
+            Billing History
+        </h3>
+
+    `;
+
+
+    if(!bills || !bills.length){
+
+        html += `
+            <div class="empty">
+                No bills found.
+            </div>
+        `;
+
+    }
+    else {
+
+        bills.forEach(
+            bill => {
+
+                const amount =
+                    Number(
+                        bill.total_amount ||
+                        bill.grand_total ||
+                        bill.amount ||
+                        0
+                    );
+
+
+                html += `
+
+                    <div class="bill">
+
+                        <div>
+
+                            <strong>
+                                Bill #${
+                                    String(
+                                        bill.id
+                                    )
+                                    .substring(
+                                        0,
+                                        8
+                                    )
+                                    .toUpperCase()
+                                }
+                            </strong>
+
+                            <div class="muted">
+
+                                ${
+                                    bill.created_at
+                                        ? formatDate(
+                                            bill.created_at
+                                          )
+                                        : ""
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                ₹${
+                                    amount.toLocaleString(
+                                        "en-IN",
+                                        {
+                                            minimumFractionDigits:2
+                                        }
+                                    )
+                                }
+                            </strong>
+
+                            <br>
+
+                            <button
+                                class="view"
+                                onclick="viewBill(
+                                    '${bill.id}'
+                                )"
+                            >
+                                View Bill
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+    }
+
+
+    document
+        .getElementById(
+            "customerDetails"
+        )
+        .innerHTML =
+            html;
+
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .style.display =
+            "flex";
+
+}
+
+
+function closeDetails(){
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .style.display =
+            "none";
+
+}
+
+
+/* =========================
+   BILL
+========================= */
+
+function viewBill(billId){
+
+    window.open(
+        `/bill/${billId}/pdf`,
+        "_blank"
+    );
+
+}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function formatDate(
+    value
+){
+
+    const date =
+        new Date(value);
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return value;
+
+    }
+
+    return date.toLocaleDateString(
+        "en-IN",
+        {
+            day:"2-digit",
+            month:"short",
+            year:"numeric"
+        }
+    );
+
+}
+
+
+function escapeHtml(
+    value
+){
+
+    return String(value || "")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
