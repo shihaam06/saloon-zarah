@@ -4064,8 +4064,7 @@ source:
 
                                     balance_amount:
     Math.max(
-        (await getServicePrice(service)) -
-        ADVANCE_AMOUNT,
+        servicePrice - ADVANCE_AMOUNT,
         0
     )
 
@@ -4146,7 +4145,7 @@ ${formatTimeForCustomer(
 )}
 
 Service price:
-₹${await getServicePrice(service)}
+₹${servicePrice}
 
 Advance:
 ₹${ADVANCE_AMOUNT}
@@ -4156,8 +4155,7 @@ ${paymentLink.short_url}
 
 Remaining balance after advance:
 ₹${Math.max(
-    (await getServicePrice(service)) -
-    ADVANCE_AMOUNT,
+    servicePrice - ADVANCE_AMOUNT,
     0
 )}
 
