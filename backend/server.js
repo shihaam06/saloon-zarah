@@ -472,28 +472,24 @@ try {
     // ==========================================
 
     if (
-        updatedBooking.phone &&
-        updatedBooking.phone.startsWith("instagram:")
-    ) {
+    updatedBooking.source === "Instagram" &&
+    updatedBooking.instagram_user_id
+) {
 
-        const instagramUserId =
-            updatedBooking.phone
-                .replace("instagram:", "");
+    console.log(
+        "📸 Sending Instagram payment confirmation to:",
+        updatedBooking.instagram_user_id
+    );
 
-        console.log(
-            "📸 Sending Instagram payment confirmation to:",
-            instagramUserId
-        );
+    await sendInstagramMessage(
+        updatedBooking.instagram_user_id,
+        confirmationMessage
+    );
 
-        await sendInstagramMessage(
-            instagramUserId,
-            confirmationMessage
-        );
-
-        console.log(
-            "✅ Instagram confirmation sent"
-        );
-    }
+    console.log(
+        "✅ Instagram confirmation sent"
+    );
+}
 
     // ==========================================
     // WHATSAPP BOOKING
@@ -1202,9 +1198,17 @@ Customer name:
 
 ${profileName || ""}
 
-Customer phone:
+Instagram customer identifier:
 
 ${phone}
+
+IMPORTANT:
+The Instagram customer identifier above is NOT the customer's phone number.
+
+Only return a value in "phone" if the customer has explicitly provided
+their actual phone number in the conversation.
+
+Never use the Instagram customer identifier as the customer's phone number.
 
 Previous conversation:
 
@@ -1831,13 +1835,10 @@ async function sendInstagramMessage(
 // PAYMENT CONFIRMATION
 // =====================================================
 
-async function confirmAdvancePayment(
-    phone
-) {
+async function confirmAdvancePayment(phone) {
 
     const pendingBooking =
         await findPendingBooking(phone);
-
 
     if (!pendingBooking) {
 
@@ -1849,114 +1850,12 @@ async function confirmAdvancePayment(
 
     }
 
-
-    const service =
-        pendingBooking.service || "";
-
-
-    const totalPrice =
-        await getServicePrice(service);
-
-
-    const balance =
-        Math.max(
-            totalPrice - ADVANCE_AMOUNT,
-            0
-        );
-
-
-    const {
-        data: updatedBooking,
-        error
-    } = await supabase
-
-        .from("bookings")
-
-        .update({
-
-            status: "Confirmed",
-
-            advance_paid:
-                ADVANCE_AMOUNT,
-
-            advance_payment_status:
-                "Paid",
-
-            balance_amount:
-                balance,
-
-            advance_payment_method:
-                "UPI"
-
-        })
-
-        .eq(
-            "id",
-            pendingBooking.id
-        )
-
-        .select()
-        .single();
-
-
-    if (error) {
-
-        console.error(
-            "PAYMENT UPDATE ERROR:",
-            error
-        );
-
-        return {
-            success: false,
-            message:
-                "Unable to confirm payment."
-        };
-
-    }
-
-
-    console.log(
-        "================================="
-    );
-
-    console.log(
-        "ADVANCE PAYMENT CONFIRMED"
-    );
-
-    console.log(
-        "Booking:",
-        updatedBooking.id
-    );
-
-    console.log(
-        "Advance:",
-        ADVANCE_AMOUNT
-    );
-
-    console.log(
-        "Balance:",
-        balance
-    );
-
-    console.log(
-        "================================="
-    );
-
-
     return {
-
-        success: true,
-
-        booking:
-            updatedBooking,
-
+        success: false,
         message:
-            "Advance payment confirmed."
-
+            "Payment cannot be confirmed from a customer message. Waiting for Razorpay verification."
     };
-
 }
-
 
 // =====================================================
 // WHATSAPP WEBHOOK
@@ -3966,17 +3865,25 @@ Do not say the booking is confirmed unless the payment result says so.
 
                     const missing = [];
 
-                    if (!booking.service) {
-                        missing.push("service");
-                    }
+if (!booking.service) {
+    missing.push("service");
+}
 
-                    if (!booking.booking_date) {
-                        missing.push("date");
-                    }
+if (!booking.booking_date) {
+    missing.push("date");
+}
 
-                    if (!booking.booking_time) {
-                        missing.push("time");
-                    }
+if (!booking.booking_time) {
+    missing.push("time");
+}
+
+if (!booking.customer_name) {
+    missing.push("name");
+}
+
+if (!booking.phone || booking.phone === instagramPhone) {
+    missing.push("phone");
+}
 
                     // -----------------------------------------
                     // MISSING INFORMATION
@@ -4108,26 +4015,28 @@ Do NOT say the appointment is confirmed.
                                         PROFILE_ID,
 
                                     customer_name:
-                                        booking.customer_name ||
-                                        profileName,
+    booking.customer_name || "Instagram Customer",
 
-                                    phone:
-                                        instagramPhone,
+phone:
+    booking.phone || null,
 
-                                    service:
-                                        service,
+instagram_user_id:
+    senderId,
 
-                                    booking_date:
-                                        booking.booking_date,
+service:
+    service,
 
-                                    booking_time:
-                                        booking.booking_time,
+booking_date:
+    booking.booking_date,
 
-                                    status:
-                                        "Pending",
+booking_time:
+    booking.booking_time,
 
-                                    source:
-                                        "Instagram",
+status:
+    "Pending",
+
+source:
+    "Instagram",
 
                                     notes:
                                         null,
