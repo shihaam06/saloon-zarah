@@ -5171,24 +5171,29 @@ app.post(
             // PHONE
             // ==========================================
 
-            if (!bill.phone) {
+            let phone = String(bill.phone || "").trim();
 
-                return res.status(400).json({
+if (!phone) {
+    return res.status(400).json({
+        error: "Customer WhatsApp number is missing."
+    });
+}
 
-                    error:
-                        "Customer WhatsApp number is missing."
+if (phone.startsWith("whatsapp:")) {
+    phone = phone.replace("whatsapp:", "").trim();
+}
 
-                });
+if (phone.startsWith("+91")) {
+    // Already in international format
+} else if (phone.startsWith("91") && phone.length === 12) {
+    phone = `+${phone}`;
+} else if (phone.length === 10) {
+    phone = `+91${phone}`;
+}
 
-            }
+const whatsappTo = `whatsapp:${phone}`;
 
-
-            const whatsappTo =
-                bill.phone.startsWith(
-                    "whatsapp:"
-                )
-                    ? bill.phone
-                    : `whatsapp:${bill.phone}`;
+console.log("📱 Sending bill to:", whatsappTo);
 
 
             // ==========================================
