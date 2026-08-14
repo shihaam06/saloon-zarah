@@ -472,10 +472,21 @@ function renderInvoice() {
         ) || 0;
 
 
-    const total =
-        Number(
-            bill.total
-        ) || 0;
+    const grossTotal =
+    Number(
+        bill.total
+    ) || 0;
+
+const advancePaid =
+    Number(
+        bill.advance_paid
+    ) || 0;
+
+const total =
+    Math.max(
+        grossTotal - advancePaid,
+        0
+    );
 
 
     document.getElementById(
@@ -531,6 +542,34 @@ function renderInvoice() {
         "total"
     ).textContent =
         formatMoney(total);
+
+
+        const advanceRow =
+    document.getElementById(
+        "advanceRow"
+    );
+
+const advanceElement =
+    document.getElementById(
+        "advancePaid"
+    );
+
+if (
+    advanceRow &&
+    advanceElement &&
+    advancePaid > 0
+) {
+
+    advanceRow.style.display =
+        "flex";
+
+    advanceElement.textContent =
+        "-" +
+        formatMoney(
+            advancePaid
+        );
+
+}
 
 
     // ======================================

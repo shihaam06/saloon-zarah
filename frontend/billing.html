@@ -600,6 +600,13 @@
             max-width: 180px;
         }
 
+        #deductAdvanceBtn.active {
+            border-color: #e98272 !important;
+            background: #fff8f6 !important;
+            color: #d96f60 !important;
+            box-shadow: 0 0 0 1px rgba(233, 130, 114, .08);
+        }
+
         /* =====================================================
            SUMMARY
         ===================================================== */
@@ -886,6 +893,13 @@
                 display: none;
             }
         }
+        @media(max-width:700px){
+
+    #paymentDetails > div{
+        grid-template-columns:1fr !important;
+    }
+
+}
     </style>
 </head>
 
@@ -1243,6 +1257,75 @@
 
 
             <!-- =================================================
+                 ADVANCE DEDUCTION
+            ================================================= -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <div class="card-title">
+
+                        <div class="card-icon">
+                            ₹
+                        </div>
+
+                        <h3>
+                            Advance Payment
+                        </h3>
+
+                    </div>
+
+                    <small>
+                        OPTIONAL
+                    </small>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="discount-row">
+
+                        <div>
+
+                            <div class="field-label">
+                                ADVANCE PAYMENT
+                            </div>
+
+                            <div class="discount-description">
+                                Customer has already paid ₹500 for this appointment.
+                            </div>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            id="deductAdvanceBtn"
+                            style="
+                                min-width:150px;
+                                height:39px;
+                                padding:0 16px;
+                                border:1px solid #d9dee5;
+                                border-radius:8px;
+                                background:#fff;
+                                color:#475569;
+                                cursor:pointer;
+                                font-size:11px;
+                                font-weight:700;
+                                transition:.18s;
+                            "
+                        >
+                            Deduct ₹500
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
                  DISCOUNT
             ================================================= -->
 
@@ -1433,6 +1516,19 @@
 </div>
 
 
+<div class="summary-row" id="advanceSummaryRow" style="display:none;">
+
+    <span>
+        Adv. Paid
+    </span>
+
+    <span id="advanceTotal" style="color:#16a15b;font-weight:700;">
+        -₹500
+    </span>
+
+</div>
+
+
 <div class="summary-row total">
 
     <span>
@@ -1487,80 +1583,60 @@
 
                     <div class="payment-methods">
 
+    <div
+        class="payment-option"
+        data-payment="Cash"
+    >
+        <div class="payment-icon">💵</div>
 
-                        <div
-                            class="payment-option"
-                            data-payment="Cash"
-                        >
+        <div>
+            <div class="payment-name">
+                Cash
+            </div>
 
-                            <div class="payment-icon">
-                                💵
-                            </div>
-
-                            <div>
-
-                                <div class="payment-name">
-                                    Cash
-                                </div>
-
-                                <div class="payment-description">
-                                    Paid at counter
-                                </div>
-
-                            </div>
-
-                        </div>
+            <div class="payment-description">
+                Paid at counter
+            </div>
+        </div>
+    </div>
 
 
-                        <div
-                            class="payment-option"
-                            data-payment="Card"
-                        >
+    <div
+        class="payment-option"
+        data-payment="Card"
+    >
+        <div class="payment-icon">💳</div>
 
-                            <div class="payment-icon">
-                                💳
-                            </div>
+        <div>
+            <div class="payment-name">
+                Card
+            </div>
 
-                            <div>
-
-                                <div class="payment-name">
-                                    Card
-                                </div>
-
-                                <div class="payment-description">
-                                    Debit / credit card
-                                </div>
-
-                            </div>
-
-                        </div>
+            <div class="payment-description">
+                Debit / credit card
+            </div>
+        </div>
+    </div>
 
 
-                        <div
-                            class="payment-option"
-                            data-payment="UPI"
-                        >
+    <div
+        class="payment-option"
+        data-payment="UPI"
+    >
+        <div class="payment-icon">📱</div>
 
-                            <div class="payment-icon">
-                                📱
-                            </div>
+        <div>
+            <div class="payment-name">
+                UPI
+            </div>
 
-                            <div>
+            <div class="payment-description">
+                Digital payment
+            </div>
+        </div>
+    </div>
 
-                                <div class="payment-name">
-                                    UPI
-                                </div>
-
-                                <div class="payment-description">
-                                    Digital payment
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                    </div>
+</div>
 
 
                     <button
@@ -1596,6 +1672,58 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="js/supabase.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const advanceButton =
+        document.getElementById("deductAdvanceBtn");
+
+    const advanceRow =
+        document.getElementById("advanceSummaryRow");
+
+    if (!advanceButton || !advanceRow) {
+        return;
+    }
+
+    // Advance is NOT deducted initially
+    window.advanceDeducted = false;
+
+    advanceButton.addEventListener("click", () => {
+
+        window.advanceDeducted =
+            !window.advanceDeducted;
+
+        if (window.advanceDeducted) {
+
+            advanceButton.classList.add("active");
+
+            advanceButton.textContent =
+                "₹500 Deducted";
+
+            advanceRow.style.display =
+                "flex";
+
+        } else {
+
+            advanceButton.classList.remove("active");
+
+            advanceButton.textContent =
+                "Deduct ₹500";
+
+            advanceRow.style.display =
+                "none";
+        }
+
+        // Tell billing.js that the advance state changed
+        document.dispatchEvent(
+            new CustomEvent("advanceChanged")
+        );
+
+    });
+
+});
+</script>
 
 <script src="js/billing.js"></script>
 

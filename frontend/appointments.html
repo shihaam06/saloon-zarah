@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Appointments | SAGET</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f6f7f9;
+    color: #111827;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 35px auto;
+    padding: 0 24px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-top: 6px;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input,
+select {
+    padding: 11px 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+}
+
+.search {
+    flex: 1;
+}
+
+.card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: left;
+}
+
+th {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+}
+
+td {
+    font-size: 14px;
+}
+
+.customer {
+    font-weight: 700;
+}
+
+.muted {
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #eef2ff;
+}
+
+.status.completed {
+    background: #dcfce7;
+}
+
+.status.cancelled {
+    background: #fee2e2;
+}
+
+.status.no-show {
+    background: #fef3c7;
+}
+
+.actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    border-radius: 7px;
+    padding: 8px 11px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.primary {
+    background: #ef806f;
+    color: white;
+}
+
+.secondary {
+    background: #f3f4f6;
+}
+
+.danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.empty {
+    padding: 50px;
+    text-align: center;
+    color: #6b7280;
+}
+
+/* MODAL */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    width: 520px;
+    max-width: 92%;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close {
+    background: none;
+    font-size: 22px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-control {
+    width: 100%;
+}
+
+.save {
+    width: 100%;
+    margin-top: 22px;
+}
+
+@media(max-width:800px) {
+
+    .controls {
+        flex-direction: column;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .card {
+        overflow-x: auto;
+    }
+    .back-btn{
+    border:1px solid #e5e7eb;
+    background:white;
+    color:#111827;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.back-btn:hover{
+    background:#f3f4f6;
+}
+
+    table {
+        min-width: 1000px;
+    }
+}
+</style>
+</head>
+
+<body>
+    <button
+    onclick="window.location.href='dashboard.html'"
+    class="back-btn"
+>
+    ← Back to Dashboard
+</button>
+
+<div class="container">
+
+    <div class="header">
+
+        <div>
+            <h1>Appointments</h1>
+
+            <div class="subtitle">
+                Manage bookings, schedules and appointment status.
+            </div>
+        </div>
+
+        <button
+            class="primary"
+            onclick="openAddAppointment()"
+        >
+            + New Appointment
+        </button>
+
+    </div>
+
+
+    <div class="controls">
+
+        <input
+            id="search"
+            class="search"
+            placeholder="Search customer, phone or service..."
+            oninput="renderAppointments()"
+        >
+
+        <input
+            id="dateFilter"
+            type="date"
+            onchange="renderAppointments()"
+        >
+
+        <select
+            id="statusFilter"
+            onchange="renderAppointments()"
+        >
+            <option value="all">All Status</option>
+            <option value="Scheduled">Scheduled</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="No-show">No-show</option>
+        </select>
+
+    </div>
+
+
+    <div class="card">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Staff</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="appointmentTable"></tbody>
+
+        </table>
+
+
+        <div
+            id="empty"
+            class="empty"
+            style="display:none;"
+        >
+            No appointments found.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ADD APPOINTMENT -->
+
+<div
+    id="appointmentModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>New Appointment</h2>
+
+            <button
+                class="close"
+                onclick="closeModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <label>Customer</label>
+
+        <input
+            id="customerName"
+            class="form-control"
+            placeholder="Customer name"
+        >
+
+
+        <label>Phone</label>
+
+        <input
+            id="customerPhone"
+            class="form-control"
+            placeholder="+91XXXXXXXXXX"
+        >
+
+
+        <label>Service</label>
+
+        <select
+            id="serviceSelect"
+            class="form-control"
+        >
+            <option value="">
+                Select service
+            </option>
+        </select>
+
+
+        <label>Staff</label>
+
+        <input
+            id="staffName"
+            class="form-control"
+            placeholder="Staff name"
+        >
+
+
+        <label>Date</label>
+
+        <input
+            id="appointmentDate"
+            class="form-control"
+            type="date"
+        >
+
+
+        <label>Time</label>
+
+        <input
+            id="appointmentTime"
+            class="form-control"
+            type="time"
+        >
+
+
+        <label>Duration</label>
+
+        <select
+            id="duration"
+            class="form-control"
+        >
+            <option value="30">30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60" selected>60 minutes</option>
+            <option value="90">90 minutes</option>
+            <option value="120">120 minutes</option>
+        </select>
+
+
+        <label>Notes</label>
+
+        <input
+            id="notes"
+            class="form-control"
+            placeholder="Optional notes"
+        >
+
+
+        <button
+            class="primary save"
+            onclick="saveAppointment()"
+        >
+            Create Appointment
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+    "https://mnhszkqbtxqvzntusmxp.supabase.co";
+
+const SUPABASE_ANON_KEY =
+    "sb_publishable_gVPcn3AyRRNxj1yGV54vNw_Y5_av5m-";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+
+let currentUser = null;
+let appointments = [];
+let services = [];
+
+
+/* =========================================
+   INIT
+========================================= */
+
+async function init(){
+
+    const {
+        data: {
+            user
+        }
+    } =
+    await supabaseClient
+        .auth
+        .getUser();
+
+
+    if(!user){
+
+        alert("Please login first.");
+
+        return;
+
+    }
+
+
+    currentUser = user;
+
+
+    await loadServices();
+
+    await loadAppointments();
+
+}
+
+
+/* =========================================
+   SERVICES
+========================================= */
+
+async function loadServices(){
+
+    const {
+        data,
+        error
+    } =
+    await supabaseClient
+        .from("services")
+        .select(
+            "id, name, price, item_type, active"
+        )
+        .eq(
+            "profile_id",
+            currentUser.id
+        )
+        .eq(
+            "item_type",
+            "service"
+        )
+        .eq(
+            "active",
+            true
+        )
+        .order(
+            "name",
+            {
+                ascending:true
+            }
+        );
+
+
+    if(error){
+
+        console.error(
+            "SERVICE LOAD ERROR:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    services =
+        data || [];
+
+
+    const select =
+        document.getElementById(
+            "serviceSelect"
+        );
+
+
+    services.forEach(
+        service => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                service.id;
+
+            option.textContent =
+                `${service.name} — ₹${Number(
+                    service.price || 0
+                ).toLocaleString("en-IN")}`;
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   LOAD APPOINTMENTS
+========================================= */
+
+async function loadAppointments(){
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("bookings")
+        .select("*")
+        .eq(
+            "profile_id",
+            currentUser.id
+        )
+        .order(
+            "booking_date",
+            {
+                ascending: true
+            }
+        )
+        .order(
+            "booking_time",
+            {
+                ascending: true
+            }
+        );
+
+
+    if(error){
+
+        console.error(
+            "BOOKING LOAD ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to load appointments."
+        );
+
+        return;
+    }
+
+
+    appointments = data || [];
+
+    renderAppointments();
+}
+
+
+/* =========================================
+   RENDER
+========================================= */
+
+function renderAppointments(){
+
+    const table =
+        document.getElementById(
+            "appointmentTable"
+        );
+
+    const empty =
+        document.getElementById(
+            "empty"
+        );
+
+
+    const query =
+        document
+            .getElementById("search")
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    const date =
+        document
+            .getElementById("dateFilter")
+            .value;
+
+
+    const status =
+        document
+            .getElementById("statusFilter")
+            .value;
+
+
+    table.innerHTML = "";
+
+
+    const filtered =
+        appointments.filter(
+            appointment => {
+
+                const text =
+                    `${appointment.customer_name || ""}
+                     ${appointment.customer_phone || ""}
+                     ${appointment.service || ""}`
+                        .toLowerCase();
+
+
+                const matchesSearch =
+                    text.includes(query);
+
+
+                const matchesDate =
+                    !date ||
+                    appointment.booking_date === date;
+
+
+                const matchesStatus =
+                    status === "all" ||
+                    appointment.status === status;
+
+
+                return (
+                    matchesSearch &&
+                    matchesDate &&
+                    matchesStatus
+                );
+
+            }
+        );
+
+
+    if(!filtered.length){
+
+        empty.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    empty.style.display =
+        "none";
+
+
+    filtered.forEach(
+        appointment => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    <strong>
+                        ${formatDate(
+                            appointment.booking_date
+                        )}
+                    </strong>
+                </td>
+
+
+                <td>
+                    ${formatTime(
+                        appointment.booking_time
+                    )}
+                </td>
+
+
+                <td>
+
+                    <div class="customer">
+                        ${escapeHtml(
+                            appointment.customer_name
+                        )}
+                    </div>
+
+                    <div class="muted">
+                        ${escapeHtml(
+                            appointment.customer_phone || ""
+                        )}
+                    </div>
+
+                </td>
+
+
+                <td>
+                    ${escapeHtml(
+                        appointment.service
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHtml(
+                        appointment.staff_name || "—"
+                    )}
+                </td>
+
+
+                <td>
+
+                    <span class="status ${
+                        appointment.status
+                            .toLowerCase()
+                            .replace(
+                                " ",
+                                "-"
+                            )
+                    }">
+
+                        ${escapeHtml(
+                            appointment.status
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+                    ${escapeHtml(
+    appointment.advance_payment_status || "Pending"
+)}
+                </td>
+
+
+                <td>
+
+                    <div class="actions">
+
+                        ${
+                            appointment.status !==
+                            "Completed"
+                            &&
+                            appointment.status !==
+                            "Cancelled"
+                            ?
+                            `
+                            <button
+                                class="success"
+                                onclick="updateStatus(
+                                    '${appointment.id}',
+                                    'Completed'
+                                )"
+                            >
+                                Complete
+                            </button>
+
+                            <button
+                                class="danger"
+                                onclick="updateStatus(
+                                    '${appointment.id}',
+                                    'Cancelled'
+                                )"
+                            >
+                                Cancel
+                            </button>
+                            `
+                            :
+                            ""
+                        }
+
+
+                        ${
+                            appointment.status ===
+                            "Scheduled"
+                            ?
+                            `
+                            <button
+                                class="secondary"
+                                onclick="updateStatus(
+                                    '${appointment.id}',
+                                    'Confirmed'
+                                )"
+                            >
+                                Confirm
+                            </button>
+                            `
+                            :
+                            ""
+                        }
+
+
+                        ${
+                            appointment.status ===
+                            "Confirmed"
+                            ||
+                            appointment.status ===
+                            "Scheduled"
+                            ?
+                            `
+                            <button
+                                class="secondary"
+                                onclick="updateStatus(
+                                    '${appointment.id}',
+                                    'No-show'
+                                )"
+                            >
+                                No-show
+                            </button>
+                            `
+                            :
+                            ""
+                        }
+
+                    </div>
+
+                </td>
+
+            `;
+
+
+            table.appendChild(row);
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   ADD APPOINTMENT
+========================================= */
+
+function openAddAppointment(){
+
+    document
+        .getElementById(
+            "appointmentModal"
+        )
+        .style.display =
+            "flex";
+
+
+    const today =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+    document
+        .getElementById(
+            "appointmentDate"
+        )
+        .value =
+            today;
+
+}
+
+
+function closeModal(){
+
+    document
+        .getElementById(
+            "appointmentModal"
+        )
+        .style.display =
+            "none";
+
+}
+
+
+async function saveAppointment(){
+
+    const customerName =
+        document
+            .getElementById(
+                "customerName"
+            )
+            .value
+            .trim();
+
+
+    const customerPhone =
+        document
+            .getElementById(
+                "customerPhone"
+            )
+            .value
+            .trim();
+
+
+    const serviceId =
+        document
+            .getElementById(
+                "serviceSelect"
+            )
+            .value;
+
+
+    const staffName =
+        document
+            .getElementById(
+                "staffName"
+            )
+            .value
+            .trim();
+
+
+    const appointmentDate =
+        document
+            .getElementById(
+                "appointmentDate"
+            )
+            .value;
+
+
+    const appointmentTime =
+        document
+            .getElementById(
+                "appointmentTime"
+            )
+            .value;
+
+
+    const duration =
+        Number(
+            document
+                .getElementById(
+                    "duration"
+                )
+                .value
+        );
+
+
+    const notes =
+        document
+            .getElementById(
+                "notes"
+            )
+            .value
+            .trim();
+
+
+    if(
+        !customerName ||
+        !serviceId ||
+        !appointmentDate ||
+        !appointmentTime
+    ){
+
+        alert(
+            "Customer, service, date and time are required."
+        );
+
+        return;
+
+    }
+
+
+    const service =
+        services.find(
+            item =>
+                item.id === serviceId
+        );
+
+
+    if(!service){
+
+        alert(
+            "Please select a valid service."
+        );
+
+        return;
+
+    }
+
+
+    /* =================================
+       FIND / CREATE CUSTOMER
+    ================================= */
+
+    let customerId = null;
+
+
+    if(customerPhone){
+
+        const {
+            data: existingCustomer
+        } =
+        await supabaseClient
+            .from("customers")
+            .select("id")
+            .eq(
+                "profile_id",
+                currentUser.id
+            )
+            .eq(
+                "phone",
+                customerPhone
+            )
+            .maybeSingle();
+
+
+        if(existingCustomer){
+
+            customerId =
+                existingCustomer.id;
+
+        }
+        else {
+
+            const {
+                data: newCustomer,
+                error: customerError
+            } =
+            await supabaseClient
+                .from("customers")
+                .insert({
+
+                    profile_id:
+                        currentUser.id,
+
+                    name:
+                        customerName,
+
+                    phone:
+                        customerPhone
+
+                })
+                .select("id")
+                .single();
+
+
+            if(customerError){
+
+                console.error(
+                    customerError
+                );
+
+            }
+            else {
+
+                customerId =
+                    newCustomer.id;
+
+            }
+
+        }
+
+    }
+
+
+    /* =================================
+       CREATE APPOINTMENT
+    ================================= */
+
+    const {
+    error
+} = await supabaseClient
+    .from("bookings")
+    .insert({
+
+        profile_id:
+            currentUser.id,
+
+        customer_name:
+            customerName,
+
+        phone:
+            customerPhone || null,
+
+        service:
+            service.name,
+
+        booking_date:
+            appointmentDate,
+
+        booking_time:
+            appointmentTime,
+
+        status:
+            "Confirmed",
+
+        source:
+            "Dashboard",
+
+        notes:
+            notes || null,
+
+        intent:
+            "booking",
+
+        raw_message:
+            null,
+
+        advance_required:
+            false,
+
+        advance_amount:
+            0,
+
+        advance_paid:
+            0,
+
+        advance_payment_method:
+            null,
+
+        advance_payment_status:
+            "Not Required",
+
+        balance_amount:
+            Number(service.price || 0)
+
+    });
+
+
+    if(error){
+
+        console.error(
+            "APPOINTMENT CREATE ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to create appointment."
+        );
+
+        return;
+
+    }
+
+
+    closeModal();
+
+    clearForm();
+
+    await loadAppointments();
+
+    alert(
+        "Appointment created successfully."
+    );
+
+}
+
+
+/* =========================================
+   UPDATE STATUS
+========================================= */
+
+async function updateStatus(
+    bookingId,
+    newStatus
+){
+
+    const {
+        error
+    } = await supabaseClient
+        .from("bookings")
+        .update({
+            status: newStatus
+        })
+        .eq(
+            "id",
+            bookingId
+        )
+        .eq(
+            "profile_id",
+            currentUser.id
+        );
+
+
+    if(error){
+
+        console.error(
+            "BOOKING STATUS UPDATE ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to update booking status."
+        );
+
+        return;
+    }
+
+
+    // Reload the real bookings table
+    await loadAppointments();
+
+}
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function clearForm(){
+
+    document.getElementById(
+        "customerName"
+    ).value = "";
+
+    document.getElementById(
+        "customerPhone"
+    ).value = "";
+
+    document.getElementById(
+        "serviceSelect"
+    ).value = "";
+
+    document.getElementById(
+        "staffName"
+    ).value = "";
+
+    document.getElementById(
+        "appointmentTime"
+    ).value = "";
+
+    document.getElementById(
+        "notes"
+    ).value = "";
+
+}
+
+
+function formatDate(value){
+
+    if(!value){
+        return "—";
+    }
+
+    const date =
+        new Date(
+            value + "T00:00:00"
+        );
+
+    return date.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+function formatTime(value){
+
+    if(!value){
+        return "—";
+    }
+
+    const parts =
+        value
+            .split(":");
+
+    let hour =
+        Number(parts[0]);
+
+    const minute =
+        parts[1];
+
+    const suffix =
+        hour >= 12
+            ? "PM"
+            : "AM";
+
+    hour =
+        hour % 12 || 12;
+
+    return `${hour}:${minute} ${suffix}`;
+
+}
+
+
+function escapeHtml(value){
+
+    return String(
+        value || ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>

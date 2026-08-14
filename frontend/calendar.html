@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calendar | SAGET</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f7f8fa;
+    color:#111827;
+}
+
+.container{
+    max-width:1400px;
+    margin:0 auto;
+    padding:32px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.title h1{
+    margin:0;
+    font-size:30px;
+}
+
+.title p{
+    margin:7px 0 0;
+    color:#6b7280;
+}
+
+.header-actions{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+button{
+    border:1px solid #e5e7eb;
+    background:white;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+button:hover{
+    background:#f3f4f6;
+}
+
+.primary{
+    background:#ef806f;
+    color:white;
+    border-color:#ef806f;
+}
+
+.primary:hover{
+    background:#e87564;
+}
+
+.calendar-card{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:15px;
+    overflow:hidden;
+}
+
+.calendar-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 20px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.navigation{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.navigation h2{
+    min-width:230px;
+    text-align:center;
+    margin:0;
+    font-size:19px;
+}
+
+.views{
+    display:flex;
+    gap:5px;
+}
+
+.view-btn.active{
+    background:#ef806f;
+    color:white;
+    border-color:#ef806f;
+}
+
+/* MONTH */
+
+.month-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+}
+
+.weekday{
+    padding:12px;
+    font-size:12px;
+    font-weight:700;
+    color:#6b7280;
+    text-align:center;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.day{
+    min-height:145px;
+    border-right:1px solid #e5e7eb;
+    border-bottom:1px solid #e5e7eb;
+    padding:9px;
+    cursor:pointer;
+}
+
+.day:nth-child(7n){
+    border-right:none;
+}
+
+.day:hover{
+    background:#fafafa;
+}
+
+.day.other{
+    background:#fafafa;
+    color:#9ca3af;
+}
+
+.day.today{
+    background:#fff7f5;
+}
+
+.day-number{
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:7px;
+}
+
+.today .day-number{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:28px;
+    height:28px;
+    background:#ef806f;
+    color:white;
+    border-radius:50%;
+}
+
+.event{
+    padding:6px 7px;
+    margin-bottom:5px;
+    border-radius:6px;
+    background:#fff0ed;
+    border-left:3px solid #ef806f;
+    font-size:11px;
+    cursor:pointer;
+    overflow:hidden;
+}
+
+.event.confirmed{
+    background:#ecfdf5;
+    border-left-color:#22c55e;
+}
+
+.event.completed{
+    background:#f0fdf4;
+    border-left-color:#16a34a;
+}
+
+.event.cancelled{
+    background:#fef2f2;
+    border-left-color:#ef4444;
+}
+
+.event.no-show{
+    background:#fffbeb;
+    border-left-color:#f59e0b;
+}
+
+.event-time{
+    font-weight:700;
+}
+
+.event-name{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.more{
+    font-size:11px;
+    color:#6b7280;
+    margin-top:4px;
+}
+
+/* WEEK */
+
+.week-grid{
+    display:grid;
+    grid-template-columns:70px repeat(7,1fr);
+    overflow-x:auto;
+}
+
+.time-column{
+    border-right:1px solid #e5e7eb;
+}
+
+.time-label{
+    height:60px;
+    border-bottom:1px solid #f0f0f0;
+    padding:7px;
+    font-size:11px;
+    color:#9ca3af;
+    text-align:right;
+}
+
+.week-day{
+    min-width:120px;
+    border-right:1px solid #e5e7eb;
+}
+
+.week-day-header{
+    height:60px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:center;
+    padding:10px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.hour{
+    height:60px;
+    border-bottom:1px solid #f0f0f0;
+    position:relative;
+}
+
+.week-event{
+    position:absolute;
+    left:4px;
+    right:4px;
+    top:4px;
+    min-height:50px;
+    padding:6px;
+    border-radius:6px;
+    background:#fff0ed;
+    border-left:3px solid #ef806f;
+    font-size:11px;
+    z-index:2;
+    cursor:pointer;
+}
+
+/* DAY */
+
+.day-view{
+    display:grid;
+    grid-template-columns:80px 1fr;
+}
+
+.day-time{
+    height:65px;
+    border-right:1px solid #e5e7eb;
+    border-bottom:1px solid #f0f0f0;
+    padding:8px;
+    font-size:11px;
+    color:#9ca3af;
+    text-align:right;
+}
+
+.day-slot{
+    height:65px;
+    border-bottom:1px solid #f0f0f0;
+    position:relative;
+}
+
+.day-event{
+    position:absolute;
+    left:8px;
+    right:8px;
+    top:4px;
+    min-height:56px;
+    padding:8px;
+    border-radius:7px;
+    background:#fff0ed;
+    border-left:4px solid #ef806f;
+    cursor:pointer;
+    z-index:2;
+}
+
+.empty{
+    padding:60px;
+    text-align:center;
+    color:#6b7280;
+}
+
+.hidden{
+    display:none !important;
+}
+
+/* MODAL */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+}
+.back-btn{
+    border:1px solid #e5e7eb;
+    background:white;
+    color:#111827;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.back-btn:hover{
+    background:#f3f4f6;
+}
+
+.modal-box{
+    background:white;
+    width:430px;
+    max-width:92%;
+    border-radius:15px;
+    padding:25px;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.modal-header h2{
+    margin:0;
+}
+
+.detail{
+    padding:12px 0;
+    border-bottom:1px solid #f0f0f0;
+}
+
+.detail-label{
+    font-size:11px;
+    color:#6b7280;
+    margin-bottom:4px;
+}
+
+.detail-value{
+    font-weight:600;
+}
+
+@media(max-width:900px){
+
+    .container{
+        padding:15px;
+    }
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .calendar-toolbar{
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .month-grid{
+        min-width:900px;
+    }
+
+    .calendar-card{
+        overflow:auto;
+    }
+
+}
+</style>
+</head>
+
+<body>
+    <button
+    onclick="window.location.href='dashboard.html'"
+    class="back-btn"
+>
+    ← Back to Dashboard
+</button>
+
+<div class="container">
+    
+
+    <div class="header">
+
+        <div class="title">
+            <h1>Calendar</h1>
+            <p>Manage your salon schedule.</p>
+        </div>
+
+        <div class="header-actions">
+
+            <button onclick="goToday()">
+                Today
+            </button>
+
+            <button
+                class="primary"
+                onclick="window.location.href='appointments.html'"
+            >
+                View Appointments
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="calendar-card">
+
+        <div class="calendar-toolbar">
+
+            <div class="navigation">
+
+                <button onclick="previousPeriod()">
+                    ‹
+                </button>
+
+                <h2 id="periodTitle">
+                    Loading...
+                </h2>
+
+                <button onclick="nextPeriod()">
+                    ›
+                </button>
+
+            </div>
+
+
+            <div class="views">
+
+                <button
+                    id="monthBtn"
+                    class="view-btn active"
+                    onclick="changeView('month')"
+                >
+                    Month
+                </button>
+
+                <button
+                    id="weekBtn"
+                    class="view-btn"
+                    onclick="changeView('week')"
+                >
+                    Week
+                </button>
+
+                <button
+                    id="dayBtn"
+                    class="view-btn"
+                    onclick="changeView('day')"
+                >
+                    Day
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="monthView"></div>
+
+        <div
+            id="weekView"
+            class="hidden"
+        ></div>
+
+        <div
+            id="dayView"
+            class="hidden"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- DETAILS MODAL -->
+
+<div
+    id="detailsModal"
+    class="modal"
+    onclick="closeModal(event)"
+>
+
+    <div
+        class="modal-box"
+        onclick="event.stopPropagation()"
+    >
+
+        <div class="modal-header">
+
+            <h2>Appointment</h2>
+
+            <button onclick="hideModal()">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="detail">
+            <div class="detail-label">
+                CUSTOMER
+            </div>
+
+            <div
+                id="detailCustomer"
+                class="detail-value"
+            ></div>
+        </div>
+
+
+        <div class="detail">
+            <div class="detail-label">
+                PHONE
+            </div>
+
+            <div
+                id="detailPhone"
+                class="detail-value"
+            ></div>
+        </div>
+
+
+        <div class="detail">
+            <div class="detail-label">
+                SERVICE
+            </div>
+
+            <div
+                id="detailService"
+                class="detail-value"
+            ></div>
+        </div>
+
+
+        <div class="detail">
+            <div class="detail-label">
+                DATE & TIME
+            </div>
+
+            <div
+                id="detailDate"
+                class="detail-value"
+            ></div>
+        </div>
+
+
+        <div class="detail">
+            <div class="detail-label">
+                STATUS
+            </div>
+
+            <div
+                id="detailStatus"
+                class="detail-value"
+            ></div>
+        </div>
+
+
+        <div class="detail">
+            <div class="detail-label">
+                PAYMENT
+            </div>
+
+            <div
+                id="detailPayment"
+                class="detail-value"
+            ></div>
+        </div>
+
+
+        <div class="detail">
+            <div class="detail-label">
+                NOTES
+            </div>
+
+            <div
+                id="detailNotes"
+                class="detail-value"
+            ></div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+    "https://mnhszkqbtxqvzntusmxp.supabase.co";
+
+const SUPABASE_ANON_KEY =
+    "sb_publishable_gVPcn3AyRRNxj1yGV54vNw_Y5_av5m-";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+
+let currentUser = null;
+
+let bookings = [];
+
+let currentView = "month";
+
+let currentDate = new Date();
+
+
+/* =========================================
+   INIT
+========================================= */
+
+async function init(){
+
+    const {
+        data:{
+            user
+        }
+    } =
+    await supabaseClient
+        .auth
+        .getUser();
+
+
+    if(!user){
+
+        alert(
+            "Please login first."
+        );
+
+        return;
+
+    }
+
+
+    currentUser =
+        user;
+
+
+    await loadBookings();
+
+}
+
+
+/* =========================================
+   LOAD BOOKINGS
+========================================= */
+
+async function loadBookings(){
+
+    const {
+        data,
+        error
+    } =
+    await supabaseClient
+        .from("bookings")
+        .select("*")
+        .eq(
+            "profile_id",
+            currentUser.id
+        )
+        .order(
+            "booking_date",
+            {
+                ascending:true
+            }
+        )
+        .order(
+            "booking_time",
+            {
+                ascending:true
+            }
+        );
+
+
+    if(error){
+
+        console.error(
+            "CALENDAR BOOKING ERROR:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    bookings =
+        data || [];
+
+
+    renderCalendar();
+
+}
+
+
+/* =========================================
+   VIEW
+========================================= */
+
+function changeView(view){
+
+    currentView =
+        view;
+
+
+    document
+        .getElementById("monthBtn")
+        .classList
+        .toggle(
+            "active",
+            view === "month"
+        );
+
+
+    document
+        .getElementById("weekBtn")
+        .classList
+        .toggle(
+            "active",
+            view === "week"
+        );
+
+
+    document
+        .getElementById("dayBtn")
+        .classList
+        .toggle(
+            "active",
+            view === "day"
+        );
+
+
+    renderCalendar();
+
+}
+
+
+function previousPeriod(){
+
+    if(currentView === "month"){
+
+        currentDate.setMonth(
+            currentDate.getMonth() - 1
+        );
+
+    }
+    else if(currentView === "week"){
+
+        currentDate.setDate(
+            currentDate.getDate() - 7
+        );
+
+    }
+    else{
+
+        currentDate.setDate(
+            currentDate.getDate() - 1
+        );
+
+    }
+
+
+    renderCalendar();
+
+}
+
+
+function nextPeriod(){
+
+    if(currentView === "month"){
+
+        currentDate.setMonth(
+            currentDate.getMonth() + 1
+        );
+
+    }
+    else if(currentView === "week"){
+
+        currentDate.setDate(
+            currentDate.getDate() + 7
+        );
+
+    }
+    else{
+
+        currentDate.setDate(
+            currentDate.getDate() + 1
+        );
+
+    }
+
+
+    renderCalendar();
+
+}
+
+
+function goToday(){
+
+    currentDate =
+        new Date();
+
+    renderCalendar();
+
+}
+
+
+/* =========================================
+   RENDER
+========================================= */
+
+function renderCalendar(){
+
+    if(currentView === "month"){
+
+        renderMonth();
+
+    }
+    else if(currentView === "week"){
+
+        renderWeek();
+
+    }
+    else{
+
+        renderDay();
+
+    }
+
+}
+
+
+/* =========================================
+   MONTH
+========================================= */
+
+function renderMonth(){
+
+    const year =
+        currentDate.getFullYear();
+
+    const month =
+        currentDate.getMonth();
+
+
+    document
+        .getElementById(
+            "periodTitle"
+        )
+        .textContent =
+            new Intl.DateTimeFormat(
+                "en-IN",
+                {
+                    month:"long",
+                    year:"numeric"
+                }
+            ).format(
+                currentDate
+            );
+
+
+    const firstDay =
+        new Date(
+            year,
+            month,
+            1
+        );
+
+
+    const startDay =
+        firstDay.getDay();
+
+
+    const daysInMonth =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    const previousDays =
+        new Date(
+            year,
+            month,
+            0
+        ).getDate();
+
+
+    let html = `
+        <div class="month-grid">
+
+            <div class="weekday">Sun</div>
+            <div class="weekday">Mon</div>
+            <div class="weekday">Tue</div>
+            <div class="weekday">Wed</div>
+            <div class="weekday">Thu</div>
+            <div class="weekday">Fri</div>
+            <div class="weekday">Sat</div>
+    `;
+
+
+    const totalCells =
+        Math.ceil(
+            (
+                startDay +
+                daysInMonth
+            ) / 7
+        ) * 7;
+
+
+    for(
+        let cell = 0;
+        cell < totalCells;
+        cell++
+    ){
+
+        let dayNumber;
+
+        let cellDate;
+
+        let other = false;
+
+
+        if(cell < startDay){
+
+            dayNumber =
+                previousDays -
+                startDay +
+                cell +
+                1;
+
+            cellDate =
+                new Date(
+                    year,
+                    month - 1,
+                    dayNumber
+                );
+
+            other = true;
+
+        }
+        else if(
+            cell >=
+            startDay +
+            daysInMonth
+        ){
+
+            dayNumber =
+                cell -
+                (
+                    startDay +
+                    daysInMonth
+                ) +
+                1;
+
+            cellDate =
+                new Date(
+                    year,
+                    month + 1,
+                    dayNumber
+                );
+
+            other = true;
+
+        }
+        else{
+
+            dayNumber =
+                cell -
+                startDay +
+                1;
+
+            cellDate =
+                new Date(
+                    year,
+                    month,
+                    dayNumber
+                );
+
+        }
+
+
+        const dateString =
+            toDateString(
+                cellDate
+            );
+
+
+        const isToday =
+            dateString ===
+            toDateString(
+                new Date()
+            );
+
+
+        const dayBookings =
+            bookings.filter(
+                booking =>
+                    booking.booking_date ===
+                    dateString
+            );
+
+
+        html += `
+            <div
+                class="day
+                ${other ? "other" : ""}
+                ${isToday ? "today" : ""}"
+            >
+
+                <div class="day-number">
+                    ${dayNumber}
+                </div>
+        `;
+
+
+        const visible =
+            dayBookings.slice(
+                0,
+                3
+            );
+
+
+        visible.forEach(
+            booking => {
+
+                html +=
+                    eventHTML(
+                        booking
+                    );
+
+            }
+        );
+
+
+        if(
+            dayBookings.length >
+            3
+        ){
+
+            html += `
+                <div class="more">
+                    +${dayBookings.length - 3}
+                    more
+                </div>
+            `;
+
+        }
+
+
+        html += `
+            </div>
+        `;
+
+    }
+
+
+    html += `
+        </div>
+    `;
+
+
+    document
+        .getElementById(
+            "monthView"
+        )
+        .innerHTML =
+            html;
+
+
+    document
+        .getElementById(
+            "weekView"
+        )
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById(
+            "dayView"
+        )
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById(
+            "monthView"
+        )
+        .classList
+        .remove("hidden");
+
+}
+
+
+/* =========================================
+   WEEK
+========================================= */
+
+function renderWeek(){
+
+    const weekStart =
+        getWeekStart(
+            currentDate
+        );
+
+
+    const weekEnd =
+        new Date(
+            weekStart
+        );
+
+    weekEnd.setDate(
+        weekEnd.getDate() + 6
+    );
+
+
+    document
+        .getElementById(
+            "periodTitle"
+        )
+        .textContent =
+            `${formatShortDate(
+                weekStart
+            )} – ${formatShortDate(
+                weekEnd
+            )}`;
+
+
+    let html = `
+        <div class="week-grid">
+
+            <div class="time-column">
+                <div class="week-day-header"></div>
+    `;
+
+
+    for(
+        let hour = 8;
+        hour <= 21;
+        hour++
+    ){
+
+        html += `
+            <div class="time-label">
+                ${formatHour(hour)}
+            </div>
+        `;
+
+    }
+
+
+    html += `
+            </div>
+    `;
+
+
+    for(
+        let day = 0;
+        day < 7;
+        day++
+    ){
+
+        const date =
+            new Date(
+                weekStart
+            );
+
+        date.setDate(
+            date.getDate() + day
+        );
+
+
+        const dateString =
+            toDateString(date);
+
+
+        const dayBookings =
+            bookings.filter(
+                booking =>
+                    booking.booking_date ===
+                    dateString
+            );
+
+
+        html += `
+            <div class="week-day">
+
+                <div class="week-day-header">
+                    ${date.toLocaleDateString(
+                        "en-IN",
+                        {
+                            weekday:"short",
+                            day:"numeric"
+                        }
+                    )}
+                </div>
+        `;
+
+
+        for(
+            let hour = 8;
+            hour <= 21;
+            hour++
+        ){
+
+            const matching =
+                dayBookings.filter(
+                    booking =>
+                        getHour(
+                            booking.booking_time
+                        ) === hour
+                );
+
+
+            html += `
+                <div class="hour">
+            `;
+
+
+            matching.forEach(
+                booking => {
+
+                    html +=
+                        weekEventHTML(
+                            booking
+                        );
+
+                }
+            );
+
+
+            html += `
+                </div>
+            `;
+
+        }
+
+
+        html += `
+            </div>
+        `;
+
+    }
+
+
+    html += `
+        </div>
+    `;
+
+
+    document
+        .getElementById(
+            "weekView"
+        )
+        .innerHTML =
+            html;
+
+
+    document
+        .getElementById(
+            "monthView"
+        )
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById(
+            "dayView"
+        )
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById(
+            "weekView"
+        )
+        .classList
+        .remove("hidden");
+
+}
+
+
+/* =========================================
+   DAY
+========================================= */
+
+function renderDay(){
+
+    const dateString =
+        toDateString(
+            currentDate
+        );
+
+
+    document
+        .getElementById(
+            "periodTitle"
+        )
+        .textContent =
+            currentDate.toLocaleDateString(
+                "en-IN",
+                {
+                    weekday:"long",
+                    day:"numeric",
+                    month:"long",
+                    year:"numeric"
+                }
+            );
+
+
+    const dayBookings =
+        bookings.filter(
+            booking =>
+                booking.booking_date ===
+                dateString
+        );
+
+
+    let html = `
+        <div class="day-view">
+
+            <div>
+    `;
+
+
+    for(
+        let hour = 8;
+        hour <= 21;
+        hour++
+    ){
+
+        html += `
+            <div class="day-time">
+                ${formatHour(hour)}
+            </div>
+        `;
+
+    }
+
+
+    html += `
+            </div>
+
+            <div>
+    `;
+
+
+    for(
+        let hour = 8;
+        hour <= 21;
+        hour++
+    ){
+
+        const matching =
+            dayBookings.filter(
+                booking =>
+                    getHour(
+                        booking.booking_time
+                    ) === hour
+            );
+
+
+        html += `
+            <div class="day-slot">
+        `;
+
+
+        matching.forEach(
+            booking => {
+
+                html +=
+                    dayEventHTML(
+                        booking
+                    );
+
+            }
+        );
+
+
+        html += `
+            </div>
+        `;
+
+    }
+
+
+    html += `
+            </div>
+
+        </div>
+    `;
+
+
+    document
+        .getElementById(
+            "dayView"
+        )
+        .innerHTML =
+            html;
+
+
+    document
+        .getElementById(
+            "monthView"
+        )
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById(
+            "weekView"
+        )
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById(
+            "dayView"
+        )
+        .classList
+        .remove("hidden");
+
+}
+
+
+/* =========================================
+   EVENT HTML
+========================================= */
+
+function eventHTML(
+    booking
+){
+
+    const status =
+        String(
+            booking.status ||
+            ""
+        )
+        .toLowerCase()
+        .replace(
+            " ",
+            "-"
+        );
+
+
+    return `
+        <div
+            class="event ${status}"
+            onclick='showDetails(
+                ${JSON.stringify(
+                    booking
+                )}
+            )'
+        >
+
+            <div class="event-time">
+                ${formatTime(
+                    booking.booking_time
+                )}
+            </div>
+
+            <div class="event-name">
+                ${escapeHtml(
+                    booking.customer_name
+                )}
+            </div>
+
+            <div class="event-name">
+                ${escapeHtml(
+                    booking.service || ""
+                )}
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+function weekEventHTML(
+    booking
+){
+
+    return `
+        <div
+            class="week-event"
+            onclick='showDetails(
+                ${JSON.stringify(
+                    booking
+                )}
+            )'
+        >
+
+            <strong>
+                ${formatTime(
+                    booking.booking_time
+                )}
+            </strong>
+
+            <br>
+
+            ${escapeHtml(
+                booking.customer_name
+            )}
+
+            <br>
+
+            ${escapeHtml(
+                booking.service || ""
+            )}
+
+        </div>
+    `;
+
+}
+
+
+function dayEventHTML(
+    booking
+){
+
+    return `
+        <div
+            class="day-event"
+            onclick='showDetails(
+                ${JSON.stringify(
+                    booking
+                )}
+            )'
+        >
+
+            <strong>
+                ${formatTime(
+                    booking.booking_time
+                )}
+            </strong>
+
+            —
+            ${escapeHtml(
+                booking.customer_name
+            )}
+
+            <br>
+
+            ${escapeHtml(
+                booking.service || ""
+            )}
+
+        </div>
+    `;
+
+}
+
+
+/* =========================================
+   DETAILS
+========================================= */
+
+function showDetails(
+    booking
+){
+
+    document
+        .getElementById(
+            "detailCustomer"
+        )
+        .textContent =
+            booking.customer_name ||
+            "—";
+
+
+    document
+        .getElementById(
+            "detailPhone"
+        )
+        .textContent =
+            booking.phone ||
+            "—";
+
+
+    document
+        .getElementById(
+            "detailService"
+        )
+        .textContent =
+            booking.service ||
+            "—";
+
+
+    document
+        .getElementById(
+            "detailDate"
+        )
+        .textContent =
+            `${formatDate(
+                booking.booking_date
+            )} at ${formatTime(
+                booking.booking_time
+            )}`;
+
+
+    document
+        .getElementById(
+            "detailStatus"
+        )
+        .textContent =
+            booking.status ||
+            "—";
+
+
+    document
+        .getElementById(
+            "detailPayment"
+        )
+        .textContent =
+            booking.advance_payment_status ||
+            "Pending";
+
+
+    document
+        .getElementById(
+            "detailNotes"
+        )
+        .textContent =
+            booking.notes ||
+            "No notes";
+
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .style.display =
+            "flex";
+
+}
+
+
+function hideModal(){
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .style.display =
+            "none";
+
+}
+
+
+function closeModal(event){
+
+    if(
+        event.target.id ===
+        "detailsModal"
+    ){
+
+        hideModal();
+
+    }
+
+}
+
+
+/* =========================================
+   DATE HELPERS
+========================================= */
+
+function toDateString(
+    date
+){
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        )
+        .padStart(
+            2,
+            "0"
+        );
+
+    const day =
+        String(
+            date.getDate()
+        )
+        .padStart(
+            2,
+            "0"
+        );
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+function getWeekStart(
+    date
+){
+
+    const result =
+        new Date(
+            date
+        );
+
+    const day =
+        result.getDay();
+
+
+    result.setDate(
+        result.getDate() -
+        day
+    );
+
+
+    return result;
+
+}
+
+
+function formatDate(
+    value
+){
+
+    if(!value){
+
+        return "—";
+
+    }
+
+
+    return new Date(
+        value + "T00:00:00"
+    )
+    .toLocaleDateString(
+        "en-IN",
+        {
+            day:"2-digit",
+            month:"short",
+            year:"numeric"
+        }
+    );
+
+}
+
+
+function formatShortDate(
+    date
+){
+
+    return date.toLocaleDateString(
+        "en-IN",
+        {
+            day:"numeric",
+            month:"short"
+        }
+    );
+
+}
+
+
+function formatTime(
+    value
+){
+
+    if(!value){
+
+        return "—";
+
+    }
+
+
+    const parts =
+        value.split(":");
+
+
+    let hour =
+        Number(
+            parts[0]
+        );
+
+
+    const minute =
+        parts[1] ||
+        "00";
+
+
+    const suffix =
+        hour >= 12
+            ? "PM"
+            : "AM";
+
+
+    hour =
+        hour % 12 ||
+        12;
+
+
+    return `${hour}:${minute} ${suffix}`;
+
+}
+
+
+function formatHour(
+    hour
+){
+
+    const suffix =
+        hour >= 12
+            ? "PM"
+            : "AM";
+
+
+    let display =
+        hour % 12 ||
+        12;
+
+
+    return `${display}:00 ${suffix}`;
+
+}
+
+
+function getHour(
+    time
+){
+
+    if(!time){
+
+        return -1;
+
+    }
+
+
+    return Number(
+        time.split(":")[0]
+    );
+
+}
+
+
+function escapeHtml(
+    value
+){
+
+    return String(
+        value || ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>

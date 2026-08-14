@@ -158,6 +158,37 @@ async function loadBooking() {
 
 
     renderBooking();
+    // ======================================
+// INITIALIZE PAYMENT AMOUNT
+// ======================================
+
+const amountInput =
+    document.getElementById(
+        "amountReceived"
+    );
+
+if (amountInput) {
+
+    const total =
+        Number(
+            calculateTotal().total
+        ) || 0;
+
+    const advance =
+        Number(
+            booking?.advance_paid
+        ) || 0;
+
+    const remaining =
+        Math.max(
+            total - advance,
+            0
+        );
+
+    amountInput.value =
+        remaining.toFixed(2);
+
+}
 
 }
 
@@ -406,7 +437,7 @@ function renderServices() {
                     }
 
                     ${
-                        profileSettings.gst_enabled
+                        profileSettings?.gst_enabled
                         ? ` • GST ${gstRate}%`
                         : ""
                     }
@@ -797,7 +828,7 @@ function calculateTotal() {
     // ======================================
 
     const mainGST =
-        profileSettings.gst_enabled
+        profileSettings?.gst_enabled
             ? Number(
                 mainService?.gst_rate
             ) || 0
@@ -858,7 +889,7 @@ function calculateTotal() {
 
 
             const addonGST =
-                profileSettings.gst_enabled
+                profileSettings?.gst_enabled
                     ? Number(
                         addon.gstRate
                     ) || 0
@@ -990,16 +1021,37 @@ function calculateTotal() {
         );
 
 
-    document.getElementById(
-        "grandTotal"
-    ).textContent =
-        "₹" +
-        total.toLocaleString(
-            "en-IN",
-            {
-                minimumFractionDigits: 2
-            }
-        );
+    // ======================================
+// GRAND TOTAL AFTER ADVANCE
+// ======================================
+
+const advancePaid =
+    Number(booking?.advance_paid) || 0;
+
+const finalAmount =
+    Math.max(
+        total - advancePaid,
+        0
+    );
+
+const displayTotal =
+    window.advanceDeducted
+        ? Math.max(
+            total - (Number(booking?.advance_paid) || 0),
+            0
+        )
+        : total;
+
+document.getElementById(
+    "grandTotal"
+).textContent =
+    "₹" +
+    displayTotal.toLocaleString(
+        "en-IN",
+        {
+            minimumFractionDigits: 2
+        }
+    );
 
 
     /*
@@ -1110,6 +1162,16 @@ function calculateTotal() {
     };
 
 }
+// ==========================================
+// ADVANCE DEDUCTION TOGGLE
+// ==========================================
+
+document.addEventListener(
+    "advanceChanged",
+    () => {
+        calculateTotal();
+    }
+);
 
 
 // ==========================================
@@ -1153,6 +1215,33 @@ document
 
         }
     );
+    const amountReceivedInput =
+    document.getElementById(
+        "amountReceived"
+    );
+
+if(amountReceivedInput){
+
+    const advance =
+        Number(
+            booking?.advance_paid
+        ) || 0;
+
+    const total =
+        Number(
+            calculateTotal().total
+        ) || 0;
+
+    const remaining =
+        Math.max(
+            total - advance,
+            0
+        );
+
+    amountReceivedInput.value =
+        remaining.toFixed(2);
+
+}
 
 
 // ==========================================
@@ -1261,14 +1350,14 @@ document
 // ADVANCE PAYMENT FROM BOOKING
 // ======================================
 
-const advancePaid =
-    Number(booking.advance_paid) || 0;
+// const advancePaid =
+//     Number(booking.advance_paid) || 0;
 
-const balanceDue =
-    Math.max(
-        totals.total - advancePaid,
-        0
-    );
+// const balanceDue =
+//     Math.max(
+//         totals.total - advancePaid,
+//         0
+//     );
 
 
             const validAddons =
@@ -1313,89 +1402,241 @@ const balanceDue =
             // CREATE BILL
             // ======================================
 
-            const {
-                data: bill,
-                error: billError
-            } =
-                await client
+            // ======================================
+// PAYMENT CALCULATION
+// ======================================
 
-                    .from("bills")
+// ======================================
+// PAYMENT CALCULATION
+// ======================================
 
-                    .insert({
+const billTotal =
+    Number(totals.total) || 0;
 
-                        profile_id:
-                            user.id,
 
-                        booking_id:
-                            booking.id,
+// Amount already received when booking was made
+const bookingAdvance =
+    Number(booking.advance_paid) || 0;
 
-                        customer_name:
-                            booking.customer_name,
 
-                        phone:
-                            booking.phone,
+// Amount received NOW at billing
+const amountInput =
+    document.getElementById(
+        "amountReceived"
+    );
 
-                        subtotal:
-                            totals.subtotal,
 
-                        addon_total:
-                            totals.addonTotal,
+const remainingBeforePayment =
+    Math.max(
+        billTotal - bookingAdvance,
+        0
+    );
 
-                        discount:
-                            totals.discount,
+const currentPayment =
+    Number(
+        amountInput?.value
+    ) || 0;
 
-                        taxable_amount:
-                            totals.taxableAmount,
+if(
+    currentPayment >
+    remainingBeforePayment
+){
 
-                        cgst_amount:
-                            totals.cgstAmount,
+    alert(
+        `Amount received cannot exceed the remaining balance of ₹${remainingBeforePayment.toFixed(2)}.`
+    );
 
-                        sgst_amount:
-                            totals.sgstAmount,
+    return;
+}
 
-                        igst_amount:
-                            totals.igstAmount,
+const amountPaid =
+    bookingAdvance +
+    currentPayment;
 
-                        total_tax:
-                            totals.totalTax,
+const balanceAmount =
+    Math.max(
+        billTotal -
+        amountPaid,
+        0
+    );
 
-                        total:
-                            totals.total,
+let paymentStatus =
+    "Pending";
 
-                        invoice_number:
-                            invoiceNumber,
+if(
+    amountPaid >= billTotal
+){
 
-                        invoice_date:
-                            new Date()
-                                .toISOString()
-                                .split("T")[0],
+    paymentStatus =
+        "Paid";
 
-                        seller_gstin:
-                            profileSettings.gstin ||
-                            null,
+}
+else if(
+    amountPaid > 0
+){
 
-                        seller_state:
-                            profileSettings.business_state ||
-                            null,
+    paymentStatus =
+        "Partially Paid";
 
-                        seller_state_code:
-                            profileSettings.state_code ||
-                            null,
+}
 
-                        payment_method:
-    selectedPayment,
 
-payment_status:
-    "Paid",
+// const balanceAmount =
+//     Math.max(
+//         billTotal -
+//         amountPaid,
+//         0
+//     );
 
-advance_paid:
-    advancePaid
 
-                    })
+// let paymentStatus =
+//     "Pending";
 
-                    .select()
 
-                    .single();
+if(amountPaid >= billTotal){
+
+    paymentStatus =
+        "Paid";
+
+}
+else if(amountPaid > 0){
+
+    paymentStatus =
+        "Partially Paid";
+
+}
+
+
+// ======================================
+// UPDATE PAYMENT UI
+// ======================================
+
+const statusElement =
+    document.getElementById(
+        "paymentStatusDisplay"
+    );
+
+
+const balanceElement =
+    document.getElementById(
+        "balanceDueDisplay"
+    );
+
+
+if(statusElement){
+
+    statusElement.textContent =
+        paymentStatus;
+
+}
+
+
+if(balanceElement){
+
+    balanceElement.textContent =
+        "₹" +
+        balanceAmount.toLocaleString(
+            "en-IN",
+            {
+                minimumFractionDigits:2
+            }
+        );
+
+}
+
+
+// ======================================
+// CREATE BILL
+// ======================================
+
+const {
+    data: bill,
+    error: billError
+} = await client
+    .from("bills")
+    .insert({
+
+        profile_id:
+            user.id,
+
+        booking_id:
+            booking.id,
+
+        customer_name:
+            booking.customer_name,
+
+        phone:
+            booking.phone,
+
+        subtotal:
+            totals.subtotal,
+
+        addon_total:
+            totals.addonTotal,
+
+        discount:
+            totals.discount,
+
+        taxable_amount:
+            totals.taxableAmount,
+
+        cgst_amount:
+            totals.cgstAmount,
+
+        sgst_amount:
+            totals.sgstAmount,
+
+        igst_amount:
+            totals.igstAmount,
+
+        total_tax:
+            totals.totalTax,
+
+        total:
+            billTotal,
+
+        invoice_number:
+            invoiceNumber,
+
+        invoice_date:
+            new Date()
+                .toISOString()
+                .split("T")[0],
+
+        seller_gstin:
+            profileSettings.gstin ||
+            null,
+
+        seller_state:
+            profileSettings.business_state ||
+            null,
+
+        seller_state_code:
+            profileSettings.state_code ||
+            null,
+
+        // ==============================
+        // PAYMENT
+        // ==============================
+
+        payment_method:
+            selectedPayment,
+
+        payment_status:
+            paymentStatus,
+
+        advance_paid:
+    bookingAdvance,
+
+amount_paid:
+    amountPaid,
+
+balance_amount:
+    balanceAmount,
+
+    })
+    .select()
+    .single();
 
 
             if (billError) {
@@ -1446,7 +1687,7 @@ advance_paid:
 
 
             const mainGST =
-                profileSettings.gst_enabled
+                profileSettings?.gst_enabled
                     ? Number(
                         mainService.gst_rate
                     ) || 0
@@ -1546,7 +1787,7 @@ advance_paid:
 
 
                     const addonGST =
-                        profileSettings.gst_enabled
+                        profileSettings?.gst_enabled
                             ? Number(
                                 addon.gstRate
                             ) || 0

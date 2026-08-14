@@ -1784,7 +1784,7 @@ const filterMenu =
     document.getElementById("filterMenu");
 
 
-let currentBookingFilter = "all";
+let currentBookingFilter = "today";
 
 
 if (
@@ -2112,11 +2112,28 @@ async function loadBookings() {
 // TABLE
 // =================================================
 
-const filteredBookings =
-    applyBookingFilter(
-        safeBookings,
-        currentBookingFilter || "all"
+let filteredBookings;
+
+if (currentBookingFilter === "today") {
+
+    filteredBookings = safeBookings.filter(
+        booking =>
+            booking.booking_date >= getLocalDateString()
+            &&
+            (
+                booking.status || "Confirmed"
+            ).toLowerCase() !== "cancelled"
     );
+
+} else {
+
+    filteredBookings =
+        applyBookingFilter(
+            safeBookings,
+            currentBookingFilter
+        );
+
+}
 
 renderBookings(
     filteredBookings
