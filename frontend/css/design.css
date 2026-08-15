@@ -1,0 +1,94 @@
+/* design.css - Neutral premium palette */
+:root {
+  --color-bg: #f6f7f9; /* light gray background */
+  --color-surface: #ffffff; /* cards */
+  --color-primary: hsl(170, 62%, 45%); /* teal accent */
+  --color-primary-hover: hsl(170, 62%, 50%);
+  --color-muted: #6b7280; /* gray text */
+  --color-border: #e5e7eb; /* light border */
+  --color-danger: #e53e3e;
+  --font-family: "Inter", Arial, sans-serif;
+  --radius: 8px;
+  --spacing: 16px;
+  --transition: all 0.2s ease-in-out;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: #111827;
+}
+
+.container {
+  max-width: 1250px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+button {
+  border: none;
+  border-radius: var(--radius);
+  padding: 11px 18px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+button.primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+button.primary:hover {
+  background: var(--color-primary-hover);
+}
+
+button.view {
+  background: var(--color-surface);
+  color: #111827;
+  border: 1px solid var(--color-border);
+}
+
+button.view:hover {
+  background: #f3f4f6;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+input:focus, textarea:focus {
+  outline: 2px solid var(--color-primary);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: var(--color-surface);
+  width: 500px;
+  max-width: 92%;
+  border-radius: var(--radius);
+  padding: 25px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media(max-width:700px) {
+  .container {
+    margin: 20px auto;
+    padding: 0 12px;
+  }
+}
