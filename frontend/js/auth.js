@@ -18,6 +18,9 @@ if (registerBtn) {
         const password =
             document.getElementById("password").value;
 
+        const ownerPin =
+            document.getElementById("ownerPin") ? document.getElementById("ownerPin").value : null;
+
 
         const { data, error } =
             await client.auth.signUp({
@@ -42,7 +45,10 @@ if (registerBtn) {
                     id: data.user.id,
 
                     business_name:
-                        businessName
+                        businessName,
+
+                    owner_pin:
+                        ownerPin || password
 
                 });
 

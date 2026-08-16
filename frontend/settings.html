@@ -621,6 +621,21 @@ textarea{
                 </div>
 
 
+                <div class="form-group">
+
+                    <label>
+                        Owner Password / PIN (for Analytics & Settings)
+                    </label>
+
+                    <input
+                        id="ownerPin"
+                        type="password"
+                        placeholder="Used for Analytics & Settings protection"
+                    >
+
+                </div>
+
+
                 <div class="form-group full">
 
                     <label>
@@ -871,6 +886,7 @@ textarea{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="js/supabase.js"></script>
+<script src="js/ownerLock.js"></script>
 
 
 <script>
@@ -971,6 +987,11 @@ document.addEventListener(
                     )
                     .value =
                     data.business_phone || "";
+
+
+                if (document.getElementById("ownerPin")) {
+                    document.getElementById("ownerPin").value = data.owner_pin || "";
+                }
 
 
                 document
@@ -1097,6 +1118,12 @@ document.addEventListener(
                             )
                             .value
                             .trim(),
+
+                    owner_pin:
+                        document
+                            .getElementById("ownerPin")
+                            ? document.getElementById("ownerPin").value.trim()
+                            : "",
 
                     business_address:
                         document

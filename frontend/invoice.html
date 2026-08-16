@@ -4,738 +4,865 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View and share your salon invoice — SAGET E-Bill.">
+    <title>Invoice | SAGET</title>
 
-    <title>Bill Receipt - Glamour Studio</title>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        /* ─── RESET ──────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Inter, sans-serif;
+        :root {
+            --bg:        #f0f2f5;
+            --surface:   #ffffff;
+            --border:    #e2e6ea;
+            --primary:   hsl(171, 55%, 40%);
+            --primary-l: hsl(171, 55%, 95%);
+            --text:      #172033;
+            --muted:     #8993a1;
+            --accent:    #e98272;
+            --green:     #24945a;
+            --green-l:   #f0faf4;
+            --green-b:   #c8e6d5;
+            --danger:    #dc2626;
+            --danger-l:  #fee2e2;
+            --font:      'Inter', sans-serif;
+            --radius:    12px;
+            --shadow:    0 8px 32px rgba(0,0,0,.08);
+            --trans:     .18s ease;
         }
 
         body {
-            background: #f3f5f8;
-            color: #172033;
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
         }
 
-        .page {
-            max-width: 850px;
-            margin: 35px auto;
-            padding: 0 20px;
+        /* ─── TOAST ──────────────────────────────────────── */
+        #toastContainer {
+            position: fixed; top: 20px; right: 20px;
+            z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
         }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 22px;
-        }
-
-        .back-btn {
-            border: none;
-            background: none;
-            color: #64748b;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .topbar h1 {
-            font-size: 22px;
-        }
-
-        .invoice {
-            background: white;
-            border: 1px solid #dfe4e9;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0,0,0,.05);
-        }
-
-        .invoice-header {
-            padding: 32px;
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #edf0f3;
-        }
-
-        .brand {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .brand-icon {
-            font-size: 30px;
-            color: #e98272;
-        }
-
-        .brand-name {
-            font-size: 22px;
-            font-weight: 800;
-        }
-
-        .brand-sub {
-            color: #e98272;
-            font-size: 10px;
-            letter-spacing: 1px;
-            margin-top: 3px;
-        }
-
-        .invoice-title {
-            text-align: right;
-        }
-
-        .invoice-title h2 {
-            font-size: 24px;
-            margin-bottom: 7px;
-        }
-
-        .invoice-title p {
-            color: #8791a0;
-            font-size: 11px;
-        }
-
-        .customer-section {
-            padding: 25px 32px;
-            background: #fafbfc;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-
-        .label {
-            color: #8993a1;
-            font-size: 10px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: .4px;
-        }
-
-        .value {
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .items {
-            padding: 28px 32px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            color: #8993a1;
-            font-size: 10px;
-            padding: 12px 0;
-            border-bottom: 1px solid #dfe4e9;
-        }
-
-        td {
-            padding: 15px 0;
-            border-bottom: 1px solid #edf0f3;
-            font-size: 12px;
-        }
-
-        th:last-child,
-        td:last-child {
-            text-align: right;
-        }
-
-        .item-type {
-            color: #8993a1;
-            font-size: 10px;
-            margin-top: 4px;
-        }
-
-        .summary {
-            width: 330px;
-            margin-left: auto;
-            padding: 0 32px 30px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 9px 0;
-            color: #64748b;
-            font-size: 12px;
-        }
-
-        .summary-row.total {
-            margin-top: 8px;
-            padding-top: 16px;
-            border-top: 1px solid #dfe4e9;
-            color: #172033;
-            font-size: 21px;
-            font-weight: 800;
-        }
-        .business-details {
-    margin-top: 8px;
-    color: #8993a1;
-    font-size: 10px;
-    line-height: 1.6;
-}
-
-
-.business-details span {
-    color: #59616d;
-    font-weight: 600;
-}
-
-
-.gst-section {
-    margin-top: 4px;
-}
-
-
-.gst-section .summary-row {
-    font-size: 11px;
-    padding: 6px 0;
-}
-
-
-#totalTax {
-    font-weight: 600;
-    color: #172033;
-}
-
-        .payment {
-            margin: 0 32px 30px;
-            padding: 16px 18px;
+        .toast {
+            display: flex; align-items: center; gap: 10px;
+            padding: 13px 18px;
             border-radius: 10px;
-            background: #f5faf7;
-            border: 1px solid #dcefe3;
+            font-size: 14px; font-weight: 500;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            min-width: 260px; max-width: 360px;
+            animation: toastIn .25s ease;
+        }
+        .toast.success { border-left: 4px solid var(--primary); }
+        .toast.error   { border-left: 4px solid var(--danger);  }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes toastOut {
+            to { opacity: 0; transform: translateX(30px); }
+        }
+
+        /* ─── TOP BAR ────────────────────────────────────── */
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px; font-weight: 600;
+            color: var(--text); cursor: pointer;
+            transition: background var(--trans), border-color var(--trans);
+            font-family: var(--font);
+        }
+        .back-btn:hover { background: var(--bg); border-color: #cdd2d8; }
+
+        .topbar-title {
+            font-size: 16px; font-weight: 700; color: var(--text);
         }
 
-        .payment-label {
-            color: #64748b;
-            font-size: 11px;
+        /* ─── PAGE WRAPPER ───────────────────────────────── */
+        .page {
+            max-width: 860px;
+            margin: 32px auto;
+            padding: 0 20px 60px;
         }
 
-        .payment-method {
-            color: #24945a;
-            font-weight: 700;
-            margin-top: 3px;
-        }
-
-        .paid {
-            color: #24945a;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .footer {
-            padding: 25px 32px;
-            border-top: 1px solid #edf0f3;
-            text-align: center;
-            color: #8993a1;
-            font-size: 11px;
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 13px;
-            border: none;
-            border-radius: 9px;
-            cursor: pointer;
-            font-weight: 700;
-        }
-
-        .whatsapp-btn {
-            background: #25d366;
-            color: white;
-        }
-
-        .print-btn {
-            background: white;
-            border: 1px solid #dce1e7;
-            color: #172033;
-        }
-
-        .loading {
+        /* ─── LOADING ────────────────────────────────────── */
+        .loading-state {
             text-align: center;
             padding: 100px 20px;
-            color: #8993a1;
+            color: var(--muted);
+        }
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid var(--primary-l);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 14px; font-weight: 500; color: var(--muted); }
+
+        /* ─── ERROR STATE ────────────────────────────────── */
+        .error-state {
+            text-align: center; padding: 80px 20px;
+        }
+        .error-icon { font-size: 48px; margin-bottom: 16px; }
+        .error-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .error-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+
+        /* ─── INVOICE CARD ───────────────────────────────── */
+        .invoice-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
         }
 
-        @media(max-width:650px) {
-
-            .invoice-header {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .invoice-title {
-                text-align: left;
-            }
-
-            .customer-section {
-                grid-template-columns: 1fr;
-            }
-
-            .summary {
-                width: auto;
-            }
-
-            .actions {
-                flex-direction: column;
-            }
-
+        /* ─── INVOICE HEADER ─────────────────────────────── */
+        .inv-header {
+            padding: 30px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #fdfefe 0%, #f8f9fb 100%);
         }
 
+        .brand { display: flex; align-items: flex-start; gap: 14px; }
+        .brand-icon-wrap {
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, var(--accent), #d4645a);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .brand-name { font-size: 22px; font-weight: 800; color: var(--text); }
+        .brand-tag {
+            font-size: 9px; font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .brand-details {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+        .brand-details strong { color: #59616d; }
+
+        .inv-meta { text-align: right; flex-shrink: 0; }
+        .inv-label {
+            display: inline-block;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-transform: uppercase;
+            background: #fff4f2;
+            padding: 4px 12px;
+            border-radius: 99px;
+            border: 1px solid #f5cdc6;
+            margin-bottom: 10px;
+        }
+        .inv-number { font-size: 20px; font-weight: 800; color: var(--text); }
+        .inv-date { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+        /* ─── STATUS BADGE ───────────────────────────────── */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 14px;
+            border-radius: 99px;
+            font-size: 12px; font-weight: 700;
+            margin-top: 10px;
+        }
+        .status-paid   { background: var(--green-l); color: var(--green); border: 1px solid var(--green-b); }
+        .status-unpaid { background: var(--danger-l); color: var(--danger); border: 1px solid #fca5a5; }
+        .status-partial { background: #fffbeb; color: #d97706; border: 1px solid #fcd34d; }
+
+        /* ─── BILLED TO ──────────────────────────────────── */
+        .billed-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            padding: 22px 32px;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--border);
+        }
+        .billed-item {}
+        .billed-label {
+            font-size: 10px; font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase; letter-spacing: .8px;
+            margin-bottom: 6px;
+        }
+        .billed-value { font-size: 14px; font-weight: 600; color: var(--text); }
+        .billed-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+        /* ─── ITEMS TABLE ────────────────────────────────── */
+        .items-section { padding: 24px 32px 16px; }
+        .section-heading {
+            font-size: 11px; font-weight: 700;
+            color: var(--muted); text-transform: uppercase; letter-spacing: .8px;
+            margin-bottom: 12px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead tr { background: #f8f9fb; }
+        th {
+            padding: 11px 12px;
+            font-size: 10px; font-weight: 700;
+            color: var(--muted);
+            text-align: left;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase; letter-spacing: .6px;
+        }
+        th:last-child { text-align: right; }
+
+        td {
+            padding: 14px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: top;
+        }
+        td:last-child { text-align: right; font-weight: 600; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .item-name { font-weight: 600; color: var(--text); }
+        .item-meta { font-size: 11px; color: var(--muted); margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .item-tag {
+            background: #f3f4f6; color: #6b7280;
+            padding: 1px 7px; border-radius: 99px;
+            font-size: 10px; font-weight: 600;
+        }
+        .item-tag.service { background: var(--primary-l); color: var(--primary); }
+        .item-tag.addon   { background: #ede9fe; color: #7c3aed; }
+        .item-tag.product { background: #fff7ed; color: #c2410c; }
+
+        /* ─── SUMMARY ────────────────────────────────────── */
+        .summary-wrap {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 32px 24px;
+        }
+        .summary-box {
+            width: 340px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .sum-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #64748b;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .sum-row:last-child { border-bottom: none; }
+        .sum-row.highlight { background: #f8fffe; }
+        .sum-row.grand-total {
+            background: var(--text);
+            color: white;
+            font-size: 18px; font-weight: 800;
+            padding: 14px 16px;
+        }
+        .sum-row.grand-total span:last-child { color: #7ef4d9; }
+        .sum-row .green-val { color: var(--green); font-weight: 700; }
+        .sum-divider {
+            border: none;
+            border-top: 2px solid var(--border);
+            margin: 0;
+        }
+
+        /* ─── GST SECTION ────────────────────────────────── */
+        .gst-block {
+            background: #f8fafc;
+            border-top: 1px dashed #d1d8e0;
+            border-bottom: 1px dashed #d1d8e0;
+        }
+        .gst-label {
+            padding: 8px 16px 4px;
+            font-size: 10px; font-weight: 700;
+            color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+        }
+
+        /* ─── PAYMENT SECTION ────────────────────────────── */
+        .payment-section {
+            margin: 0 32px 24px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: var(--green-l);
+            border: 1px solid var(--green-b);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .pay-method-label { font-size: 11px; color: #4a8869; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; }
+        .pay-method-value { font-size: 16px; font-weight: 800; color: var(--green); margin-top: 3px; }
+        .pay-status-pill {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            border-radius: 99px;
+            font-size: 13px; font-weight: 700;
+        }
+        .pay-status-pill.paid   { background: var(--green); color: white; }
+        .pay-status-pill.unpaid { background: var(--danger); color: white; }
+        .pay-status-pill.partial { background: #f59e0b; color: white; }
+
+        /* ─── FOOTER ─────────────────────────────────────── */
+        .inv-footer {
+            padding: 20px 32px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            background: #fafbfc;
+            line-height: 1.7;
+        }
+        .inv-footer strong { color: var(--text); }
+
+        /* ─── ACTIONS ────────────────────────────────────── */
+        .actions-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 13px 20px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px; font-weight: 700;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: opacity var(--trans), transform var(--trans), box-shadow var(--trans);
+            font-family: var(--font);
+        }
+        .action-btn:active { transform: scale(.97); }
+        .action-btn:disabled { opacity: .6; cursor: default; }
+
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 211, 102, .35);
+        }
+        .btn-whatsapp:hover:not(:disabled) { background: #1ebe5c; box-shadow: 0 6px 18px rgba(37, 211, 102, .45); }
+
+        .btn-print {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-print:hover { background: var(--bg); }
+
+        .btn-copy {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            flex: 0;
+            padding: 13px 16px;
+        }
+        .btn-copy:hover { background: var(--bg); }
+
+        /* ─── PRINT STYLES ───────────────────────────────── */
         @media print {
-
-            body {
-                background: white;
-            }
-
-            .page {
-                margin: 0;
-                max-width: none;
-            }
-
-            .topbar,
-            .actions {
-                display: none;
-            }
-
-            .invoice {
-                border: none;
-                box-shadow: none;
-            }
-
+            body { background: white; }
+            .topbar, .actions-bar { display: none !important; }
+            .page { margin: 0; max-width: none; padding: 0; }
+            .invoice-card { border: none; box-shadow: none; border-radius: 0; }
         }
 
+        /* ─── RESPONSIVE ─────────────────────────────────── */
+        @media (max-width: 640px) {
+            .inv-header { flex-direction: column; gap: 20px; }
+            .inv-meta { text-align: left; }
+            .billed-section { grid-template-columns: 1fr 1fr; }
+            .summary-wrap { padding: 0 16px 20px; }
+            .summary-box { width: 100%; }
+            .payment-section { margin: 0 16px 20px; flex-direction: column; align-items: flex-start; }
+            .items-section { padding: 20px 16px 12px; }
+            .inv-header { padding: 22px 16px; }
+            .billed-section { padding: 18px 16px; }
+            .inv-footer { padding: 16px; }
+            .actions-bar { flex-direction: column; }
+        }
     </style>
-
 </head>
 
 <body>
 
+<!-- ── TOAST ─────────────────────────────────────────────── -->
+<div id="toastContainer" role="status" aria-live="polite"></div>
+
+<!-- ── TOP BAR ───────────────────────────────────────────── -->
+<div class="topbar">
+    <button class="back-btn" onclick="history.back()" aria-label="Go back">← Back</button>
+    <span class="topbar-title">E-Bill / Invoice</span>
+    <div style="width:80px;"></div><!-- spacer -->
+</div>
+
+<!-- ── PAGE ──────────────────────────────────────────────── -->
 <div class="page">
 
-    <div class="topbar">
-
-        <div>
-
-            <button
-                class="back-btn"
-                onclick="history.back()"
-            >
-                ← Back
-            </button>
-
-        </div>
-
-        <h1>
-            E-Bill
-        </h1>
-
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading invoice…</div>
     </div>
 
-
-    <div id="loading" class="loading">
-        Loading bill...
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display:none;">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title">Invoice Not Found</div>
+        <div class="error-sub" id="errorMsg">Unable to load the invoice. Please try again.</div>
+        <button class="back-btn" onclick="history.back()" style="margin:0 auto;">← Go Back</button>
     </div>
 
+    <!-- Invoice Card -->
+    <div id="invoiceCard" class="invoice-card" style="display:none;">
 
-    <div
-        id="invoice"
-        class="invoice"
-        style="display:none;"
-    >
-
-        <!-- HEADER -->
-
-        <div class="invoice-header">
-
+        <!-- Header -->
+        <div class="inv-header">
             <div class="brand">
-
-                <div class="brand-icon">
-                    ✦
-                </div>
-
+                <div class="brand-icon-wrap">✦</div>
                 <div>
-
-                    <div
-                        class="brand-name"
-                        id="businessName"
-                    >
-                        Glamour Studio
-                    </div>
-
-                    <div class="brand-sub">
-                        AI RECEPTIONIST
-                    </div>
-                    <div
-    class="business-details"
->
-
-    <div id="businessAddress"></div>
-
-    <div id="businessPhone"></div>
-
-    <div>
-        GSTIN:
-        <span id="sellerGstin">
-            Not provided
-        </span>
-    </div>
-
-    <div>
-        State:
-        <span id="sellerState">
-            Not provided
-        </span>
-    </div>
-
-</div>
-
+                    <div class="brand-name" id="businessName">Glamour Studio</div>
+                    <div class="brand-tag">AI Receptionist</div>
+                    <div class="brand-details" id="businessDetails"></div>
                 </div>
-
             </div>
-
-
-            <div class="invoice-title">
-
-                <h2>
-                    INVOICE
-                </h2>
-
-                <p>
-                    Bill #<span id="billNumber">-</span>
-                </p>
-
-                <p id="billDate">
-                    -
-                </p>
-
+            <div class="inv-meta">
+                <div class="inv-label">INVOICE</div>
+                <div class="inv-number">
+                    #<span id="billNumber">—</span>
+                </div>
+                <div class="inv-date" id="billDate">—</div>
+                <div id="paymentStatusBadge"></div>
             </div>
-
         </div>
 
-
-        <!-- CUSTOMER -->
-
-        <div class="customer-section">
-
-            <div>
-
-                <div class="label">
-                    Billed To
-                </div>
-
-                <div
-                    class="value"
-                    id="customerName"
-                >
-                    -
-                </div>
-
+        <!-- Billed To -->
+        <div class="billed-section">
+            <div class="billed-item">
+                <div class="billed-label">Billed To</div>
+                <div class="billed-value" id="customerName">—</div>
             </div>
-
-
-            <div>
-
-                <div class="label">
-                    WhatsApp
-                </div>
-
-                <div
-                    class="value"
-                    id="customerPhone"
-                >
-                    -
-                </div>
-
+            <div class="billed-item">
+                <div class="billed-label">WhatsApp / Phone</div>
+                <div class="billed-value" id="customerPhone">—</div>
             </div>
-
-
-            <div>
-
-                <div class="label">
-                    Appointment
-                </div>
-
-                <div
-                    class="value"
-                    id="appointment"
-                >
-                    -
-                </div>
-
+            <div class="billed-item">
+                <div class="billed-label">Appointment</div>
+                <div class="billed-value" id="appointmentVal">—</div>
             </div>
-
         </div>
 
-
-        <!-- ITEMS -->
-
-        <div class="items">
-
-            <table>
-
+        <!-- Items -->
+        <div class="items-section">
+            <div class="section-heading">Services &amp; Items</div>
+            <table aria-label="Invoice items">
                 <thead>
-
                     <tr>
-
-                        <th>
-                            DESCRIPTION
-                        </th>
-
-                        <th>
-                            AMOUNT
-                        </th>
-
+                        <th>Description</th>
+                        <th style="text-align:right;">Amount</th>
                     </tr>
-
                 </thead>
-
-                <tbody id="items">
-
-                </tbody>
-
+                <tbody id="itemsBody"></tbody>
             </table>
-
         </div>
 
+        <!-- Summary -->
+        <div class="summary-wrap">
+            <div class="summary-box">
 
-        <!-- SUMMARY -->
+                <div class="sum-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">₹0.00</span>
+                </div>
 
-        <div class="summary">
+                <div class="sum-row" id="addonRow">
+                    <span>Add-ons</span>
+                    <span id="addonTotal">₹0.00</span>
+                </div>
 
-    <div class="summary-row">
-        <span>Subtotal</span>
-        <span id="subtotal">₹0.00</span>
-    </div>
+                <div class="sum-row" id="discountRow">
+                    <span>Discount</span>
+                    <span id="discount" style="color:#dc2626;">-₹0.00</span>
+                </div>
 
+                <div class="sum-row highlight">
+                    <span>Taxable Amount</span>
+                    <span id="taxableAmount">₹0.00</span>
+                </div>
 
-    <div class="summary-row">
-        <span>Add-ons</span>
-        <span id="addonTotal">₹0.00</span>
-    </div>
+                <!-- GST Block -->
+                <div id="gstBlock" class="gst-block" style="display:none;">
+                    <div class="gst-label">Tax Breakdown</div>
+                    <div class="sum-row" id="cgstRow">
+                        <span id="cgstLabel">CGST</span>
+                        <span id="cgstAmount">₹0.00</span>
+                    </div>
+                    <div class="sum-row" id="sgstRow">
+                        <span id="sgstLabel">SGST</span>
+                        <span id="sgstAmount">₹0.00</span>
+                    </div>
+                    <div class="sum-row" id="igstRow" style="display:none;">
+                        <span id="igstLabel">IGST</span>
+                        <span id="igstAmount">₹0.00</span>
+                    </div>
+                    <div class="sum-row highlight">
+                        <span>Total GST</span>
+                        <span id="totalTax" style="font-weight:700;">₹0.00</span>
+                    </div>
+                </div>
 
+                <!-- Advance -->
+                <div class="sum-row" id="advanceRow" style="display:none;">
+                    <span>Advance Paid</span>
+                    <span id="advancePaid" class="green-val">-₹0.00</span>
+                </div>
 
-    <div class="summary-row">
-        <span>Discount</span>
-        <span id="discount">-₹0.00</span>
-    </div>
+                <!-- Grand Total -->
+                <div class="sum-row grand-total">
+                    <span>Total Due</span>
+                    <span id="grandTotal">₹0.00</span>
+                </div>
 
-
-    <div class="summary-row">
-
-        <span>
-            Taxable Amount
-        </span>
-
-        <span id="taxableAmount">
-            ₹0.00
-        </span>
-
-    </div>
-
-
-    <!-- =========================
-         GST
-    ========================== -->
-
-    <div
-        id="gstSection"
-        class="gst-section"
-    >
-
-        <div class="summary-row">
-
-            <span>
-                CGST
-            </span>
-
-            <span id="cgstAmount">
-                ₹0.00
-            </span>
-
+            </div>
         </div>
 
-
-        <div class="summary-row">
-
-            <span>
-                SGST
-            </span>
-
-            <span id="sgstAmount">
-                ₹0.00
-            </span>
-
-        </div>
-
-
-        <div
-            class="summary-row"
-            id="igstRow"
-        >
-
-            <span>
-                IGST
-            </span>
-
-            <span id="igstAmount">
-                ₹0.00
-            </span>
-
-        </div>
-
-
-        <div class="summary-row">
-
-            <span>
-                Total GST
-            </span>
-
-            <span id="totalTax">
-                ₹0.00
-            </span>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         GRAND TOTAL
-    ========================== -->
-
-    <div
-    class="summary-row"
-    id="advanceRow"
-    style="display:none;"
->
-
-    <span>
-        Adv. Paid
-    </span>
-
-    <span
-        id="advancePaid"
-        style="color:#24945a;font-weight:700;"
-    >
-        -₹0.00
-    </span>
-
-</div>
-
-
-<div class="summary-row total">
-
-    <span>
-        Total
-    </span>
-
-    <span id="total">
-        ₹0.00
-    </span>
-
-</div>
-
-</div>
-
-        <!-- PAYMENT -->
-
-        <div class="payment">
-
+        <!-- Payment -->
+        <div class="payment-section" id="paymentSection">
             <div>
-
-                <div class="payment-label">
-                    PAYMENT METHOD
-                </div>
-
-                <div
-                    class="payment-method"
-                    id="paymentMethod"
-                >
-                    -
-                </div>
-
+                <div class="pay-method-label">Payment Method</div>
+                <div class="pay-method-value" id="paymentMethod">—</div>
             </div>
-
-            <div class="paid">
-                ✓ PAID
-            </div>
-
+            <div class="pay-status-pill paid" id="paymentPill">✓ PAID</div>
         </div>
 
-
-        <!-- FOOTER -->
-
-        <div class="footer">
-
-            Thank you for visiting
-            <strong id="footerBusiness">
-                Glamour Studio
-            </strong>.
-
-            <br>
-
-            We look forward to seeing you again.
-
+        <!-- Footer -->
+        <div class="inv-footer">
+            Thank you for visiting <strong id="footerBusiness">Glamour Studio</strong>.<br>
+            We look forward to seeing you again! 🙏
         </div>
 
-    </div>
+    </div><!-- /invoiceCard -->
 
-
-    <!-- ACTIONS -->
-
-    <div
-        id="actions"
-        class="actions"
-        style="display:none;"
-    >
-
-        <button
-            class="action-btn whatsapp-btn"
-            id="whatsappBtn"
-        >
+    <!-- Action Buttons -->
+    <div id="actionsBar" class="actions-bar" style="display:none;">
+        <button class="action-btn btn-whatsapp" id="whatsappBtn">
             💬 Send on WhatsApp
         </button>
-
-        <button
-            class="action-btn print-btn"
-            onclick="window.print()"
-        >
-            🖨 Print / Save PDF
+        <button class="action-btn btn-print" onclick="window.print()">
+            🖨️ Print / Save PDF
         </button>
-
+        <button class="action-btn btn-copy" id="copyLinkBtn" title="Copy invoice link">
+            🔗
+        </button>
     </div>
 
-</div>
+</div><!-- /page -->
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="js/supabase.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════
+   INVOICE PAGE — Enterprise upgrade
+   Relies on js/supabase.js which exposes window.client
+═══════════════════════════════════════════════════════ */
 
-<script src="js/invoice.js"></script>
+const params  = new URLSearchParams(window.location.search);
+const billId  = params.get("bill");
+
+let bill    = null;
+let booking = null;
+let items   = [];
+
+/* ── INIT ─────────────────────────────────────────────── */
+async function init() {
+
+    if (!billId) {
+        showError("No bill ID provided in the URL.");
+        return;
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) { window.location.href = "login.html"; return; }
+
+    // Parallel fetch: bill + its items
+    const [billRes, itemsRes] = await Promise.all([
+        client.from("bills").select("*").eq("id", billId).eq("profile_id", user.id).single(),
+        client.from("bill_items").select("*").eq("bill_id", billId).order("created_at", { ascending: true })
+    ]);
+
+    if (billRes.error) { showError("Unable to load invoice. " + (billRes.error.message || "")); return; }
+
+    bill  = billRes.data;
+    items = itemsRes.data || [];
+
+    // Optionally load booking
+    if (bill.booking_id) {
+        const { data: bk } = await client.from("bookings").select("*").eq("id", bill.booking_id).single();
+        booking = bk || null;
+    }
+
+    // Load business profile
+    const { data: profile } = await client
+        .from("profiles")
+        .select("business_name, business_address, business_phone")
+        .eq("id", user.id)
+        .single();
+
+    renderInvoice(profile);
+    bindActions();
+}
+
+/* ── RENDER ───────────────────────────────────────────── */
+function renderInvoice(profile) {
+
+    // ── Business info
+    if (profile?.business_name) {
+        el("businessName").textContent  = profile.business_name;
+        el("footerBusiness").textContent = profile.business_name;
+    }
+    const detailParts = [];
+    if (profile?.business_address) detailParts.push(profile.business_address);
+    if (profile?.business_phone)   detailParts.push(profile.business_phone);
+    if (bill.seller_gstin)          detailParts.push(`GSTIN: <strong>${escHtml(bill.seller_gstin)}</strong>`);
+    if (bill.seller_state) {
+        const st = bill.seller_state + (bill.seller_state_code ? ` (${bill.seller_state_code})` : "");
+        detailParts.push(`State: <strong>${escHtml(st)}</strong>`);
+    }
+    el("businessDetails").innerHTML = detailParts.map(p => `<div>${p}</div>`).join("");
+
+    // ── Bill number
+    el("billNumber").textContent = bill.invoice_number || bill.id.substring(0, 8).toUpperCase();
+
+    // ── Date
+    const dateVal = bill.invoice_date || bill.created_at;
+    el("billDate").textContent = new Date(dateVal).toLocaleString("en-IN", {
+        day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+    });
+
+    // ── Payment status badge
+    const status = (bill.payment_status || "Paid").toLowerCase();
+    const badgeClass = status === "paid" ? "status-paid" : status === "partial" ? "status-partial" : "status-unpaid";
+    const badgeIcon  = status === "paid" ? "✓" : status === "partial" ? "◑" : "✗";
+    el("paymentStatusBadge").innerHTML =
+        `<span class="status-badge ${badgeClass}">${badgeIcon} ${(bill.payment_status || "Paid").toUpperCase()}</span>`;
+
+    // ── Customer
+    el("customerName").textContent  = bill.customer_name || "—";
+    el("customerPhone").textContent = bill.phone         || "—";
+
+    // ── Appointment
+    let appt = "—";
+    if (booking?.booking_date) {
+        appt = new Date(booking.booking_date).toLocaleDateString("en-IN",
+            { day: "2-digit", month: "short", year: "numeric" });
+        if (booking.booking_time) {
+            appt += " • " + new Date(`1970-01-01T${booking.booking_time}`)
+                .toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        }
+    }
+    el("appointmentVal").textContent = appt;
+
+    // ── Items
+    const tbody = el("itemsBody");
+    tbody.innerHTML = "";
+    if (!items.length) {
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:30px;">No items found</td></tr>`;
+    } else {
+        items.forEach(item => {
+            const typeLabel = item.item_type === "addon" ? "Add-on" : item.item_type === "product" ? "Product" : "Service";
+            const typeClass = item.item_type === "addon" ? "addon" : item.item_type === "product" ? "product" : "service";
+            const meta = [
+                `<span class="item-tag ${typeClass}">${typeLabel}</span>`,
+                item.hsn_sac ? `<span class="item-tag">HSN/SAC: ${escHtml(item.hsn_sac)}</span>` : "",
+                Number(item.gst_rate) > 0 ? `<span class="item-tag">GST ${Number(item.gst_rate)}%</span>` : ""
+            ].filter(Boolean).join("");
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>
+                    <div class="item-name">${escHtml(item.item_name)}</div>
+                    <div class="item-meta">${meta}</div>
+                </td>
+                <td>${fmtMoney(item.total)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ── Totals
+    const subtotal      = Number(bill.subtotal)       || 0;
+    const addonTotal    = Number(bill.addon_total)    || 0;
+    const discount      = Number(bill.discount)       || 0;
+    const taxableAmt    = Number(bill.taxable_amount) || 0;
+    const cgstAmount    = Number(bill.cgst_amount)    || 0;
+    const sgstAmount    = Number(bill.sgst_amount)    || 0;
+    const igstAmount    = Number(bill.igst_amount)    || 0;
+    const totalTax      = Number(bill.total_tax)      || 0;
+    const grossTotal    = Number(bill.total)          || 0;
+    const advancePaid   = Number(bill.advance_paid)   || 0;
+    const finalTotal    = Math.max(grossTotal - advancePaid, 0);
+
+    el("subtotal").textContent      = fmtMoney(subtotal);
+    el("addonTotal").textContent    = fmtMoney(addonTotal);
+    el("discount").textContent      = "-" + fmtMoney(discount);
+    el("taxableAmount").textContent = fmtMoney(taxableAmt);
+    el("grandTotal").textContent    = fmtMoney(finalTotal);
+
+    // Hide zero rows
+    if (addonTotal === 0)  el("addonRow").style.display    = "none";
+    if (discount   === 0)  el("discountRow").style.display = "none";
+
+    // GST
+    if (totalTax > 0) {
+        el("gstBlock").style.display  = "block";
+        el("cgstAmount").textContent  = fmtMoney(cgstAmount);
+        el("sgstAmount").textContent  = fmtMoney(sgstAmount);
+        el("igstAmount").textContent  = fmtMoney(igstAmount);
+        el("totalTax").textContent    = fmtMoney(totalTax);
+        if (igstAmount === 0) el("igstRow").style.display = "none";
+        if (cgstAmount === 0 && sgstAmount === 0) {
+            el("cgstRow").style.display = "none";
+            el("sgstRow").style.display = "none";
+        }
+        // Label with rate if available
+        if (bill.cgst_rate) el("cgstLabel").textContent = `CGST (${bill.cgst_rate}%)`;
+        if (bill.sgst_rate) el("sgstLabel").textContent = `SGST (${bill.sgst_rate}%)`;
+        if (bill.igst_rate) el("igstLabel").textContent = `IGST (${bill.igst_rate}%)`;
+    }
+
+    // Advance
+    if (advancePaid > 0) {
+        el("advanceRow").style.display  = "flex";
+        el("advancePaid").textContent   = "-" + fmtMoney(advancePaid);
+    }
+
+    // ── Payment section
+    el("paymentMethod").textContent = bill.payment_method || "—";
+    const pillEl  = el("paymentPill");
+    const pillCls = status === "paid" ? "paid" : status === "partial" ? "partial" : "unpaid";
+    const pillTxt = status === "paid" ? "✓ PAID" : status === "partial" ? "◑ PARTIAL" : "✗ UNPAID";
+    pillEl.className = `pay-status-pill ${pillCls}`;
+    pillEl.textContent = pillTxt;
+
+    // ── Show invoice
+    el("loadingState").style.display = "none";
+    el("invoiceCard").style.display  = "block";
+    el("actionsBar").style.display   = "flex";
+
+    // Update page title with business name
+    const bName = profile?.business_name || "SAGET";
+    document.title = `Invoice #${el("billNumber").textContent} | ${bName}`;
+}
+
+/* ── ACTIONS ──────────────────────────────────────────── */
+function bindActions() {
+
+    // WhatsApp send
+    el("whatsappBtn").addEventListener("click", async () => {
+        const btn = el("whatsappBtn");
+        btn.disabled = true;
+        btn.innerHTML = `<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></span> Sending…`;
+
+        try {
+            const res = await fetch("https://saloon-zarah.onrender.com/send-bill", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ billId: bill.id })
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || "Failed to send.");
+            btn.innerHTML = "✅ Sent on WhatsApp";
+            toast("Bill sent successfully to " + bill.phone, "success");
+        } catch (err) {
+            console.error(err);
+            btn.disabled = false;
+            btn.innerHTML = "💬 Send on WhatsApp";
+            toast("Could not send: " + err.message, "error");
+        }
+    });
+
+    // Copy invoice link
+    el("copyLinkBtn").addEventListener("click", async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            toast("Invoice link copied to clipboard!", "success");
+        } catch {
+            toast("Could not copy link.", "error");
+        }
+    });
+}
+
+/* ── ERROR STATE ──────────────────────────────────────── */
+function showError(msg) {
+    el("loadingState").style.display = "none";
+    el("errorState").style.display   = "block";
+    el("errorMsg").textContent       = msg;
+}
+
+/* ── HELPERS ──────────────────────────────────────────── */
+function el(id) { return document.getElementById(id); }
+
+function fmtMoney(v) {
+    return "₹" + Number(v || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+}
+
+function escHtml(v) {
+    return String(v || "")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function toast(msg, type = "success") {
+    const icon = type === "success" ? "✅" : "❌";
+    const el_  = document.createElement("div");
+    el_.className = `toast ${type}`;
+    el_.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+    document.getElementById("toastContainer").appendChild(el_);
+    setTimeout(() => {
+        el_.style.animation = "toastOut .3s ease forwards";
+        setTimeout(() => el_.remove(), 300);
+    }, 4000);
+}
+
+/* ── BOOT ─────────────────────────────────────────────── */
+init();
+</script>
 
 </body>
-
 </html>
