@@ -980,7 +980,7 @@ async function findOrCreateCustomer({
         .from("customers")
         .insert({
 
-            profile_id: profileId,
+            profileId: activeInstagramProfileId,
 
             name:
                 name ||
@@ -4472,8 +4472,7 @@ Do NOT say the appointment is confirmed.
 
                                 .insert({
 
-                                    profile_id:
-                                        PROFILE_ID,
+                                    profile_id: activeInstagramProfileId,
 
                                     customer_name:
     booking.customer_name || "Instagram Customer",
