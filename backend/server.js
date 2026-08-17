@@ -2818,17 +2818,19 @@ the menu right now and ask them to try again.
 
     } else {
 
-        systemResult = `
-The customer asked for the general service menu.
+    systemResult = `
+The customer asked for the salon's service menu.
 
-A PDF menu containing the current services
-from the database will be sent separately.
+Send them the salon's service menu link:
 
-Keep your WhatsApp reply short and natural.
+https://saloon-zarah.onrender.com/menu.pdf
 
-Do NOT list all services in the text message.
+Tell the customer naturally that they can view the complete service menu using the link.
+
+Do NOT list all services in the message.
+Do NOT invent any services or prices.
 `;
-    }
+}
 }
             // =================================================
             // HOURS
