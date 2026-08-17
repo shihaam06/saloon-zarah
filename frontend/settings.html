@@ -1021,6 +1021,42 @@ document.addEventListener(
                     return;
 
                 }
+                // Instagram connection status
+const instagramStatus =
+    document.getElementById("instagramStatus");
+
+const instagramUsername =
+    document.getElementById("instagramUsername");
+
+const connectInstagramBtn =
+    document.getElementById("connectInstagramBtn");
+
+if (data.instagram_connected) {
+
+    instagramStatus.textContent =
+        "Instagram connected";
+
+    instagramUsername.textContent =
+        "Your salon's Instagram account is connected.";
+
+    connectInstagramBtn.textContent =
+        "Instagram Connected";
+
+    connectInstagramBtn.disabled = true;
+
+} else {
+
+    instagramStatus.textContent =
+        "Instagram not connected";
+
+    instagramUsername.textContent =
+        "Connect your salon's Instagram to receive customer enquiries and bookings.";
+
+    connectInstagramBtn.textContent =
+        "Connect Instagram";
+
+    connectInstagramBtn.disabled = false;
+}
 
 
                 document
