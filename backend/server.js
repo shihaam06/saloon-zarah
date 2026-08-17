@@ -4299,6 +4299,29 @@ Do NOT say the appointment is confirmed.
                 // =================================================
                 // OTHER INSTAGRAM MESSAGE
                 // =================================================
+                // =================================================
+// INSTAGRAM SERVICES
+// =================================================
+
+else if (
+    booking?.intent === "services"
+) {
+
+    systemResult = `
+The customer is asking for the salon's service menu.
+
+The complete current service menu is available here:
+
+https://saloon-zarah.onrender.com/menu.pdf
+
+Tell the customer naturally that they can view the complete service menu using this link.
+
+Send the URL exactly as provided.
+
+Do NOT list individual services or prices in the message.
+Do NOT invent any services or prices.
+`;
+}
 
                 else {
 
