@@ -1345,7 +1345,7 @@ connectInstagramBtn.addEventListener(
 
             const {
                 data: { session }
-            } = await supabase.auth.getSession();
+            } = await client.auth.getSession();
 
             if (!session) {
                 alert("Please log in first.");
