@@ -4007,10 +4007,28 @@ app.get("/api/instagram/callback", async (req, res) => {
         }
 
         const accessToken =
-            tokenData.access_token;
+    tokenData.access_token;
 
-        const instagramUserId =
-            tokenData.user_id;
+// Get the actual Instagram account ID used by webhooks
+const meResponse = await fetch(
+    `https://graph.instagram.com/v23.0/me?fields=user_id,username&access_token=${accessToken}`
+);
+
+const meData = await meResponse.json();
+
+console.log("📸 Instagram /me:", meData);
+
+if (!meResponse.ok || !meData.user_id) {
+    console.error("❌ Could not get Instagram account ID:", meData);
+
+    return res.status(400).send(`
+        <h2>Instagram connection failed</h2>
+        <p>Could not identify the Instagram account.</p>
+    `);
+}
+
+const instagramUserId =
+    meData.user_id;
 
         // -----------------------------------------
         // SAVE CONNECTION TO PROFILE
