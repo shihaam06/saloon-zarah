@@ -483,9 +483,10 @@ try {
     );
 
     await sendInstagramMessage(
-        updatedBooking.instagram_user_id,
-        confirmationMessage
-    );
+    updatedBooking.instagram_user_id,
+    confirmationMessage,
+    updatedBooking.profile_id
+);
 
     console.log(
         "✅ Instagram confirmation sent"
@@ -1882,8 +1883,38 @@ No quotation marks around the response.
 
 async function sendInstagramMessage(
     recipientId,
-    message
+    message,
+    profileId
 ) {
+
+    if (!profileId) {
+        throw new Error(
+            "Instagram profile ID is required."
+        );
+    }
+
+    const {
+        data: profile,
+        error
+    } = await supabase
+        .from("profiles")
+        .select("instagram_access_token")
+        .eq("id", profileId)
+        .single();
+
+    if (
+        error ||
+        !profile?.instagram_access_token
+    ) {
+        console.error(
+            "❌ Instagram token not found:",
+            error
+        );
+
+        throw new Error(
+            "Instagram account is not connected."
+        );
+    }
 
     const response =
         await fetch(
@@ -1896,11 +1927,10 @@ async function sendInstagramMessage(
                         "application/json",
 
                     "Authorization":
-                        `Bearer ${process.env.INSTAGRAM_ACCESS_TOKEN}`
+                        `Bearer ${profile.instagram_access_token}`
                 },
 
                 body: JSON.stringify({
-
                     recipient: {
                         id: recipientId
                     },
@@ -1908,7 +1938,6 @@ async function sendInstagramMessage(
                     message: {
                         text: message
                     }
-
                 })
             }
         );
@@ -4113,6 +4142,35 @@ app.post("/instagram/webhook", async (req, res) => {
         const entries = req.body?.entry || [];
 
         for (const entry of entries) {
+            const instagramBusinessId =
+    entry?.id;
+
+const {
+    data: instagramProfile,
+    error: instagramProfileError
+} = await supabase
+    .from("profiles")
+    .select("id")
+    .eq(
+        "instagram_user_id",
+        instagramBusinessId
+    )
+    .single();
+
+if (
+    instagramProfileError ||
+    !instagramProfile
+) {
+    console.error(
+        "❌ No Kangro profile found for Instagram account:",
+        instagramBusinessId
+    );
+
+    continue;
+}
+
+const activeInstagramProfileId =
+    instagramProfile.id;
 
             const messaging = entry?.messaging || [];
 
@@ -4667,9 +4725,10 @@ Do not invent:
                 // -----------------------------------------
 
                 await sendInstagramMessage(
-                    senderId,
-                    reply
-                );
+    senderId,
+    reply,
+    activeInstagramProfileId
+);
 
                 console.log(
                     "✅ Instagram reply completed"
