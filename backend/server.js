@@ -3830,6 +3830,274 @@ app.get("/instagram/webhook", (req, res) => {
 // INSTAGRAM WEBHOOK
 // =====================================================
 
+// =====================================================
+// INSTAGRAM CONNECT - START OAUTH
+// =====================================================
+
+app.get("/api/instagram/connect", async (req, res) => {
+
+    try {
+
+        const {
+            data: {
+                user
+            },
+            error
+        } = await supabase.auth.getUser(
+            req.headers.authorization?.replace("Bearer ", "")
+        );
+
+        if (error || !user) {
+            return res.status(401).send(
+                "Please log in first."
+            );
+        }
+
+        const profileId = user.id;
+
+        const redirectUri =
+            `${process.env.PUBLIC_BASE_URL}/api/instagram/callback`;
+
+        const authUrl =
+            "https://www.instagram.com/oauth/authorize" +
+            `?client_id=${process.env.INSTAGRAM_APP_ID}` +
+            `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+            `&response_type=code` +
+            `&scope=instagram_business_basic,instagram_business_manage_messages` +
+            `&state=${profileId}`;
+
+        res.json({ authUrl });
+
+    } catch (error) {
+
+        console.error(
+            "Instagram connect error:",
+            error
+        );
+
+        res.status(500).send(
+            "Could not start Instagram connection."
+        );
+    }
+});
+
+// =====================================================
+// INSTAGRAM CONNECT - OAUTH CALLBACK
+// =====================================================
+
+app.get("/api/instagram/callback", async (req, res) => {
+    try {
+
+        const { code, state, error, error_reason } = req.query;
+
+        // -----------------------------------------
+        // USER CANCELLED / META ERROR
+        // -----------------------------------------
+
+        if (error) {
+            console.error(
+                "❌ Instagram OAuth error:",
+                error,
+                error_reason
+            );
+
+            return res.status(400).send(`
+                <h2>Instagram connection cancelled</h2>
+                <p>You can close this window and try again.</p>
+            `);
+        }
+
+        // -----------------------------------------
+        // REQUIRED PARAMETERS
+        // -----------------------------------------
+
+        if (!code || !state) {
+            return res.status(400).send(
+                "Missing Instagram authorization data."
+            );
+        }
+
+        const profileId = state;
+
+        const redirectUri =
+            `${process.env.PUBLIC_BASE_URL}/api/instagram/callback`;
+
+        // -----------------------------------------
+        // EXCHANGE CODE FOR ACCESS TOKEN
+        // -----------------------------------------
+
+        const tokenResponse = await fetch(
+            "https://api.instagram.com/oauth/access_token",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    client_id:
+                        process.env.INSTAGRAM_APP_ID,
+
+                    client_secret:
+                        process.env.INSTAGRAM_APP_SECRET,
+
+                    grant_type:
+                        "authorization_code",
+
+                    redirect_uri:
+                        redirectUri,
+
+                    code:
+                        code
+                })
+            }
+        );
+
+        const tokenData =
+            await tokenResponse.json();
+
+        console.log(
+            "📸 Instagram token response:",
+            tokenData
+        );
+
+        if (
+            !tokenResponse.ok ||
+            !tokenData.access_token
+        ) {
+            console.error(
+                "❌ Instagram token exchange failed:",
+                tokenData
+            );
+
+            return res.status(400).send(`
+                <h2>Instagram connection failed</h2>
+                <p>Could not obtain an Instagram access token.</p>
+            `);
+        }
+
+        const accessToken =
+            tokenData.access_token;
+
+        const instagramUserId =
+            tokenData.user_id;
+
+        // -----------------------------------------
+        // SAVE CONNECTION TO PROFILE
+        // -----------------------------------------
+
+        const {
+            error: saveError
+        } = await supabase
+            .from("profiles")
+            .update({
+                instagram_access_token:
+                    accessToken,
+
+                instagram_user_id:
+                    instagramUserId,
+
+                instagram_connected:
+                    true
+            })
+            .eq(
+                "id",
+                profileId
+            );
+
+        if (saveError) {
+
+            console.error(
+                "❌ Instagram connection save failed:",
+                saveError
+            );
+
+            return res.status(500).send(`
+                <h2>Instagram connection failed</h2>
+                <p>Instagram was authorized, but we couldn't save the connection.</p>
+            `);
+        }
+
+        console.log(
+            "================================="
+        );
+
+        console.log(
+            "✅ INSTAGRAM CONNECTED"
+        );
+
+        console.log(
+            "Profile:",
+            profileId
+        );
+
+        console.log(
+            "Instagram User ID:",
+            instagramUserId
+        );
+
+        console.log(
+            "================================="
+        );
+
+        // -----------------------------------------
+        // SUCCESS
+        // -----------------------------------------
+
+        return res.send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Instagram Connected</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        padding: 60px 20px;
+                    }
+
+                    h2 {
+                        color: #111;
+                    }
+
+                    p {
+                        color: #666;
+                    }
+                </style>
+            </head>
+
+            <body>
+
+                <h2>✅ Instagram connected successfully</h2>
+
+                <p>
+                    Your Instagram account is now connected
+                    to your Kangro salon dashboard.
+                </p>
+
+                <p>
+                    You can close this window.
+                </p>
+
+            </body>
+            </html>
+        `);
+
+    } catch (error) {
+
+        console.error(
+            "❌ Instagram callback error:",
+            error
+        );
+
+        return res.status(500).send(`
+            <h2>Instagram connection failed</h2>
+            <p>Please try connecting again.</p>
+        `);
+    }
+});
+
+
 app.post("/instagram/webhook", async (req, res) => {
 
     // Always acknowledge Meta immediately
