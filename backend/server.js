@@ -4415,17 +4415,23 @@ const {
     error: instagramProfileError
 } = await supabase
     .from("profiles")
-    .select("id")
+    .select("id, instagram_user_id, instagram_connected")
     .eq(
         "instagram_user_id",
-        instagramBusinessId
+        String(instagramBusinessId)
     )
-    .single();
+    .maybeSingle();
 
-if (
-    instagramProfileError ||
-    !instagramProfile
-) {
+if (instagramProfileError) {
+    console.error(
+        "❌ Instagram profile lookup error:",
+        instagramProfileError
+    );
+
+    continue;
+}
+
+if (!instagramProfile) {
     console.error(
         "❌ No Kangro profile found for Instagram account:",
         instagramBusinessId
@@ -4433,6 +4439,14 @@ if (
 
     continue;
 }
+
+console.log(
+    "✅ Kangro Instagram profile matched:",
+    instagramProfile
+);
+
+const activeInstagramProfileId =
+    instagramProfile.id;
 
 const activeInstagramProfileId =
     instagramProfile.id;
