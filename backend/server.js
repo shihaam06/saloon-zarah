@@ -4244,8 +4244,8 @@ const meResponse = await fetch(
     `https://graph.instagram.com/v23.0/me?fields=user_id,username&access_token=${encodeURIComponent(accessToken)}`
 );
 
-const meData =
-    await meResponse.json();
+// const meData =
+//     await meResponse.json();
 
 console.log(
     "📸 Instagram /me:",
