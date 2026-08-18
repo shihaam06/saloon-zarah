@@ -1878,28 +1878,21 @@ No quotation marks around the response.
     return reply;
 }
 
+
 // =====================================================
-// SEND INSTAGRAM MESSAGE
+// ENSURE INSTAGRAM TOKEN IS VALID
 // =====================================================
 
-async function sendInstagramMessage(
-    recipientId,
-    message,
-    profileId
-) {
-
-    if (!profileId) {
-        throw new Error(
-            "Instagram profile ID is required."
-        );
-    }
+async function getInstagramAccessToken(profileId) {
 
     const {
         data: profile,
         error
     } = await supabase
         .from("profiles")
-        .select("instagram_access_token")
+        .select(
+            "instagram_access_token, instagram_token_expires_at"
+        )
         .eq("id", profileId)
         .single();
 
@@ -1917,6 +1910,180 @@ async function sendInstagramMessage(
         );
     }
 
+    const token =
+        profile.instagram_access_token;
+
+    const expiresAt =
+        profile.instagram_token_expires_at
+            ? new Date(
+                profile.instagram_token_expires_at
+              ).getTime()
+            : null;
+
+    // -----------------------------------------
+    // NO EXPIRY STORED
+    // -----------------------------------------
+
+    if (!expiresAt) {
+        console.warn(
+            "⚠️ Instagram token has no expiry date."
+        );
+
+        return token;
+    }
+
+    const now =
+        Date.now();
+
+    const sevenDays =
+        7 * 24 * 60 * 60 * 1000;
+
+    const timeRemaining =
+        expiresAt - now;
+
+    // -----------------------------------------
+    // TOKEN STILL HAS MORE THAN 7 DAYS
+    // -----------------------------------------
+
+    if (timeRemaining > sevenDays) {
+        return token;
+    }
+
+    // -----------------------------------------
+    // TOKEN EXPIRED
+    // -----------------------------------------
+
+    if (timeRemaining <= 0) {
+
+        console.error(
+            "❌ Instagram access token has expired."
+        );
+
+        throw new Error(
+            "Instagram access token expired. Please reconnect Instagram."
+        );
+    }
+
+    // -----------------------------------------
+    // REFRESH TOKEN
+    // -----------------------------------------
+
+    console.log(
+        "🔄 Instagram token is close to expiry. Refreshing..."
+    );
+
+    const refreshUrl =
+        "https://graph.instagram.com/refresh_access_token?" +
+        new URLSearchParams({
+            grant_type:
+                "ig_refresh_token",
+
+            access_token:
+                token
+        }).toString();
+
+    const refreshResponse =
+        await fetch(refreshUrl);
+
+    const refreshData =
+        await refreshResponse.json();
+
+    console.log(
+        "📸 Instagram refresh response:",
+        {
+            ok: refreshResponse.ok,
+            expires_in:
+                refreshData.expires_in,
+            has_token:
+                !!refreshData.access_token
+        }
+    );
+
+    if (
+        !refreshResponse.ok ||
+        !refreshData.access_token
+    ) {
+        console.error(
+            "❌ Instagram token refresh failed:",
+            refreshData
+        );
+
+        throw new Error(
+            "Instagram token refresh failed. Please reconnect Instagram."
+        );
+    }
+
+    const newExpiresIn =
+        Number(
+            refreshData.expires_in ||
+            5184000
+        );
+
+    const newExpiresAt =
+        new Date(
+            Date.now() +
+            newExpiresIn * 1000
+        ).toISOString();
+
+    const {
+        error: updateError
+    } = await supabase
+        .from("profiles")
+        .update({
+            instagram_access_token:
+                refreshData.access_token,
+
+            instagram_token_expires_at:
+                newExpiresAt
+        })
+        .eq(
+            "id",
+            profileId
+        );
+
+    if (updateError) {
+
+        console.error(
+            "❌ Failed to save refreshed Instagram token:",
+            updateError
+        );
+
+        throw updateError;
+    }
+
+    console.log(
+        "✅ Instagram token refreshed successfully"
+    );
+
+    console.log(
+        "⏳ New Instagram token expires:",
+        newExpiresAt
+    );
+
+    return refreshData.access_token;
+}
+
+// =====================================================
+// SEND INSTAGRAM MESSAGE
+// =====================================================
+
+async function sendInstagramMessage(
+    recipientId,
+    message,
+    profileId
+) {
+
+    if (!profileId) {
+        throw new Error(
+            "Instagram profile ID is required."
+        );
+    }
+
+    const accessToken =
+    await getInstagramAccessToken(
+        profileId
+    );
+
     const response =
         await fetch(
             "https://graph.instagram.com/v23.0/me/messages",
@@ -1928,7 +2095,7 @@ async function sendInstagramMessage(
                         "application/json",
 
                     "Authorization":
-                        `Bearer ${profile.instagram_access_token}`
+    `Bearer ${accessToken}`
                 },
 
                 body: JSON.stringify({
@@ -4006,13 +4173,101 @@ app.get("/api/instagram/callback", async (req, res) => {
             `);
         }
 
-        const accessToken =
-    tokenData.access_token;
+        const shortLivedToken = tokenData.access_token;
 
-// Get the actual Instagram account ID used by webhooks
-const meResponse = await fetch(
-    `https://graph.instagram.com/v23.0/me?fields=user_id,username&access_token=${accessToken}`
+// =====================================================
+// EXCHANGE SHORT-LIVED TOKEN FOR LONG-LIVED TOKEN
+// =====================================================
+
+const longLivedResponse = await fetch(
+    "https://graph.instagram.com/access_token?" +
+    new URLSearchParams({
+        grant_type: "ig_exchange_token",
+        client_secret: process.env.INSTAGRAM_APP_SECRET,
+        access_token: shortLivedToken
+    }).toString()
 );
+
+const longLivedData =
+    await longLivedResponse.json();
+
+console.log(
+    "📸 Instagram long-lived token response:",
+    {
+        ok: longLivedResponse.ok,
+        expires_in: longLivedData.expires_in,
+        has_token: !!longLivedData.access_token
+    }
+);
+
+if (
+    !longLivedResponse.ok ||
+    !longLivedData.access_token
+) {
+    console.error(
+        "❌ Instagram long-lived token exchange failed:",
+        longLivedData
+    );
+
+    return res.status(400).send(`
+        <h2>Instagram connection failed</h2>
+        <p>Could not create a long-lived Instagram connection.</p>
+    `);
+}
+
+const accessToken =
+    longLivedData.access_token;
+
+const expiresIn =
+    Number(longLivedData.expires_in || 5184000);
+
+const tokenExpiresAt =
+    new Date(
+        Date.now() + expiresIn * 1000
+    ).toISOString();
+
+console.log(
+    "✅ Instagram long-lived token obtained"
+);
+
+console.log(
+    "⏳ Instagram token expires:",
+    tokenExpiresAt
+);
+
+// =====================================================
+// GET INSTAGRAM ACCOUNT ID
+// =====================================================
+
+const meResponse = await fetch(
+    `https://graph.instagram.com/v23.0/me?fields=user_id,username&access_token=${encodeURIComponent(accessToken)}`
+);
+
+const meData =
+    await meResponse.json();
+
+console.log(
+    "📸 Instagram /me:",
+    meData
+);
+
+if (
+    !meResponse.ok ||
+    !meData.user_id
+) {
+    console.error(
+        "❌ Could not get Instagram account ID:",
+        meData
+    );
+
+    return res.status(400).send(`
+        <h2>Instagram connection failed</h2>
+        <p>Could not identify the Instagram account.</p>
+    `);
+}
+
+const instagramUserId =
+    meData.user_id;
 
 const meData = await meResponse.json();
 
@@ -4039,15 +4294,18 @@ const instagramUserId =
         } = await supabase
             .from("profiles")
             .update({
-                instagram_access_token:
-                    accessToken,
+    instagram_access_token:
+        accessToken,
 
-                instagram_user_id:
-                    instagramUserId,
+    instagram_user_id:
+        instagramUserId,
 
-                instagram_connected:
-                    true
-            })
+    instagram_connected:
+        true,
+
+    instagram_token_expires_at:
+        tokenExpiresAt
+})
             .eq(
                 "id",
                 profileId
