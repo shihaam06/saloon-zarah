@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BookFlow Inventory</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Inter, sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            color: #172033;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 280px;
+            background: #10171d;
+            color: white;
+            padding: 28px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 18px;
+            margin-bottom: 42px;
+        }
+
+        .brand-icon {
+            color: #e98272;
+            font-size: 28px;
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand-sub {
+            color: #e98272;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-top: 3px;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #d9dee5;
+            padding: 15px 20px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .nav a:hover {
+            background: #202830;
+        }
+
+        .nav a.active {
+            background: #e98272;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .whatsapp-box {
+            background: #172027;
+            border: 1px solid #29333c;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        .whatsapp-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .whatsapp-status {
+            color: #4ade80;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .logout {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 9px;
+            background: #202830;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 36px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 25px;
+            color: #121923;
+        }
+
+        .welcome h1 span {
+            color: #e98272;
+        }
+
+        .welcome p {
+            color: #8993a1;
+            margin-top: 7px;
+            font-size: 13px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .refresh-btn {
+            border: 1px solid #dce1e7;
+            background: #e98272;
+            color: white;
+            padding: 12px 17px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ================= KPI ================= */
+
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .kpi {
+            background: white;
+            border: 1px solid #dfe4e9;
+            border-radius: 13px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-height: 110px;
+        }
+
+        .kpi-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .pink { background: #fff0ed; color: #ef7161; }
+        .green { background: #eaf8ee; color: #30ad69; }
+        .purple { background: #f0eaff; color: #8362dc; }
+        .yellow { background: #fff4df; color: #d99b28; }
+
+        .kpi-label {
+            color: #718096;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #121923;
+        }
+
+        .kpi-muted {
+            color: #98a1ad;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        /* ================= INVENTORY TABLE ================= */
+
+        .card {
+            background: white;
+            border: 1px solid #dfe4e9;
+            border-radius: 13px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #edf0f3;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .search {
+            width: 260px;
+            border: 1px solid #dce1e7;
+            border-radius: 9px;
+            padding: 10px 13px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #fbfcfd;
+            color: #718096;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: left;
+            padding: 14px 18px;
+            border-bottom: 1px solid #e7ebef;
+        }
+
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #edf0f3;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        tr:hover {
+            background: #fafbfc;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px;
+            color: #98a1ad;
+        }
+
+        .stock-tag {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .stock-ok { background: #eaf8ee; color: #24945a; }
+        .stock-low { background: #fff4df; color: #c48517; }
+        .stock-out { background: #ffe9e9; color: #d94b4b; }
+
+        .action-icon-btn {
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 6px;
+            transition: .15s ease;
+        }
+
+        .action-icon-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-card {
+            background: white;
+            width: 420px;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(20px);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #121923;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dce1e7;
+            border-radius: 8px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-save {
+            background: #38a169;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        @media(max-width:1200px) {
+            .kpis {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width:800px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 10px;
+            }
+            .brand-name, .brand-sub, .nav a span:not(.nav-icon), .whatsapp-box, .logout {
+                display: none;
+            }
+            .brand {
+                padding: 0;
+                justify-content: center;
+            }
+            .nav a {
+                justify-content: center;
+                padding: 14px;
+            }
+            .main {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="brand-icon">✨</div>
+                <div>
+                    <div class="brand-name">BookFlow</div>
+                    <div class="brand-sub">AI RECEPTIONIST</div>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <a href="dashboard.html">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="appointments.html">
+                    <span class="nav-icon">📅</span>
+                    <span>Appointments</span>
+                </a>
+                <a href="calendar.html">
+                    <span class="nav-icon">🗓️</span>
+                    <span>Calendar</span>
+                </a>
+                <a href="customers.html">
+                    <span class="nav-icon">👥</span>
+                    <span>Customers</span>
+                </a>
+                <a href="services.html">
+                    <span class="nav-icon">✂️</span>
+                    <span>Services</span>
+                </a>
+                <a href="inventory.html" class="active">
+                    <span class="nav-icon">📦</span>
+                    <span>Inventory</span>
+                </a>
+                <a href="staff.html">
+                    <span class="nav-icon">👤</span>
+                    <span>Staff</span>
+                </a>
+                <a href="analytics.html">
+                    <span class="nav-icon">📈</span>
+                    <span>Analytics</span>
+                </a>
+                <a href="settings.html">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="whatsapp-box">
+                    <div class="whatsapp-title">💬 WhatsApp</div>
+                    <div class="whatsapp-status">● Connected</div>
+                </div>
+                <button class="logout" id="logoutBtn">Logout</button>
+            </div>
+
+        </aside>
+
+        <!-- ================= MAIN ================= -->
+
+        <div class="main">
+
+            <div class="topbar">
+                <div class="welcome">
+                    <h1>Inventory <span>Management</span></h1>
+                    <p>Track your salon's product stock and retail items.</p>
+                </div>
+
+                <div class="top-actions">
+                    <button class="refresh-btn" id="addProductBtn" style="background: #38a169;">
+                        ➕ &nbsp; Add Product
+                    </button>
+                    <button class="refresh-btn" id="refreshBtn">
+                        🔄 &nbsp; Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= KPI ================= -->
+
+            <div class="kpis">
+                <div class="kpi">
+                    <div class="kpi-icon purple">📦</div>
+                    <div>
+                        <div class="kpi-label">Total Products</div>
+                        <div class="kpi-value" id="kpiTotalProducts">0</div>
+                    </div>
+                </div>
+
+                <div class="kpi">
+                    <div class="kpi-icon pink">⚠️</div>
+                    <div>
+                        <div class="kpi-label">Low Stock</div>
+                        <div class="kpi-value" id="kpiLowStock">0</div>
+                        <div class="kpi-muted">Items running out</div>
+                    </div>
+                </div>
+
+                <div class="kpi">
+                    <div class="kpi-icon green">🛒</div>
+                    <div>
+                        <div class="kpi-label">Sold Today</div>
+                        <div class="kpi-value" id="kpiSoldToday">0</div>
+                    </div>
+                </div>
+
+                <div class="kpi">
+                    <div class="kpi-icon yellow">📈</div>
+                    <div>
+                        <div class="kpi-label">Sold This Week</div>
+                        <div class="kpi-value" id="kpiSoldWeek">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= INVENTORY TABLE ================= -->
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Available Products</div>
+                    <div>
+                        <input type="text" class="search" id="inventorySearch" placeholder="Search products or categories...">
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>PRODUCT NAME</th>
+                                <th>CATEGORY</th>
+                                <th>PRICE</th>
+                                <th>STOCK</th>
+                                <th>STATUS</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                            <tr>
+                                <td colspan="6" class="empty">Loading inventory...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-card">
+            <h2 id="modalTitle">Add New Product</h2>
+            <input type="hidden" id="prodId">
+            <div class="form-group">
+                <label>Product Name *</label>
+                <input type="text" id="prodName" placeholder="e.g. L'Oreal Serum">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <input type="text" id="prodCategory" placeholder="e.g. Hair Care">
+            </div>
+            <div style="display:flex; gap:12px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Price (₹) *</label>
+                    <input type="number" id="prodPrice" placeholder="0">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Stock Quantity *</label>
+                    <input type="number" id="prodStock" placeholder="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Low Stock Alert Threshold</label>
+                <input type="number" id="prodThreshold" placeholder="5" value="5">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="prodCancel">Cancel</button>
+                <button class="btn-save" id="prodSave">Save Product</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= LIBRARIES & SCRIPTS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ownerLock.js"></script>
+    <script src="js/inventory.js"></script>
+
+</body>
+
+</html>

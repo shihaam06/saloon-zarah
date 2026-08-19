@@ -905,6 +905,45 @@ async function getServicePrice(serviceName, profileId) {
 
 
 // =====================================================
+// INVENTORY & PRODUCT HELPERS
+// =====================================================
+
+async function getInventoryFromDatabase(profileId) {
+    const resolvedProfileId = profileId || PROFILE_ID;
+    const { data, error } = await supabase
+        .from("inventory")
+        .select("id, name, category, price, stock, low_stock_threshold")
+        .eq("profile_id", resolvedProfileId)
+        .order("name", { ascending: true });
+
+    if (error) {
+        console.error("INVENTORY LOAD ERROR:", error);
+        return [];
+    }
+    return data || [];
+}
+
+async function findProductInDatabase(productName, profileId) {
+    if (!productName) return null;
+    const resolvedProfileId = profileId || PROFILE_ID;
+    const wanted = cleanServiceName(productName);
+
+    const products = await getInventoryFromDatabase(resolvedProfileId);
+    if (!products || !products.length) return null;
+
+    const exact = products.find(p => cleanServiceName(p.name) === wanted);
+    if (exact) return exact;
+
+    const partial = products.find(p => {
+        const cleanName = cleanServiceName(p.name);
+        return cleanName.includes(wanted) || wanted.includes(cleanName);
+    });
+
+    return partial || null;
+}
+
+
+// =====================================================
 // CUSTOMER DATABASE HELPER
 // =====================================================
 
@@ -1215,6 +1254,7 @@ Schema:
     "customer_name": "",
     "phone": "",
     "service": "",
+    "product_name": "",
     "booking_date": "",
     "booking_time": "",
     "question": "",
@@ -1229,6 +1269,7 @@ cancel
 reschedule
 pricing
 services
+products
 hours
 location
 faq
@@ -2226,7 +2267,7 @@ app.post(
 
             if (!message) {
 
-                return res.sendStatus(200);
+                return res.type("text/xml").status(200).send("<Response></Response>");
 
             }
 
@@ -3030,6 +3071,53 @@ Do NOT invent any services or prices.
 `;
 }
 }
+
+            // =================================================
+            // PRODUCTS / INVENTORY & STOCK
+            // =================================================
+
+            else if (
+                booking.intent === "products" ||
+                booking.product_name
+            ) {
+                const searchProduct = booking.product_name || booking.service || message;
+                const dbProduct = await findProductInDatabase(searchProduct, activeProfileId);
+                const allProducts = await getInventoryFromDatabase(activeProfileId);
+
+                if (dbProduct) {
+                    const inStock = (Number(dbProduct.stock) || 0) > 0;
+                    systemResult = `
+The customer asked about the product: "${dbProduct.name}".
+Product Details from Inventory Database:
+- Name: ${dbProduct.name}
+- Category: ${dbProduct.category || "General"}
+- Price: ₹${dbProduct.price}
+- Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
+
+Respond naturally to the customer with the exact price and availability.
+If in stock, tell them they can purchase it at the salon during their visit.
+`;
+                } else if (allProducts && allProducts.length > 0) {
+                    const productListText = allProducts
+                        .slice(0, 10)
+                        .map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
+                        .join("\n");
+
+                    systemResult = `
+The customer is asking about products/retail items available in the salon.
+Available Products in Inventory Database:
+${productListText}
+
+Tell the customer what products we currently carry and their prices.
+Do NOT invent products that are not listed here.
+`;
+                } else {
+                    systemResult = `
+The customer asked about products, but no retail products are currently listed in the inventory database.
+Tell the customer politely that retail product stock is currently being updated and offer to help with salon services or appointments.
+`;
+                }
+            }
             // =================================================
             // HOURS
             // =================================================
@@ -3437,7 +3525,7 @@ else {
 }
 
 
-            return res.status(200).end();
+            return res.type("text/xml").status(200).send("<Response></Response>");
 
         }
 
@@ -3491,7 +3579,7 @@ else {
             }
 
 
-            return res.sendStatus(200);
+            return res.type("text/xml").status(200).send("<Response></Response>");
 
         }
 
@@ -4926,6 +5014,47 @@ Do NOT list individual services or prices in the message.
 Do NOT invent any services or prices.
 `;
 }
+
+                else if (
+                    booking?.intent === "products" ||
+                    booking?.product_name
+                ) {
+                    const searchProduct = booking.product_name || booking.service || message;
+                    const dbProduct = await findProductInDatabase(searchProduct, activeInstagramProfileId);
+                    const allProducts = await getInventoryFromDatabase(activeInstagramProfileId);
+
+                    if (dbProduct) {
+                        const inStock = (Number(dbProduct.stock) || 0) > 0;
+                        systemResult = `
+The customer asked about the product: "${dbProduct.name}".
+Product Details from Inventory Database:
+- Name: ${dbProduct.name}
+- Category: ${dbProduct.category || "General"}
+- Price: ₹${dbProduct.price}
+- Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
+
+Respond naturally to the customer with the exact price and stock availability.
+`;
+                    } else if (allProducts && allProducts.length > 0) {
+                        const productListText = allProducts
+                            .slice(0, 10)
+                            .map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
+                            .join("\n");
+
+                        systemResult = `
+The customer is asking about products available in the salon.
+Available Products in Inventory Database:
+${productListText}
+
+Tell the customer what products we currently carry and their prices.
+`;
+                    } else {
+                        systemResult = `
+The customer asked about products, but no retail products are currently listed in the inventory.
+Tell the customer politely that retail product stock is currently being updated.
+`;
+                    }
+                }
 
                 else {
 

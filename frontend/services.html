@@ -3,464 +3,430 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Services | BookFlow</title>
+<title>Services | Zarah Elite</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Inter,sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Inter, sans-serif;
 }
 
-body{
-    background:#f5f7fa;
-    color:#0f172a;
+body {
+    background: #f5f7fa;
+    color: #172033;
 }
 
-.app{
-    display:flex;
-    min-height:100vh;
+.app {
+    display: flex;
+    min-height: 100vh;
 }
 
-/* SIDEBAR */
+/* ================= SIDEBAR ================= */
 
-.sidebar{
-    width:280px;
-    background:#10171d;
-    color:white;
-    padding:28px 18px;
-    position:fixed;
-    inset:0 auto 0 0;
-    display:flex;
-    flex-direction:column;
+.sidebar {
+    width: 280px;
+    background: #10171d;
+    color: white;
+    padding: 28px 18px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
 }
 
-.logo{
-    padding:0 14px;
-    margin-bottom:42px;
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 18px;
+    margin-bottom: 42px;
 }
 
-.logo h2{
-    font-size:22px;
-    font-weight:800;
+.brand-icon {
+    color: #e98272;
+    font-size: 28px;
 }
 
-.logo span{
-    color:#ef8172;
+.brand-name {
+    font-size: 20px;
+    font-weight: 800;
 }
 
-.logo small{
-    display:block;
-    margin-top:4px;
-    color:#ef8172;
-    font-size:11px;
-    letter-spacing:.8px;
+.brand-sub {
+    color: #e98272;
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-top: 3px;
 }
 
-nav{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-nav a{
-    text-decoration:none;
-    color:#d8dee5;
-    padding:13px 16px;
-    border-radius:10px;
-    font-size:15px;
-    font-weight:500;
+.nav a {
+    text-decoration: none;
+    color: #d9dee5;
+    padding: 15px 20px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .2s;
 }
 
-nav a:hover{
-    background:#1c252d;
+.nav a:hover {
+    background: #202830;
 }
 
-nav a.active{
-    background:#e98272;
-    color:white;
+.nav a.active {
+    background: #e98272;
+    color: white;
 }
 
-.bottom{
-    margin-top:auto;
+.nav-icon {
+    width: 20px;
+    text-align: center;
 }
 
-.whatsapp{
-    border:1px solid #293640;
-    background:#151f27;
-    border-radius:14px;
-    padding:15px;
+.sidebar-bottom {
+    margin-top: auto;
 }
 
-.whatsapp strong{
-    display:block;
-    margin-bottom:5px;
+.whatsapp-box {
+    background: #172027;
+    border: 1px solid #29333c;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 15px;
 }
 
-.whatsapp small{
-    color:#22c55e;
+.whatsapp-title {
+    font-size: 13px;
+    font-weight: 600;
 }
 
-/* MAIN */
-
-.main{
-    margin-left:280px;
-    width:calc(100% - 280px);
-    padding:38px 40px;
+.whatsapp-status {
+    color: #4ade80;
+    font-size: 11px;
+    margin-top: 6px;
 }
 
-.page-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:28px;
+.logout {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 9px;
+    background: #202830;
+    color: white;
+    cursor: pointer;
 }
 
-.page-header h1{
-    font-size:28px;
+/* ================= MAIN ================= */
+
+.main {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 36px;
 }
 
-.page-header p{
-    color:#64748b;
-    margin-top:7px;
-    font-size:14px;
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
 }
 
-.add-btn{
-    border:none;
-    background:#e98272;
-    color:white;
-    padding:12px 20px;
-    border-radius:9px;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
+.page-header h1 {
+    font-size: 25px;
+    color: #121923;
 }
 
-.add-btn:hover{
-    background:#d96f60;
+.page-header p {
+    color: #8993a1;
+    margin-top: 5px;
+    font-size: 13px;
 }
 
-/* TOOLBAR */
-
-.toolbar{
-    background:white;
-    border:1px solid #dce2e8;
-    border-radius:14px;
-    padding:16px;
-    display:flex;
-    gap:12px;
-    margin-bottom:18px;
+.add-btn {
+    background: #e98272;
+    border: none;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.search{
-    flex:1;
-    border:1px solid #d7dee6;
-    border-radius:8px;
-    padding:11px 13px;
-    outline:none;
+.toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-.search:focus{
-    border-color:#e98272;
+.search {
+    width: 280px;
+    border: 1px solid #dce1e7;
+    border-radius: 9px;
+    padding: 10px 14px;
+    outline: none;
+    font-size: 13px;
+    background: white;
 }
 
-.filter{
-    border:1px solid #d7dee6;
-    background:white;
-    border-radius:8px;
-    padding:0 15px;
-    cursor:pointer;
+.filter {
+    border: 1px solid #dce1e7;
+    border-radius: 9px;
+    padding: 10px 14px;
+    outline: none;
+    font-size: 13px;
+    background: white;
+    cursor: pointer;
 }
 
-/* TABLE */
+/* ================= TABLE ================= */
 
-.card{
-    background:white;
-    border:1px solid #dce2e8;
-    border-radius:14px;
-    overflow:hidden;
+.card {
+    background: white;
+    border: 1px solid #dfe4e9;
+    border-radius: 13px;
+    overflow: hidden;
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
+.table-wrap {
+    overflow-x: auto;
 }
 
-thead{
-    background:#fafbfc;
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-th{
-    text-align:left;
-    padding:15px 18px;
-    font-size:11px;
-    color:#64748b;
-    text-transform:uppercase;
-    letter-spacing:.3px;
-    border-bottom:1px solid #e2e8f0;
+th {
+    background: #fbfcfd;
+    color: #718096;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: left;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e7ebef;
 }
 
-td{
-    padding:17px 18px;
-    border-bottom:1px solid #edf0f3;
-    font-size:13px;
+td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #edf0f3;
+    font-size: 13px;
+    color: #334155;
 }
 
-tbody tr:hover{
-    background:#fcfcfd;
+tr:hover {
+    background: #fafbfc;
 }
 
-.name{
-    font-weight:600;
+.name {
+    font-weight: 600;
+    color: #172033;
 }
 
-.type-badge{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:600;
+.gst {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
 }
 
-.service{
-    background:#fff0ed;
-    color:#e46f60;
+.status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #eaf8ee;
+    color: #24945a;
 }
 
-.product{
-    background:#f0ebff;
-    color:#7258d9;
+.status.inactive {
+    background: #fee2e2;
+    color: #dc2626;
 }
 
-.gst{
-    color:#15803d;
-    background:#ecfdf3;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:600;
+.actions {
+    display: flex;
+    gap: 8px;
 }
 
-.status{
-    color:#15803d;
-    background:#ecfdf3;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:600;
+.action-btn {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: .15s ease;
 }
 
-.status.inactive{
-    color:#64748b;
-    background:#f1f5f9;
+.action-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
 }
 
-.actions{
-    display:flex;
-    gap:7px;
+.action-btn.delete-btn {
+    color: #dc2626;
 }
 
-.action-btn{
-    border:1px solid #d7dee6;
-    background:white;
-    padding:7px 10px;
-    border-radius:7px;
-    cursor:pointer;
-    font-size:11px;
+/* ================= MODAL ================= */
+
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
 }
 
-.action-btn:hover{
-    background:#f8fafc;
+.modal.show {
+    opacity: 1;
+    pointer-events: all;
 }
 
-.delete-btn{
-    color:#dc2626;
+.modal-box {
+    background: white;
+    width: 440px;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transform: translateY(20px);
+    transition: transform 0.2s ease;
 }
 
-/* EMPTY */
-
-.empty{
-    padding:60px 20px;
-    text-align:center;
-    color:#94a3b8;
+.modal.show .modal-box {
+    transform: translateY(0);
 }
 
-/* MODAL */
-
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(15,23,42,.45);
-    align-items:center;
-    justify-content:center;
-    z-index:100;
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.modal.show{
-    display:flex;
+.modal-header h2 {
+    font-size: 18px;
+    color: #121923;
 }
 
-.modal-box{
-    width:520px;
-    max-width:calc(100% - 30px);
-    background:white;
-    border-radius:15px;
-    padding:26px;
-    box-shadow:0 20px 50px rgba(0,0,0,.15);
+.close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #94a3b8;
 }
 
-.modal-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:24px;
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
 }
 
-.modal-header h2{
-    font-size:19px;
+.form-group.full {
+    grid-column: span 2;
 }
 
-.close{
-    border:none;
-    background:none;
-    font-size:22px;
-    cursor:pointer;
-    color:#64748b;
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #718096;
+    margin-bottom: 5px;
 }
 
-.form-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dce1e7;
+    border-radius: 8px;
+    outline: none;
+    font-size: 13px;
 }
 
-.form-group{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
 }
 
-.form-group.full{
-    grid-column:1 / -1;
+.cancel-btn {
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
-label{
-    font-size:12px;
-    font-weight:600;
-    color:#475569;
+.save-btn {
+    background: #e98272;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
-input,
-select{
-    width:100%;
-    border:1px solid #d7dee6;
-    padding:11px 12px;
-    border-radius:8px;
-    outline:none;
-    font-size:13px;
+.message {
+    margin-top: 12px;
+    font-size: 12px;
+    font-weight: 500;
 }
 
-input:focus,
-select:focus{
-    border-color:#e98272;
-    box-shadow:0 0 0 3px rgba(233,130,114,.1);
-}
+.message.error { color: #dc2626; }
+.message.success { color: #16a34a; }
 
-.modal-actions{
-    display:flex;
-    justify-content:flex-end;
-    gap:10px;
-    margin-top:25px;
-}
-
-.cancel-btn{
-    border:1px solid #d7dee6;
-    background:white;
-    padding:11px 18px;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-.save-btn{
-    border:none;
-    background:#e98272;
-    color:white;
-    padding:11px 20px;
-    border-radius:8px;
-    font-weight:600;
-    cursor:pointer;
-}
-
-.save-btn:hover{
-    background:#d96f60;
-}
-
-.message{
-    margin-top:15px;
-    padding:10px 12px;
-    border-radius:8px;
-    font-size:12px;
-    display:none;
-}
-
-.message.success{
-    display:block;
-    color:#15803d;
-    background:#ecfdf3;
-}
-
-.message.error{
-    display:block;
-    color:#dc2626;
-    background:#fff1f2;
-}
-
-@media(max-width:900px){
-
-    .sidebar{
-        width:220px;
+@media(max-width:800px) {
+    .sidebar {
+        width: 80px;
+        padding: 20px 10px;
     }
-
-    .main{
-        margin-left:220px;
-        width:calc(100% - 220px);
-        padding:25px;
+    .brand-name, .brand-sub, .nav a span:not(.nav-icon), .whatsapp-box, .logout {
+        display: none;
     }
-
-}
-
-@media(max-width:700px){
-
-    .sidebar{
-        display:none;
+    .brand {
+        padding: 0;
+        justify-content: center;
     }
-
-    .main{
-        margin-left:0;
-        width:100%;
-        padding:20px;
+    .nav a {
+        justify-content: center;
+        padding: 14px;
     }
-
-    .form-grid{
-        grid-template-columns:1fr;
-    }
-
-    .form-group.full{
-        grid-column:auto;
-    }
-
-    .toolbar{
-        flex-direction:column;
-    }
-
-    .table-wrap{
-        overflow-x:auto;
+    .main {
+        margin-left: 80px;
+        width: calc(100% - 80px);
+        padding: 20px;
     }
 }
 </style>
@@ -470,1270 +436,393 @@ select:focus{
 
 <div class="app">
 
+<!-- ================= SIDEBAR ================= -->
 <aside class="sidebar">
-
-    <div class="logo">
-        <h2>✦ <span id="businessNameSide">abcdef</span></h2>
-        <small>AI RECEPTIONIST</small>
+    <div class="brand">
+        <div class="brand-icon">✨</div>
+        <div>
+            <div class="brand-name" id="businessNameSide">BookFlow</div>
+            <div class="brand-sub">AI RECEPTIONIST</div>
+        </div>
     </div>
 
-    <nav>
-
-        <a href="dashboard.html">▦ &nbsp; Dashboard</a>
-        <a href="appointments.html">▣ &nbsp; Appointments</a>
-        <a href="calendar.html">▤ &nbsp; Calendar</a>
-        <a href="customers.html">◉ &nbsp; Customers</a>
-        <a href="services.html" class="active">♢ &nbsp; Services</a>
-        <a href="staff.html">♧ &nbsp; Staff</a>
-        <a href="analytics.html">▥ &nbsp; Analytics</a>
-        <a href="settings.html">⚙ &nbsp; Settings</a>
-
+    <nav class="nav">
+        <a href="dashboard.html">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="appointments.html">
+            <span class="nav-icon">📅</span>
+            <span>Appointments</span>
+        </a>
+        <a href="calendar.html">
+            <span class="nav-icon">🗓️</span>
+            <span>Calendar</span>
+        </a>
+        <a href="customers.html">
+            <span class="nav-icon">👥</span>
+            <span>Customers</span>
+        </a>
+        <a href="services.html" class="active">
+            <span class="nav-icon">✂️</span>
+            <span>Services</span>
+        </a>
+        <a href="inventory.html">
+            <span class="nav-icon">📦</span>
+            <span>Inventory</span>
+        </a>
+        <a href="staff.html">
+            <span class="nav-icon">👤</span>
+            <span>Staff</span>
+        </a>
+        <a href="analytics.html">
+            <span class="nav-icon">📈</span>
+            <span>Analytics</span>
+        </a>
+        <a href="settings.html">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+        </a>
     </nav>
 
-    <div class="bottom">
-        <div class="whatsapp">
-            <strong>🟢 WhatsApp Connected</strong>
-            <small>● Live & Receiving</small>
+    <div class="sidebar-bottom">
+        <div class="whatsapp-box">
+            <div class="whatsapp-title">💬 WhatsApp</div>
+            <div class="whatsapp-status">● Live & Receiving</div>
         </div>
+        <button class="logout" id="logoutBtn">Logout</button>
     </div>
-
 </aside>
 
-
+<!-- ================= MAIN ================= -->
 <main class="main">
-
     <div class="page-header">
-
         <div>
-            <h1>Services & Products</h1>
-            <p>Manage your salon services, products and GST settings.</p>
+            <h1>Services Management</h1>
+            <p>Manage your salon services, pricing, and GST settings.</p>
         </div>
 
-        <button
-            class="add-btn"
-            id="addBtn"
-        >
-            + Add Service
+        <button class="add-btn" id="addBtn">
+            ➕ Add Service
         </button>
-
     </div>
-
 
     <div class="toolbar">
+        <input id="search" class="search" type="text" placeholder="Search services...">
 
-        <input
-            id="search"
-            class="search"
-            type="text"
-            placeholder="Search service or product..."
-        >
-
-        <select
-            id="filter"
-            class="filter"
-        >
-            <option value="all">All</option>
-            <option value="service">Services</option>
-            <option value="product">Products</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+        <select id="filter" class="filter">
+            <option value="all">All Services</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Inactive Only</option>
         </select>
-
     </div>
 
-
-    <!-- SERVICES -->
-<div class="card">
-
-    <div style="padding:20px 20px 5px;">
-        <h2 style="margin:0;font-size:18px;">
-            Services
-        </h2>
-
-        <p style="margin:6px 0 0;color:#64748b;font-size:13px;">
-            Manage your salon services and pricing.
-        </p>
+    <div class="card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Price</th>
+                        <th>GST</th>
+                        <th>SAC Code</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="servicesTable">
+                    <tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Loading services...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <div class="table-wrap">
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>GST</th>
-                    <th>SAC</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-
-            <tbody id="servicesTable">
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-
-<!-- PRODUCTS -->
-<div class="card" style="margin-top:20px;">
-
-    <div style="padding:20px 20px 5px;">
-        <h2 style="margin:0;font-size:18px;">
-            Products & Stock
-        </h2>
-
-        <p style="margin:6px 0 0;color:#64748b;font-size:13px;">
-            Manage products, HSN codes, GST and inventory.
-        </p>
-    </div>
-
-    <div class="table-wrap">
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>GST</th>
-                    <th>HSN</th>
-                    <th>Stock</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-
-            <tbody id="productsTable">
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
 </main>
 
 </div>
 
-
 <!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 id="modalTitle">Add Service</h2>
+            <button class="close" id="closeModal">×</button>
+        </div>
 
-<div
-    class="modal"
-    id="modal"
->
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Service Name *</label>
+                <input id="name" type="text" placeholder="e.g. Haircut & Styling">
+            </div>
 
-<div class="modal-box">
+            <div class="form-group">
+                <label>Price (₹) *</label>
+                <input id="price" type="number" min="0" step="0.01" placeholder="400">
+            </div>
 
-    <div class="modal-header">
+            <div class="form-group">
+                <label>SAC Code</label>
+                <input id="hsnSac" type="text" placeholder="e.g. 999721">
+            </div>
 
-        <h2 id="modalTitle">
-            Add Service
-        </h2>
+            <div class="form-group full">
+                <label>GST Rate</label>
+                <select id="gstRate">
+                    <option value="0">0%</option>
+                    <option value="5">5%</option>
+                    <option value="12">12%</option>
+                    <option value="18" selected>18%</option>
+                    <option value="28">28%</option>
+                </select>
+            </div>
+        </div>
 
-        <button
-            class="close"
-            id="closeModal"
-        >
-            ×
-        </button>
+        <div id="message" class="message"></div>
 
+        <div class="modal-actions">
+            <button class="cancel-btn" id="cancelBtn">Cancel</button>
+            <button class="save-btn" id="saveServiceBtn">Save Service</button>
+        </div>
     </div>
-
-
-    <div class="form-grid">
-
-        <div class="form-group full">
-
-            <label>
-                Name
-            </label>
-
-            <input
-                id="name"
-                type="text"
-                placeholder="e.g. Haircut"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Type
-            </label>
-
-            <select id="itemType">
-
-                <option value="service">
-                    Service
-                </option>
-
-                <option value="product">
-                    Product
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Price
-            </label>
-
-            <input
-                id="price"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="400"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                HSN / SAC
-            </label>
-
-            <input
-                id="hsnSac"
-                type="text"
-                placeholder="Enter HSN / SAC"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                GST Rate
-            </label>
-
-            <select id="gstRate">
-
-                <option value="0">0%</option>
-                <option value="5">5%</option>
-                <option value="12">12%</option>
-                <option value="18">18%</option>
-                <option value="28">28%</option>
-
-            </select>
-
-        </div>
-        <div class="form-group" id="stockGroup">
-    <label>
-        Stock Quantity
-    </label>
-
-    <input
-        id="stockQuantity"
-        type="number"
-        min="0"
-        step="1"
-        value="0"
-        placeholder="0"
-    >
 </div>
-
-    </div>
-
-
-    <div
-        id="message"
-        class="message"
-    ></div>
-
-
-    <div class="modal-actions">
-
-        <button
-            class="cancel-btn"
-            id="cancelBtn"
-        >
-            Cancel
-        </button>
-
-        <button
-            class="save-btn"
-            id="saveServiceBtn"
-        >
-            Save Service
-        </button>
-
-    </div>
-
-</div>
-
-</div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="js/supabase.js"></script>
 <script src="js/ownerLock.js"></script>
 
-
 <script>
+document.addEventListener("DOMContentLoaded", async function(){
+    const client = window.client;
+    let currentUser = null;
+    let editingId = null;
+    let allServices = [];
 
-document.addEventListener(
-    "DOMContentLoaded",
-    async function(){
+    const modal = document.getElementById("modal");
+    const servicesTable = document.getElementById("servicesTable");
+    const search = document.getElementById("search");
+    const filter = document.getElementById("filter");
 
-        const client = window.client;
+    async function getUser(){
+        const { data, error } = await client.auth.getUser();
+        if(error || !data.user){
+            throw new Error("User not logged in.");
+        }
+        currentUser = data.user;
+    }
 
-        let currentUser = null;
+    async function loadProfile(){
+        const { data } = await client
+            .from("profiles")
+            .select("business_name")
+            .eq("id", currentUser.id)
+            .single();
 
-        let editingId = null;
+        if(data && data.business_name){
+            const el = document.getElementById("businessNameSide");
+            if(el) el.textContent = data.business_name;
+        }
+    }
 
-        let allServices = [];
+    async function loadServices(){
+        const { data, error } = await client
+            .from("services")
+            .select("*")
+            .eq("profile_id", currentUser.id)
+            .order("created_at", { ascending: false });
 
-
-        const modal =
-            document.getElementById("modal");
-
-        const servicesTable =
-    document.getElementById("servicesTable");
-
-const productsTable =
-    document.getElementById("productsTable");
-
-        const search =
-            document.getElementById("search");
-
-        const filter =
-            document.getElementById("filter");
-
-
-        /* =========================
-           USER
-        ========================= */
-
-        async function getUser(){
-
-            const {
-                data,
-                error
-            } =
-                await client.auth.getUser();
-
-            if(error || !data.user){
-
-                throw new Error(
-                    "User not logged in."
-                );
-
-            }
-
-            currentUser = data.user;
-
+        if(error){
+            console.error("Error loading services:", error);
+            servicesTable.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:#dc2626;">Failed to load services.</td></tr>`;
+            return;
         }
 
+        allServices = data || [];
+        render();
+    }
 
-        /* =========================
-           LOAD BUSINESS NAME
-        ========================= */
+    function render(){
+        const query = search.value.toLowerCase().trim();
+        const selectedFilter = filter.value;
 
-        async function loadProfile(){
+        servicesTable.innerHTML = "";
 
-            const {
-                data
-            } =
-                await client
-                    .from("profiles")
-                    .select("business_name")
-                    .eq(
-                        "id",
-                        currentUser.id
-                    )
-                    .single();
-
-            if(data){
-
-                document
-                    .getElementById(
-                        "businessNameSide"
-                    )
-                    .textContent =
-                    data.business_name ||
-                    "abcdef";
-
-            }
-
-        }
-
-
-        /* =========================
-           LOAD SERVICES
-        ========================= */
-
-        async function loadServices(){
-
-            const {
-                data,
-                error
-            } =
-                await client
-                    .from("services")
-                    .select("*")
-                    .eq(
-                        "profile_id",
-                        currentUser.id
-                    )
-                    .order(
-                        "created_at",
-                        {
-                            ascending:false
-                        }
-                    );
-
-
-            if(error){
-
-                console.error(error);
-
-                return;
-
-            }
-
-
-            allServices = data || [];
-
-            render();
-
-        }
-
-
-        /* =========================
-           RENDER
-        ========================= */
-
-        function render(){
-
-    const query =
-        search
-            .value
-            .toLowerCase()
-            .trim();
-
-    const selectedFilter =
-        filter.value;
-
-    servicesTable.innerHTML = "";
-    productsTable.innerHTML = "";
-
-    const filtered =
-        allServices.filter(item => {
-
-            const matchesSearch =
-                item.name
-                    .toLowerCase()
-                    .includes(query);
-
+        const filtered = allServices.filter(item => {
+            const matchesSearch = (item.name || "").toLowerCase().includes(query);
             let matchesFilter = true;
 
-            if(selectedFilter === "service"){
-                matchesFilter =
-                    item.item_type === "service";
-            }
+            if(selectedFilter === "active") matchesFilter = item.active === true;
+            if(selectedFilter === "inactive") matchesFilter = item.active === false;
 
-            if(selectedFilter === "product"){
-                matchesFilter =
-                    item.item_type === "product";
-            }
-
-            if(selectedFilter === "active"){
-                matchesFilter =
-                    item.active === true;
-            }
-
-            if(selectedFilter === "inactive"){
-                matchesFilter =
-                    item.active === false;
-            }
-
-            return (
-                matchesSearch &&
-                matchesFilter
-            );
-
+            return matchesSearch && matchesFilter;
         });
 
+        if(filtered.length === 0){
+            servicesTable.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">No services found.</td></tr>`;
+            return;
+        }
 
-    filtered.forEach(item => {
-
-        const row =
-            document.createElement("tr");
-
-
-        /* =========================
-           SERVICE
-        ========================= */
-
-        if(item.item_type === "service"){
-
+        filtered.forEach(item => {
+            const row = document.createElement("tr");
             row.innerHTML = `
-
+                <td><span class="name">${escapeHtml(item.name)}</span></td>
+                <td>₹${Number(item.price || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
+                <td><span class="gst">${Number(item.gst_rate || 0)}%</span></td>
+                <td>${escapeHtml(item.hsn_sac || "—")}</td>
                 <td>
-                    <span class="name">
-                        ${escapeHtml(item.name)}
+                    <span class="status ${item.active ? "" : "inactive"}">
+                        ${item.active ? "Active" : "Inactive"}
                     </span>
                 </td>
-
                 <td>
-                    ₹${Number(
-                        item.price || 0
-                    ).toLocaleString(
-                        "en-IN",
-                        {
-                            minimumFractionDigits:2
-                        }
-                    )}
-                </td>
-
-                <td>
-                    <span class="gst">
-                        ${Number(
-                            item.gst_rate || 0
-                        )}%
-                    </span>
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        item.hsn_sac || "—"
-                    )}
-                </td>
-
-                <td>
-
-                    <span class="status ${
-                        item.active
-                            ? ""
-                            : "inactive"
-                    }">
-
-                        ${
-                            item.active
-                                ? "Active"
-                                : "Inactive"
-                        }
-
-                    </span>
-
-                </td>
-
-                <td>
-
                     <div class="actions">
-
-                        <button
-                            class="action-btn"
-                            onclick="editService('${item.id}')"
-                        >
-                            Edit
+                        <button class="action-btn" onclick="editService('${item.id}')">✏️ Edit</button>
+                        <button class="action-btn delete-btn" onclick="toggleService('${item.id}', ${item.active})">
+                            ${item.active ? "Disable" : "Enable"}
                         </button>
-
-                        <button
-                            class="action-btn delete-btn"
-                            onclick="toggleService(
-                                '${item.id}',
-                                ${item.active}
-                            )"
-                        >
-
-                            ${
-                                item.active
-                                    ? "Disable"
-                                    : "Enable"
-                            }
-
-                        </button>
-
                     </div>
-
                 </td>
-
             `;
-
             servicesTable.appendChild(row);
+        });
+    }
 
-        }
-
-
-        /* =========================
-           PRODUCT
-        ========================= */
-
-        if(item.item_type === "product"){
-
-            row.innerHTML = `
-
-                <td>
-                    <span class="name">
-                        ${escapeHtml(item.name)}
-                    </span>
-                </td>
-
-                <td>
-                    ₹${Number(
-                        item.price || 0
-                    ).toLocaleString(
-                        "en-IN",
-                        {
-                            minimumFractionDigits:2
-                        }
-                    )}
-                </td>
-
-                <td>
-                    <span class="gst">
-                        ${Number(
-                            item.gst_rate || 0
-                        )}%
-                    </span>
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        item.hsn_sac || "—"
-                    )}
-                </td>
-
-                <td>
-                    ${Number(
-                        item.stock_quantity || 0
-                    )}
-                </td>
-
-                <td>
-
-                    <span class="status ${
-                        item.active
-                            ? ""
-                            : "inactive"
-                    }">
-
-                        ${
-                            item.active
-                                ? "Active"
-                                : "Inactive"
-                        }
-
-                    </span>
-
-                </td>
-
-                <td>
-
-                    <div class="actions">
-
-                        <button
-                            class="action-btn"
-                            onclick="editService('${item.id}')"
-                        >
-                            Edit
-                        </button>
-
-                        <button
-                            class="action-btn delete-btn"
-                            onclick="toggleService(
-                                '${item.id}',
-                                ${item.active}
-                            )"
-                        >
-
-                            ${
-                                item.active
-                                    ? "Disable"
-                                    : "Enable"
-                            }
-
-                        </button>
-
-                    </div>
-
-                </td>
-
-            `;
-
-            productsTable.appendChild(row);
-
-        }
-
+    document.getElementById("addBtn").addEventListener("click", function(){
+        editingId = null;
+        document.getElementById("modalTitle").textContent = "Add Service";
+        document.getElementById("saveServiceBtn").textContent = "Save Service";
+        clearForm();
+        modal.classList.add("show");
     });
 
-}
-
-        /* =========================
-           ADD
-        ========================= */
-
-        document
-            .getElementById("addBtn")
-            .addEventListener(
-                "click",
-                function(){
-
-                    editingId = null;
-
-                    document
-                        .getElementById(
-                            "modalTitle"
-                        )
-                        .textContent =
-                        "Add Service";
-
-
-                    document
-                        .getElementById(
-                            "saveServiceBtn"
-                        )
-                        .textContent =
-                        "Save Service";
-
-
-                    clearForm();
-
-                    modal.classList.add(
-                        "show"
-                    );
-
-                }
-            );
-
-
-        /* =========================
-           EDIT
-        ========================= */
-
-        window.editService =
-            function(id){
-
-                const item =
-                    allServices.find(
-                        x => x.id === id
-                    );
-
-
-                if(!item){
-
-                    return;
-
-                }
-
-
-                editingId = id;
-
-
-                document
-                    .getElementById(
-                        "modalTitle"
-                    )
-                    .textContent =
-                    "Edit Service";
-
-
-                document
-                    .getElementById(
-                        "saveServiceBtn"
-                    )
-                    .textContent =
-                    "Save Changes";
-
-
-                document
-                    .getElementById(
-                        "name"
-                    )
-                    .value =
-                    item.name || "";
-
-
-                document
-                    .getElementById(
-                        "itemType"
-                    )
-                    .value =
-                    item.item_type || "service";
-
-
-                document
-                    .getElementById(
-                        "price"
-                    )
-                    .value =
-                    item.price || 0;
-
-
-                document
-                    .getElementById(
-                        "hsnSac"
-                    )
-                    .value =
-                    item.hsn_sac || "";
-
-
-                document
-                    .getElementById(
-                        "gstRate"
-                    )
-                    .value =
-                    item.gst_rate || 0;
-                    document
-    .getElementById(
-        "stockQuantity"
-    )
-    .value =
-    item.stock_quantity || 0;
-
-
-                modal.classList.add(
-                    "show"
-                );
-
-            };
-
-
-        /* =========================
-           SAVE
-        ========================= */
-
-        document
-            .getElementById(
-                "saveServiceBtn"
-            )
-            .addEventListener(
-                "click",
-                async function(){
-
-                    const name =
-                        document
-                            .getElementById(
-                                "name"
-                            )
-                            .value
-                            .trim();
-
-
-                    const itemType =
-                        document
-                            .getElementById(
-                                "itemType"
-                            )
-                            .value;
-
-
-                    const price =
-                        Number(
-                            document
-                                .getElementById(
-                                    "price"
-                                )
-                                .value
-                        );
-
-
-                    const hsnSac =
-                        document
-                            .getElementById(
-                                "hsnSac"
-                            )
-                            .value
-                            .trim();
-
-
-                    const gstRate =
-                        Number(
-                            document
-                                .getElementById(
-                                    "gstRate"
-                                )
-                                .value
-                        );
-                        const stockQuantity =
-    Number(
-        document
-            .getElementById(
-                "stockQuantity"
-            )
-            .value
-    ) || 0;
-
-
-                    if(!name){
-
-                        showMessage(
-                            "Please enter a name.",
-                            "error"
-                        );
-
-                        return;
-
-                    }
-
-
-                    if(
-                        isNaN(price) ||
-                        price < 0
-                    ){
-
-                        showMessage(
-                            "Please enter a valid price.",
-                            "error"
-                        );
-
-                        return;
-
-                    }
-
-
-                    const payload = {
-    profile_id:
-        currentUser.id,
-
-    name:
-        name,
-
-    item_type:
-        itemType,
-
-    price:
-        price,
-
-    hsn_sac:
-        hsnSac || null,
-
-    gst_rate:
-        gstRate,
-
-    stock_quantity:
-        itemType === "product"
-            ? stockQuantity
-            : 0,
-
-    active:
-        true
-};
-
-
-                    const button =
-                        document
-                            .getElementById(
-                                "saveServiceBtn"
-                            );
-
-
-                    button.disabled =
-                        true;
-
-                    button.textContent =
-                        "Saving...";
-
-
-                    try{
-
-                        let error;
-
-
-                        if(editingId){
-
-                            const result =
-                                await client
-                                    .from(
-                                        "services"
-                                    )
-                                    .update(
-                                        payload
-                                    )
-                                    .eq(
-                                        "id",
-                                        editingId
-                                    );
-
-                            error =
-                                result.error;
-
-                        }
-                        else{
-
-                            const result =
-                                await client
-                                    .from(
-                                        "services"
-                                    )
-                                    .insert(
-                                        payload
-                                    );
-
-                            error =
-                                result.error;
-
-                        }
-
-
-                        if(error){
-
-                            throw error;
-
-                        }
-
-
-                        closeModal();
-
-                        await loadServices();
-
-                    }
-                    catch(error){
-
-                        console.error(
-                            error
-                        );
-
-                        showMessage(
-                            error.message ||
-                            "Could not save.",
-                            "error"
-                        );
-
-                    }
-                    finally{
-
-                        button.disabled =
-                            false;
-
-                        button.textContent =
-                            editingId
-                            ? "Save Changes"
-                            : "Save Service";
-
-                    }
-
-                }
-            );
-
-
-        /* =========================
-           ENABLE / DISABLE
-        ========================= */
-
-        window.toggleService =
-            async function(
-                id,
-                currentStatus
-            ){
-
-                const {
-                    error
-                } =
-                    await client
-                        .from("services")
-                        .update({
-                            active:
-                                !currentStatus
-                        })
-                        .eq("id", id)
-.eq("profile_id", currentUser.id)
-
-
-                if(error){
-
-                    console.error(error);
-
-                    alert(
-                        "Could not update service."
-                    );
-
-                    return;
-
-                }
-
-
-                await loadServices();
-
-            };
-
-
-        /* =========================
-           MODAL
-        ========================= */
-
-        function clearForm(){
-
-            document
-                .getElementById("name")
-                .value = "";
-
-            document
-                .getElementById("itemType")
-                .value = "service";
-
-            document
-                .getElementById("price")
-                .value = "";
-
-            document
-                .getElementById("hsnSac")
-                .value = "";
-
-            document
-                .getElementById("gstRate")
-                .value = "0";
-
+    window.editService = function(id){
+        const item = allServices.find(x => x.id === id);
+        if(!item) return;
+
+        editingId = id;
+        document.getElementById("modalTitle").textContent = "Edit Service";
+        document.getElementById("saveServiceBtn").textContent = "Save Changes";
+        document.getElementById("name").value = item.name || "";
+        document.getElementById("price").value = item.price || 0;
+        document.getElementById("hsnSac").value = item.hsn_sac || "";
+        document.getElementById("gstRate").value = item.gst_rate || 0;
+
+        modal.classList.add("show");
+    };
+
+    document.getElementById("saveServiceBtn").addEventListener("click", async function(){
+        const name = document.getElementById("name").value.trim();
+        const price = Number(document.getElementById("price").value);
+        const hsnSac = document.getElementById("hsnSac").value.trim();
+        const gstRate = Number(document.getElementById("gstRate").value);
+
+        if(!name){
+            showMessage("Please enter a service name.", "error");
+            return;
         }
 
-
-        function closeModal(){
-
-            modal.classList.remove(
-                "show"
-            );
-
-            editingId = null;
-
+        if(isNaN(price) || price < 0){
+            showMessage("Please enter a valid price.", "error");
+            return;
         }
 
+        const payload = {
+            profile_id: currentUser.id,
+            name: name,
+            item_type: "service",
+            price: price,
+            hsn_sac: hsnSac || null,
+            gst_rate: gstRate,
+            active: true
+        };
 
-        document
-            .getElementById(
-                "closeModal"
-            )
-            .addEventListener(
-                "click",
-                closeModal
-            );
+        const button = document.getElementById("saveServiceBtn");
+        button.disabled = true;
+        button.textContent = "Saving...";
 
-
-        document
-            .getElementById(
-                "cancelBtn"
-            )
-            .addEventListener(
-                "click",
-                closeModal
-            );
-
-
-        modal.addEventListener(
-            "click",
-            function(e){
-
-                if(e.target === modal){
-
-                    closeModal();
-
-                }
-
+        try {
+            let error;
+            if(editingId){
+                const result = await client.from("services").update(payload).eq("id", editingId);
+                error = result.error;
+            } else {
+                const result = await client.from("services").insert(payload);
+                error = result.error;
             }
-        );
 
+            if(error) throw error;
 
-        /* =========================
-           SEARCH / FILTER
-        ========================= */
-
-        search.addEventListener(
-            "input",
-            render
-        );
-
-        filter.addEventListener(
-            "change",
-            render
-        );
-
-
-        /* =========================
-           SECURITY
-        ========================= */
-
-        function escapeHtml(value){
-
-            return String(value)
-                .replace(
-                    /&/g,
-                    "&amp;"
-                )
-                .replace(
-                    /</g,
-                    "&lt;"
-                )
-                .replace(
-                    />/g,
-                    "&gt;"
-                )
-                .replace(
-                    /"/g,
-                    "&quot;"
-                )
-                .replace(
-                    /'/g,
-                    "&#039;"
-                );
-
-        }
-
-
-        function showMessage(
-            text,
-            type
-        ){
-
-            const message =
-                document
-                    .getElementById(
-                        "message"
-                    );
-
-            message.textContent =
-                text;
-
-            message.className =
-                "message " + type;
-
-        }
-
-
-        /* =========================
-           START
-        ========================= */
-
-        try{
-
-            await getUser();
-
-            await loadProfile();
-
+            closeModal();
             await loadServices();
-
+        } catch(err){
+            console.error(err);
+            showMessage(err.message || "Could not save service.", "error");
+        } finally {
+            button.disabled = false;
+            button.textContent = editingId ? "Save Changes" : "Save Service";
         }
-        catch(error){
+    });
 
+    window.toggleService = async function(id, currentStatus){
+        const { error } = await client
+            .from("services")
+            .update({ active: !currentStatus })
+            .eq("id", id)
+            .eq("profile_id", currentUser.id);
+
+        if(error){
             console.error(error);
-
-            alert(
-                "Please login first."
-            );
-
+            alert("Could not update service status.");
+            return;
         }
+        await loadServices();
+    };
 
+    function clearForm(){
+        document.getElementById("name").value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("hsnSac").value = "";
+        document.getElementById("gstRate").value = "18";
+        document.getElementById("message").textContent = "";
     }
-);
 
+    function closeModal(){
+        modal.classList.remove("show");
+        editingId = null;
+    }
+
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    document.getElementById("cancelBtn").addEventListener("click", closeModal);
+    modal.addEventListener("click", function(e){
+        if(e.target === modal) closeModal();
+    });
+
+    search.addEventListener("input", render);
+    filter.addEventListener("change", render);
+
+    function escapeHtml(value){
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function showMessage(text, type){
+        const message = document.getElementById("message");
+        message.textContent = text;
+        message.className = "message " + type;
+    }
+
+    try {
+        await getUser();
+        await loadProfile();
+        await loadServices();
+    } catch(err){
+        console.error(err);
+        alert("Please login first.");
+        window.location.href = "login.html";
+    }
+});
 </script>
 
 </body>

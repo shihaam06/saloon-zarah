@@ -2,6 +2,10 @@ let booking = null;
 
 let addons = [];
 
+let selectedProducts = [];
+
+let inventoryProducts = [];
+
 let selectedPayment = null;
 
 let profileSettings = null;
@@ -156,6 +160,12 @@ async function loadBooking() {
 
     await loadMainService();
 
+    // ======================================
+    // LOAD INVENTORY PRODUCTS
+    // ======================================
+
+    await loadInventoryProducts();
+
 
     renderBooking();
     // ======================================
@@ -268,6 +278,30 @@ async function loadMainService() {
 
     }
 
+}
+
+
+// ==========================================
+// LOAD INVENTORY PRODUCTS FROM DATABASE
+// ==========================================
+
+async function loadInventoryProducts() {
+    try {
+        const { data: { user } } = await client.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await client
+            .from("inventory")
+            .select("*")
+            .eq("profile_id", user.id)
+            .order("name", { ascending: true });
+
+        if (!error && data) {
+            inventoryProducts = data;
+        }
+    } catch (err) {
+        console.error("Error loading inventory for billing:", err);
+    }
 }
 
 
@@ -695,6 +729,119 @@ function removeAddon(index) {
 
 
 // ==========================================
+// ADD PRODUCT
+// ==========================================
+
+document
+    .getElementById("addProductItemBtn")
+    ?.addEventListener("click", () => {
+        if (inventoryProducts.length === 0) {
+            alert("No products available in inventory. Please add products in the Inventory page first.");
+            return;
+        }
+
+        const firstProd = inventoryProducts[0];
+        selectedProducts.push({
+            inventory_id: firstProd.id,
+            name: firstProd.name,
+            price: Number(firstProd.price) || 0,
+            quantity: 1,
+            gstRate: 0,
+            hsnSac: "",
+            maxStock: Number(firstProd.stock) || 0
+        });
+
+        renderProducts();
+        calculateTotal();
+    });
+
+
+// ==========================================
+// RENDER PRODUCTS
+// ==========================================
+
+function renderProducts() {
+    const container = document.getElementById("productsContainer");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    selectedProducts.forEach((prod, index) => {
+        let optionsHtml = `<option value="">Select a product...</option>`;
+        inventoryProducts.forEach(inv => {
+            const isSelected = inv.id === prod.inventory_id ? "selected" : "";
+            optionsHtml += `<option value="${inv.id}" ${isSelected}>${escapeHtml(inv.name)} (Stock: ${inv.stock || 0}) - ₹${inv.price || 0}</option>`;
+        });
+
+        container.innerHTML += `
+            <div class="addon-row product-row" data-index="${index}" style="display:flex; gap:10px; margin-bottom:12px; align-items:center; flex-wrap:wrap;">
+                <select class="product-select" style="flex:2; min-width:180px; height:42px; padding:0 12px; border:1px solid #dce1e7; border-radius:8px; font-size:12px; font-weight:600; color:#334155; background:#fff;">
+                    ${optionsHtml}
+                </select>
+
+                <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:110px;">
+                    <span style="font-size:11px; font-weight:700; color:#718096;">Qty:</span>
+                    <input type="number" min="1" max="${prod.maxStock || 999}" value="${prod.quantity}" class="product-qty" style="width:100%; height:42px; padding:0 10px; border:1px solid #dce1e7; border-radius:8px; font-size:12px; font-weight:600; color:#334155; background:#fff;">
+                </div>
+
+                <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:110px;">
+                    <span style="font-size:11px; font-weight:700; color:#718096;">₹</span>
+                    <input type="number" step="0.01" value="${prod.price}" class="product-price" style="width:100%; height:42px; padding:0 10px; border:1px solid #dce1e7; border-radius:8px; font-size:12px; font-weight:600; color:#334155; background:#fff;">
+                </div>
+
+                <button type="button" class="remove-btn" onclick="removeProduct(${index})" style="height:42px; padding:0 14px; background:#fee2e2; color:#dc2626; border:none; border-radius:8px; cursor:pointer; font-size:11px; font-weight:700;">
+                    Remove
+                </button>
+            </div>
+        `;
+    });
+
+    // Attach listeners
+    document.querySelectorAll(".product-select").forEach((sel, idx) => {
+        sel.addEventListener("change", (e) => {
+            const invId = e.target.value;
+            const inv = inventoryProducts.find(i => i.id === invId);
+            if (inv) {
+                selectedProducts[idx].inventory_id = inv.id;
+                selectedProducts[idx].name = inv.name;
+                selectedProducts[idx].price = Number(inv.price) || 0;
+                selectedProducts[idx].maxStock = Number(inv.stock) || 0;
+                renderProducts();
+                calculateTotal();
+            }
+        });
+    });
+
+    document.querySelectorAll(".product-qty").forEach((input, idx) => {
+        input.addEventListener("input", () => {
+            const val = Number(input.value) || 1;
+            selectedProducts[idx].quantity = Math.max(1, val);
+            calculateTotal();
+        });
+    });
+
+    document.querySelectorAll(".product-price").forEach((input, idx) => {
+        input.addEventListener("input", () => {
+            selectedProducts[idx].price = Number(input.value) || 0;
+            calculateTotal();
+        });
+    });
+}
+
+
+// ==========================================
+// REMOVE PRODUCT
+// ==========================================
+
+function removeProduct(index) {
+    selectedProducts.splice(index, 1);
+    renderProducts();
+    calculateTotal();
+}
+window.removeProduct = removeProduct;
+
+
+// ==========================================
 // DISCOUNT
 // ==========================================
 
@@ -789,6 +936,24 @@ function calculateTotal() {
         );
 
 
+    const productTotal =
+        selectedProducts.reduce(
+            (
+                sum,
+                prod
+            ) => {
+
+                return sum +
+                    (
+                        (Number(prod.price) || 0) *
+                        (Number(prod.quantity) || 1)
+                    );
+
+            },
+            0
+        );
+
+
     const discount =
         Number(
             document.getElementById(
@@ -801,7 +966,8 @@ function calculateTotal() {
         Math.max(
             0,
             subtotal +
-            addonTotal
+            addonTotal +
+            productTotal
         );
 
 
@@ -919,6 +1085,68 @@ function calculateTotal() {
 
 
     // ======================================
+    // PRODUCT TAX
+    // ======================================
+
+    let productTaxTotal = 0;
+
+    let productCGST = 0;
+
+    let productSGST = 0;
+
+
+    selectedProducts.forEach(
+        prod => {
+
+            const prodPrice =
+                (Number(prod.price) || 0) *
+                (Number(prod.quantity) || 1);
+
+
+            const prodDiscount =
+                prodPrice *
+                discountRatio;
+
+
+            const prodTaxable =
+                Math.max(
+                    0,
+                    prodPrice -
+                    prodDiscount
+                );
+
+
+            const prodGST =
+                profileSettings?.gst_enabled
+                    ? Number(
+                        prod.gstRate
+                    ) || 0
+                    : 0;
+
+
+            const tax =
+                calculateItemTax(
+                    prodTaxable,
+                    prodGST
+                );
+
+
+            productTaxTotal +=
+                tax.taxAmount;
+
+
+            productCGST +=
+                tax.cgstAmount;
+
+
+            productSGST +=
+                tax.sgstAmount;
+
+        }
+    );
+
+
+    // ======================================
     // TOTALS
     // ======================================
 
@@ -950,17 +1178,45 @@ function calculateTotal() {
 
             },
             0
+        ) +
+        selectedProducts.reduce(
+            (
+                sum,
+                prod
+            ) => {
+
+                const prodPrice =
+                    (Number(prod.price) || 0) *
+                    (Number(prod.quantity) || 1);
+
+
+                const prodDiscount =
+                    prodPrice *
+                    discountRatio;
+
+
+                return sum +
+                    Math.max(
+                        0,
+                        prodPrice -
+                        prodDiscount
+                    );
+
+            },
+            0
         );
 
 
     const cgstAmount =
         mainTax.cgstAmount +
-        addonCGST;
+        addonCGST +
+        productCGST;
 
 
     const sgstAmount =
         mainTax.sgstAmount +
-        addonSGST;
+        addonSGST +
+        productSGST;
 
 
     const igstAmount =
@@ -1007,6 +1263,25 @@ function calculateTotal() {
                 minimumFractionDigits: 2
             }
         );
+
+
+    const prodEl =
+        document.getElementById(
+            "productTotal"
+        );
+
+    if (prodEl) {
+
+        prodEl.textContent =
+            "₹" +
+            productTotal.toLocaleString(
+                "en-IN",
+                {
+                    minimumFractionDigits: 2
+                }
+            );
+
+    }
 
 
     document.getElementById(
@@ -1847,6 +2122,95 @@ balance_amount:
 
                 }
             );
+
+
+            // ======================================
+            // PRODUCTS / RETAIL DEDUCTIONS
+            // ======================================
+
+            for (const prod of selectedProducts) {
+
+                if (!prod.name) continue;
+
+                const qty =
+                    Number(prod.quantity) || 1;
+
+                const prodPrice =
+                    (Number(prod.price) || 0) * qty;
+
+                const grossAmount =
+                    totals.subtotal +
+                    totals.addonTotal +
+                    (totals.productTotal || 0);
+
+                const prodDiscount =
+                    grossAmount > 0
+                        ? (prodPrice / grossAmount) * totals.discount
+                        : 0;
+
+                const prodTaxable =
+                    Math.max(
+                        0,
+                        prodPrice - prodDiscount
+                    );
+
+                const prodGST =
+                    profileSettings?.gst_enabled
+                        ? Number(prod.gstRate) || 0
+                        : 0;
+
+                const prodTax =
+                    calculateItemTax(
+                        prodTaxable,
+                        prodGST
+                    );
+
+                items.push({
+                    bill_id: bill.id,
+                    item_name: prod.name,
+                    item_type: "product",
+                    quantity: qty,
+                    price: Number(prod.price) || 0,
+                    total: prodPrice,
+                    hsn_sac: prod.hsnSac || null,
+                    gst_rate: prodGST,
+                    taxable_amount: prodTaxable,
+                    cgst_amount: prodTax.cgstAmount,
+                    sgst_amount: prodTax.sgstAmount,
+                    igst_amount: prodTax.igstAmount,
+                    tax_amount: prodTax.taxAmount
+                });
+
+                // Deduct stock from inventory & log sale transaction
+                if (prod.inventory_id) {
+                    try {
+                        const { data: invItem } = await client
+                            .from("inventory")
+                            .select("stock")
+                            .eq("id", prod.inventory_id)
+                            .single();
+
+                        if (invItem) {
+                            const newStock = Math.max(0, (Number(invItem.stock) || 0) - qty);
+                            await client
+                                .from("inventory")
+                                .update({ stock: newStock })
+                                .eq("id", prod.inventory_id);
+                        }
+
+                        await client.from("inventory_transactions").insert([{
+                            profile_id: user.id,
+                            inventory_id: prod.inventory_id,
+                            quantity_change: -qty,
+                            type: "sale",
+                            bill_id: bill.id
+                        }]);
+                    } catch (invErr) {
+                        console.error("Failed to update inventory stock for:", prod.name, invErr);
+                    }
+                }
+
+            }
 
 
             // ======================================
