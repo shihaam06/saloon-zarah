@@ -5592,6 +5592,45 @@ app.get(
 
 
 // =====================================================
+// MANUAL BOOKING
+// =====================================================
+
+app.post("/api/bookings/manual", async (req, res) => {
+    try {
+        const { profile_id, customer_name, phone, service, booking_date, booking_time } = req.body;
+
+        if (!profile_id || !customer_name || !service || !booking_date || !booking_time) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        const { data: newBooking, error } = await supabase
+            .from("bookings")
+            .insert({
+                profile_id,
+                customer_name,
+                phone: phone || null,
+                service,
+                booking_date,
+                booking_time,
+                status: "Confirmed",
+                source: "Walk-in"
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Manual booking error:", error);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        return res.status(200).json({ success: true, booking: newBooking });
+    } catch (error) {
+        console.error("Manual booking endpoint error:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// =====================================================
 // SEND BILL ON WHATSAPP
 // =====================================================
 
