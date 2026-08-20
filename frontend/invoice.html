@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="View and share your salon invoice — SAGET E-Bill.">
-    <title>Invoice | SAGET</title>
+    <meta name="description" content="View and share your salon invoice — Kangro E-Bill.">
+    <title>Invoice | Kangro</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -783,7 +783,7 @@ function renderInvoice(profile) {
     el("actionsBar").style.display   = "flex";
 
     // Update page title with business name
-    const bName = profile?.business_name || "SAGET";
+    const bName = profile?.business_name || "Kangro";
     document.title = `Invoice #${el("billNumber").textContent} | ${bName}`;
 }
 

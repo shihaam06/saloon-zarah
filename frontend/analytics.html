@@ -4,11 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Analytics | SAGET</title>
+<title>Analytics | Kangro</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/ownerLock.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 *{
@@ -17,9 +19,138 @@
 
 body{
     margin:0;
-    font-family:Arial,sans-serif;
+    font-family:'Inter',Arial,sans-serif;
     background:#f7f8fa;
     color:#111827;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:280px;
+    background:#10171d;
+    color:white;
+    padding:28px 18px;
+    position:fixed;
+    left:0;top:0;bottom:0;
+    display:flex;
+    flex-direction:column;
+    z-index:100;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:0 18px;
+    margin-bottom:42px;
+}
+
+.brand-icon{
+    color:#e98272;
+    font-size:28px;
+}
+
+.brand-name{
+    font-size:20px;
+    font-weight:800;
+}
+
+.brand-sub{
+    color:#e98272;
+    font-size:10px;
+    letter-spacing:1px;
+    margin-top:3px;
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    flex:1;
+}
+
+.nav a{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:12px 18px;
+    border-radius:10px;
+    color:#94a3b8;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:500;
+    transition:all .18s ease;
+}
+
+.nav a:hover{
+    background:rgba(255,255,255,.06);
+    color:#e2e8f0;
+}
+
+.nav a.active{
+    background:rgba(239,130,116,.12);
+    color:#ef8274;
+    font-weight:600;
+}
+
+.nav-icon{
+    font-size:17px;
+    width:22px;
+    text-align:center;
+}
+
+.sidebar-bottom{
+    margin-top:auto;
+    padding-top:20px;
+}
+
+.whatsapp-box{
+    background:rgba(37,211,102,.08);
+    border:1px solid rgba(37,211,102,.18);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:14px;
+}
+
+.whatsapp-title{
+    font-size:13px;
+    font-weight:600;
+    color:#25d366;
+}
+
+.whatsapp-status{
+    font-size:11px;
+    color:#6b7280;
+    margin-top:4px;
+}
+
+.logout{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.04);
+    color:#94a3b8;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .18s ease;
+}
+
+.logout:hover{
+    background:rgba(239,68,68,.12);
+    color:#f87171;
+    border-color:rgba(239,68,68,.2);
+}
+
+.main{
+    margin-left:280px;
+    flex:1;
 }
 
 .container{
@@ -255,12 +386,84 @@ button{
 </head>
 
 <body>
-    <button
-    onclick="window.location.href='dashboard.html'"
-    class="back-btn"
->
-    ← Back to Dashboard
-</button>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">✦</div>
+            <div>
+                <div class="brand-name" id="sidebarBusinessName">Glamour Studio</div>
+                <div class="brand-sub">AI RECEPTIONIST</div>
+            </div>
+        </div>
+
+        <nav class="nav">
+
+            <a href="dashboard.html">
+                <span class="nav-icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="appointments.html">
+                <span class="nav-icon">□</span>
+                <span>Appointments</span>
+            </a>
+
+            <a href="calendar.html">
+                <span class="nav-icon">▤</span>
+                <span>Calendar</span>
+            </a>
+
+            <a href="customers.html">
+                <span class="nav-icon">◉</span>
+                <span>Customers</span>
+            </a>
+
+            <a href="services.html">
+                <span class="nav-icon">✂️</span>
+                <span>Services</span>
+            </a>
+
+            <a href="inventory.html">
+                <span class="nav-icon">📦</span>
+                <span>Inventory</span>
+            </a>
+
+            <a href="staff.html">
+                <span class="nav-icon">👤</span>
+                <span>Staff</span>
+            </a>
+
+            <a class="active">
+                <span class="nav-icon">▥</span>
+                <span>Analytics</span>
+            </a>
+
+            <a href="settings.html">
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="whatsapp-box">
+                <div class="whatsapp-title">🟢 WhatsApp Connected</div>
+                <div class="whatsapp-status">● Live & Receiving</div>
+            </div>
+
+            <button id="logoutBtn" class="logout">Logout</button>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
 
 <div class="container">
 

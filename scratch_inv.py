@@ -5,11 +5,13 @@ with open(path, 'r', encoding='utf-8') as f:
     content = f.read()
 
 # Replace title
-content = content.replace("<title>BookFlow Dashboard</title>", "<title>BookFlow Inventory</title>")
+content = content.replace(
+    "<title>Kangro Dashboard</title>", "<title>Kangro Inventory</title>")
 
 # Active link logic
-content = content.replace('class="active"', '') # strip all active
-content = content.replace('<a href="inventory.html">', '<a href="inventory.html" class="active">')
+content = content.replace('class="active"', '')  # strip all active
+content = content.replace('<a href="inventory.html">',
+                          '<a href="inventory.html" class="active">')
 
 # Extract main content replacement
 start_main = '<div class="main">'
@@ -18,7 +20,7 @@ end_main = '<!-- ================= LIBRARIES ================= -->'
 if start_main in content and end_main in content:
     pre = content[:content.find(start_main)]
     post = content[content.find(end_main):]
-    
+
     new_main = """<div class="main">
             <div class="topbar">
                 <div class="welcome">
@@ -161,6 +163,6 @@ if start_main in content and end_main in content:
         </div>
     </div>
 """
-    
+
     with open(path, 'w', encoding='utf-8') as f:
         f.write(pre + new_main + "\n    " + post)
