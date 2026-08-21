@@ -4269,18 +4269,12 @@ app.get("/api/instagram/callback", async (req, res) => {
 // =====================================================
 
 const longLivedResponse = await fetch(
-    "https://graph.instagram.com/access_token",
-    {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-            grant_type: "ig_exchange_token",
-            client_secret: process.env.INSTAGRAM_APP_SECRET,
-            access_token: shortLivedToken
-        })
-    }
+    "https://graph.instagram.com/access_token?" +
+    new URLSearchParams({
+        grant_type: "ig_exchange_token",
+        client_secret: process.env.INSTAGRAM_APP_SECRET,
+        access_token: shortLivedToken
+    }).toString()
 );
 
 const longLivedData =
