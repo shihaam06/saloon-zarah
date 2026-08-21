@@ -166,6 +166,12 @@ async function loadBooking() {
 
     await loadInventoryProducts();
 
+    // ======================================
+    // LOAD STAFF LIST (for line-item attribution)
+    // ======================================
+
+    await loadStaffList();
+
 
     renderBooking();
     // ======================================
@@ -302,6 +308,41 @@ async function loadInventoryProducts() {
     } catch (err) {
         console.error("Error loading inventory for billing:", err);
     }
+}
+
+
+// ==========================================
+// STAFF LIST FOR LINE-ITEM ATTRIBUTION
+// ==========================================
+
+let staffList = [];
+
+async function loadStaffList() {
+    try {
+        const { data: { user } } = await client.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await client
+            .from("staff")
+            .select("id, name")
+            .eq("profile_id", user.id)
+            .eq("active", true)
+            .order("name", { ascending: true });
+
+        if (!error && data) {
+            staffList = data;
+        }
+    } catch (err) {
+        console.error("Error loading staff for billing:", err);
+    }
+}
+
+function buildStaffOptions(selectedId = "") {
+    let opts = `<option value="">— Assign Staff —</option>`;
+    staffList.forEach(s => {
+        opts += `<option value="${s.id}" ${s.id === selectedId ? "selected" : ""}>${escapeHtml(s.name)}</option>`;
+    });
+    return opts;
 }
 
 
@@ -478,6 +519,12 @@ function renderServices() {
 
                 </div>
 
+                <div style="margin-top:8px;">
+                    <select id="mainServiceStaff" style="font-size:13px;padding:5px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#334155;min-width:160px;" onchange="mainServiceStaffId=this.value">
+                        ${buildStaffOptions()}
+                    </select>
+                </div>
+
             </div>
 
             <div class="service-price">
@@ -496,6 +543,8 @@ function renderServices() {
     `;
 
 }
+
+let mainServiceStaffId = "";
 
 
 // ==========================================
@@ -584,6 +633,10 @@ function renderAddons() {
                         value="${escapeHtml(addon.hsnSac)}"
                         class="addon-hsn"
                     >
+
+                    <select class="addon-staff" style="height:42px; padding:0 8px; border:1px solid #dce1e7; border-radius:8px; font-size:12px; font-weight:600; color:#334155; background:#fff;">
+                        ${buildStaffOptions(addon.staff_id || "")}
+                    </select>
 
                     <button
                         class="remove-btn"
@@ -707,6 +760,30 @@ function renderAddons() {
             }
         );
 
+    // ======================================
+    // STAFF
+    // ======================================
+
+    document
+        .querySelectorAll(
+            ".addon-staff"
+        )
+        .forEach(
+            (select, index) => {
+
+                select.addEventListener(
+                    "change",
+                    () => {
+
+                        addons[index].staff_id =
+                            select.value || null;
+
+                    }
+                );
+
+            }
+        );
+
 }
 
 
@@ -789,6 +866,10 @@ function renderProducts() {
                     <input type="number" step="0.01" value="${prod.price}" class="product-price" style="width:100%; height:42px; padding:0 10px; border:1px solid #dce1e7; border-radius:8px; font-size:12px; font-weight:600; color:#334155; background:#fff;">
                 </div>
 
+                <select class="product-staff" style="height:42px; padding:0 8px; border:1px solid #dce1e7; border-radius:8px; font-size:12px; font-weight:600; color:#334155; background:#fff;">
+                    ${buildStaffOptions(prod.staff_id || "")}
+                </select>
+
                 <button type="button" class="remove-btn" onclick="removeProduct(${index})" style="height:42px; padding:0 14px; background:#fee2e2; color:#dc2626; border:none; border-radius:8px; cursor:pointer; font-size:11px; font-weight:700;">
                     Remove
                 </button>
@@ -824,6 +905,12 @@ function renderProducts() {
         input.addEventListener("input", () => {
             selectedProducts[idx].price = Number(input.value) || 0;
             calculateTotal();
+        });
+    });
+
+    document.querySelectorAll(".product-staff").forEach((sel, idx) => {
+        sel.addEventListener("change", (e) => {
+            selectedProducts[idx].staff_id = e.target.value || null;
         });
     });
 }
@@ -2020,7 +2107,10 @@ balance_amount:
                     mainTax.igstAmount,
 
                 tax_amount:
-                    mainTax.taxAmount
+                    mainTax.taxAmount,
+
+                staff_id:
+                    mainServiceStaffId || null
 
             });
 
@@ -2116,7 +2206,10 @@ balance_amount:
                             addonTax.igstAmount,
 
                         tax_amount:
-                            addonTax.taxAmount
+                            addonTax.taxAmount,
+
+                        staff_id:
+                            addon.staff_id || null
 
                     });
 
@@ -2178,7 +2271,8 @@ balance_amount:
                     cgst_amount: prodTax.cgstAmount,
                     sgst_amount: prodTax.sgstAmount,
                     igst_amount: prodTax.igstAmount,
-                    tax_amount: prodTax.taxAmount
+                    tax_amount: prodTax.taxAmount,
+                    staff_id: prod.staff_id || null
                 });
 
                 // Deduct stock from inventory & log sale transaction

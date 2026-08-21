@@ -114,68 +114,97 @@
   `;
   document.head.appendChild(style);
 
-  // Inject Modal HTML
-  const modalDiv = document.createElement("div");
-  modalDiv.id = "ownerLockModal";
-  modalDiv.className = "owner-lock-modal";
-  modalDiv.style.display = "none";
-  modalDiv.innerHTML = `
-    <div class="owner-lock-box">
-      <div class="owner-lock-header">
-        <div class="owner-lock-icon">🔒</div>
-        <h2>OWNER ACCESS</h2>
-        <p>This section is restricted. Please enter the owner password.</p>
-      </div>
-      <div class="owner-lock-body">
-        <label for="ownerLockPassword">Owner Password</label>
-        <input type="password" id="ownerLockPassword" placeholder="••••••••" autocomplete="current-password">
-        <div id="ownerLockError" class="owner-lock-error">Incorrect owner password.</div>
-      </div>
-      <div class="owner-lock-footer">
-        <button type="button" class="owner-lock-btn cancel" id="ownerLockCancelBtn">Cancel</button>
-        <button type="button" class="owner-lock-btn unlock" id="ownerLockUnlockBtn">Unlock</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modalDiv);
-
   let pendingTargetUrl = null;
 
+  function initModal() {
+    if (document.getElementById("ownerLockModal")) return;
+
+    const modalDiv = document.createElement("div");
+    modalDiv.id = "ownerLockModal";
+    modalDiv.className = "owner-lock-modal";
+    modalDiv.style.display = "none";
+    modalDiv.innerHTML = `
+      <div class="owner-lock-box">
+        <div class="owner-lock-header">
+          <div class="owner-lock-icon">🔒</div>
+          <h2>OWNER ACCESS</h2>
+          <p>This section is restricted. Please enter the owner password.</p>
+        </div>
+        <div class="owner-lock-body">
+          <label for="ownerLockPassword">Owner Password</label>
+          <input type="password" id="ownerLockPassword" placeholder="••••••••" autocomplete="current-password">
+          <div id="ownerLockError" class="owner-lock-error">Incorrect owner password.</div>
+        </div>
+        <div class="owner-lock-footer">
+          <button type="button" class="owner-lock-btn cancel" id="ownerLockCancelBtn">Cancel</button>
+          <button type="button" class="owner-lock-btn unlock" id="ownerLockUnlockBtn">Unlock</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalDiv);
+
+    // Event Listeners for Modal
+    document.getElementById("ownerLockUnlockBtn")?.addEventListener("click", verifyAndUnlock);
+    document.getElementById("ownerLockPassword")?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        verifyAndUnlock();
+      }
+    });
+
+    document.getElementById("ownerLockCancelBtn")?.addEventListener("click", () => {
+      hideLockModal();
+      const currentFile = window.location.pathname.split("/").pop();
+      if (currentFile === "analytics.html" || currentFile === "settings.html") {
+        window.location.href = "dashboard.html";
+      }
+    });
+  }
+
   function showLockModal(targetUrl) {
+    initModal();
     pendingTargetUrl = targetUrl || null;
     const modal = document.getElementById("ownerLockModal");
     const pwdInput = document.getElementById("ownerLockPassword");
     const errDiv = document.getElementById("ownerLockError");
 
-    pwdInput.value = "";
-    errDiv.style.display = "none";
-    errDiv.textContent = "";
-    modal.style.display = "flex";
-    pwdInput.focus();
+    if (pwdInput) pwdInput.value = "";
+    if (errDiv) {
+      errDiv.style.display = "none";
+      errDiv.textContent = "";
+    }
+    if (modal) {
+      modal.style.display = "flex";
+      pwdInput?.focus();
+    }
   }
 
   function hideLockModal() {
     const modal = document.getElementById("ownerLockModal");
-    modal.style.display = "none";
+    if (modal) modal.style.display = "none";
   }
 
   async function verifyAndUnlock() {
     const pwdInput = document.getElementById("ownerLockPassword");
     const errDiv = document.getElementById("ownerLockError");
-    const enteredPassword = pwdInput.value;
+    const enteredPassword = pwdInput?.value;
 
     if (!enteredPassword) {
-      errDiv.textContent = "Please enter the owner password.";
-      errDiv.style.display = "block";
+      if (errDiv) {
+        errDiv.textContent = "Please enter the owner password.";
+        errDiv.style.display = "block";
+      }
       return;
     }
 
-    errDiv.style.display = "none";
+    if (errDiv) errDiv.style.display = "none";
 
     const supabaseClient = window.client || window.supabaseClient;
     if (!supabaseClient) {
-      errDiv.textContent = "System error: Supabase client not initialized.";
-      errDiv.style.display = "block";
+      if (errDiv) {
+        errDiv.textContent = "System error: Supabase client not initialized.";
+        errDiv.style.display = "block";
+      }
       return;
     }
 
@@ -194,8 +223,10 @@
         .single();
 
       if (profile && profile.role === "staff") {
-        errDiv.textContent = "Access restricted: Only account owners can unlock this section.";
-        errDiv.style.display = "block";
+        if (errDiv) {
+          errDiv.textContent = "Access restricted: Only account owners can unlock this section.";
+          errDiv.style.display = "block";
+        }
         return;
       }
 
@@ -209,8 +240,10 @@
       }
 
       if (!isVerified) {
-        errDiv.textContent = "Incorrect owner password.";
-        errDiv.style.display = "block";
+        if (errDiv) {
+          errDiv.textContent = "Incorrect owner password.";
+          errDiv.style.display = "block";
+        }
         return;
       }
 
@@ -226,27 +259,12 @@
 
     } catch (err) {
       console.error("Owner unlock error:", err);
-      errDiv.textContent = "Verification failed. Please try again.";
-      errDiv.style.display = "block";
+      if (errDiv) {
+        errDiv.textContent = "Verification failed. Please try again.";
+        errDiv.style.display = "block";
+      }
     }
   }
-
-  // Event Listeners for Modal
-  document.getElementById("ownerLockUnlockBtn").addEventListener("click", verifyAndUnlock);
-  document.getElementById("ownerLockPassword").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      verifyAndUnlock();
-    }
-  });
-
-  document.getElementById("ownerLockCancelBtn").addEventListener("click", () => {
-    hideLockModal();
-    const currentFile = window.location.pathname.split("/").pop();
-    if (currentFile === "analytics.html" || currentFile === "settings.html") {
-      window.location.href = "dashboard.html";
-    }
-  });
 
   // Always Intercept Clicks on Analytics or Settings links
   document.addEventListener("DOMContentLoaded", () => {

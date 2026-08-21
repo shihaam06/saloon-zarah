@@ -830,78 +830,62 @@ function renderAppointments(){
                     <div class="actions">
 
                         ${
-                            appointment.status !==
-                            "Completed"
-                            &&
-                            appointment.status !==
-                            "Cancelled"
+                            appointment.status === 'Scheduled' || appointment.status === 'Confirmed'
                             ?
                             `
                             <button
                                 class="success"
-                                onclick="updateStatus(
-                                    '${appointment.id}',
-                                    'Completed'
-                                )"
+                                onclick="updateStatus('${appointment.id}', 'Checked In')"
                             >
-                                Complete
+                                Check In
                             </button>
 
                             <button
                                 class="danger"
-                                onclick="updateStatus(
-                                    '${appointment.id}',
-                                    'Cancelled'
-                                )"
+                                onclick="updateStatus('${appointment.id}', 'Cancelled')"
                             >
                                 Cancel
                             </button>
                             `
-                            :
-                            ""
+                            : ""
                         }
 
 
                         ${
-                            appointment.status ===
-                            "Scheduled"
+                            appointment.status === 'Checked In'
                             ?
                             `
                             <button
                                 class="secondary"
-                                onclick="updateStatus(
-                                    '${appointment.id}',
-                                    'Confirmed'
-                                )"
+                                onclick="updateStatus('${appointment.id}', 'Checked Out')"
                             >
-                                Confirm
+                                Check Out
                             </button>
                             `
-                            :
-                            ""
+                            : ""
                         }
 
 
                         ${
-                            appointment.status ===
-                            "Confirmed"
-                            ||
-                            appointment.status ===
-                            "Scheduled"
+                            appointment.status === 'Checked Out'
                             ?
                             `
                             <button
-                                class="secondary"
-                                onclick="updateStatus(
-                                    '${appointment.id}',
-                                    'No-show'
-                                )"
+                                class="primary"
+                                style="background: #ef806f; color: white;"
+                                onclick="window.location.href='billing.html?booking=${appointment.id}'"
                             >
-                                No-show
+                                Create Invoice
                             </button>
                             `
-                            :
-                            ""
+                            : ""
+                        }
+
+                        ${
+                            appointment.status === 'Completed'
+                            ?
+                            `<span style="color:#25d366; font-weight:600; font-size:13px;">Billed ✅</span>`
+                            : ""
                         }
 
                     </div>

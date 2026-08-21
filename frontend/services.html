@@ -523,9 +523,11 @@ tr:hover {
                 <thead>
                     <tr>
                         <th>Service Name</th>
+                        <th>Category</th>
+                        <th>Duration</th>
+                        <th>Available For</th>
                         <th>Price</th>
-                        <th>GST</th>
-                        <th>SAC Code</th>
+                        <th>TAT</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -555,8 +557,47 @@ tr:hover {
             </div>
 
             <div class="form-group">
+                <label>Category</label>
+                <select id="category">
+                    <option value="Uncategorized">Uncategorized</option>
+                    <option value="Hair Cut">Hair Cut</option>
+                    <option value="Hair Colouring">Hair Colouring</option>
+                    <option value="Waxing">Waxing</option>
+                    <option value="Massage">Massage</option>
+                    <option value="Facial">Facial</option>
+                    <option value="Nails">Nails</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label>Price (₹) *</label>
                 <input id="price" type="number" min="0" step="0.01" placeholder="400">
+            </div>
+
+            <div class="form-group">
+                <label>Duration</label>
+                <select id="duration">
+                    <option value="15 min">15 min</option>
+                    <option value="30 min" selected>30 min</option>
+                    <option value="45 min">45 min</option>
+                    <option value="60 min">60 min</option>
+                    <option value="90 min">90 min</option>
+                    <option value="120 min">120 min</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Available For</label>
+                <select id="availableFor">
+                    <option value="Everyone" selected>Everyone</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Turn Around Time (TAT)</label>
+                <input id="tat" type="text" placeholder="e.g. 5 min">
             </div>
 
             <div class="form-group">
@@ -564,7 +605,7 @@ tr:hover {
                 <input id="hsnSac" type="text" placeholder="e.g. 999721">
             </div>
 
-            <div class="form-group full">
+            <div class="form-group">
                 <label>GST Rate</label>
                 <select id="gstRate">
                     <option value="0">0%</option>
@@ -656,7 +697,7 @@ document.addEventListener("DOMContentLoaded", async function(){
         });
 
         if(filtered.length === 0){
-            servicesTable.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">No services found.</td></tr>`;
+            servicesTable.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">No services found.</td></tr>`;
             return;
         }
 
@@ -664,9 +705,11 @@ document.addEventListener("DOMContentLoaded", async function(){
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><span class="name">${escapeHtml(item.name)}</span></td>
+                <td><span class="category">${escapeHtml(item.category || "Uncategorized")}</span></td>
+                <td><span class="duration">${escapeHtml(item.duration || "30 min")}</span></td>
+                <td><span class="available-for">${escapeHtml(item.available_for || "Everyone")}</span></td>
                 <td>₹${Number(item.price || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
-                <td><span class="gst">${Number(item.gst_rate || 0)}%</span></td>
-                <td>${escapeHtml(item.hsn_sac || "—")}</td>
+                <td><span class="tat">${escapeHtml(item.turnaround_time || "—")}</span></td>
                 <td>
                     <span class="status ${item.active ? "" : "inactive"}">
                         ${item.active ? "Active" : "Inactive"}
@@ -702,6 +745,10 @@ document.addEventListener("DOMContentLoaded", async function(){
         document.getElementById("saveServiceBtn").textContent = "Save Changes";
         document.getElementById("name").value = item.name || "";
         document.getElementById("price").value = item.price || 0;
+        document.getElementById("category").value = item.category || "Uncategorized";
+        document.getElementById("duration").value = item.duration || "30 min";
+        document.getElementById("availableFor").value = item.available_for || "Everyone";
+        document.getElementById("tat").value = item.turnaround_time || "";
         document.getElementById("hsnSac").value = item.hsn_sac || "";
         document.getElementById("gstRate").value = item.gst_rate || 0;
 
@@ -711,6 +758,10 @@ document.addEventListener("DOMContentLoaded", async function(){
     document.getElementById("saveServiceBtn").addEventListener("click", async function(){
         const name = document.getElementById("name").value.trim();
         const price = Number(document.getElementById("price").value);
+        const category = document.getElementById("category").value;
+        const duration = document.getElementById("duration").value;
+        const availableFor = document.getElementById("availableFor").value;
+        const tat = document.getElementById("tat").value.trim();
         const hsnSac = document.getElementById("hsnSac").value.trim();
         const gstRate = Number(document.getElementById("gstRate").value);
 
@@ -728,6 +779,10 @@ document.addEventListener("DOMContentLoaded", async function(){
             profile_id: currentUser.id,
             name: name,
             item_type: "service",
+            category: category,
+            duration: duration,
+            available_for: availableFor,
+            turnaround_time: tat || null,
             price: price,
             hsn_sac: hsnSac || null,
             gst_rate: gstRate,
@@ -779,9 +834,14 @@ document.addEventListener("DOMContentLoaded", async function(){
     function clearForm(){
         document.getElementById("name").value = "";
         document.getElementById("price").value = "";
+        document.getElementById("category").value = "Uncategorized";
+        document.getElementById("duration").value = "30 min";
+        document.getElementById("availableFor").value = "Everyone";
+        document.getElementById("tat").value = "";
         document.getElementById("hsnSac").value = "";
         document.getElementById("gstRate").value = "18";
         document.getElementById("message").textContent = "";
+        document.getElementById("message").className = "message";
     }
 
     function closeModal(){

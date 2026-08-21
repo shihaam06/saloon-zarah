@@ -382,6 +382,195 @@ button{
     }
 
 }
+
+/* CA EXPORT CARD & REPORTS HUB */
+.ca-export-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 14px;
+    padding: 24px 28px;
+    color: #ffffff;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.ca-export-info h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+}
+
+.ca-export-info p {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.ca-export-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ca-month-input {
+    background: #334155;
+    border: 1px solid #475569;
+    color: #f8fafc;
+    color-scheme: dark;
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+}
+
+.btn-excel {
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    padding: 11px 20px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-excel:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-excel:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary-export {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 11px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-export:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+/* REPORTS DIRECTORY SECTION */
+.reports-section-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 32px 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reports-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.report-tile {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.report-tile:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.report-tile-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.report-tile-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.icon-green { background: #dcfce7; color: #15803d; }
+.icon-blue { background: #dbeafe; color: #1d4ed8; }
+.icon-purple { background: #f3e8ff; color: #7e22ce; }
+.icon-orange { background: #ffedd5; color: #c2410c; }
+.icon-pink { background: #fce7f3; color: #be185d; }
+
+.report-tile-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 3px;
+}
+
+.report-tile-desc {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.report-tile-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.report-tile-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
 </style>
 </head>
 
@@ -504,6 +693,26 @@ button{
 
         </div>
 
+    </div>
+
+
+    <!-- CA MONTHLY EXCEL EXPORT BANNER -->
+    <div class="ca-export-card">
+        <div class="ca-export-info">
+            <h2>
+                <span>📊</span> Monthly CA Accounting & Tax Export
+            </h2>
+            <p>Generate clean Excel/CSV file of all monthly bookings, bills, line items, and GST breakdown for your CA or Salon Owner.</p>
+        </div>
+        <div class="ca-export-controls">
+            <input type="month" id="caReportMonth" class="ca-month-input">
+            <button id="downloadCaReportBtn" class="btn-excel" onclick="downloadMonthlyCAReport()">
+                <span>📥</span> Download Excel/CSV
+            </button>
+            <button class="btn-secondary-export" onclick="downloadMonthlyGSTReport()">
+                <span>📑</span> GST GSTR-1 Format
+            </button>
+        </div>
     </div>
 
 
@@ -738,6 +947,83 @@ button{
 
     </div>
 
+    <!-- CATEGORIZED ENTERPRISE REPORTS DIRECTORY -->
+    <div class="reports-section-title">
+        <span>📑</span> Complete Enterprise Reports Hub
+    </div>
+
+    <div class="reports-hub-grid">
+        <!-- FINANCE -->
+        <div class="report-tile">
+            <div class="report-tile-header">
+                <div class="report-tile-icon icon-green">💰</div>
+                <div>
+                    <div class="report-tile-title">Finance & CA Reports</div>
+                    <div class="report-tile-desc">Monthly bills, line-item taxes, and GSTR-1 export for accountant.</div>
+                </div>
+            </div>
+            <button class="report-tile-btn" onclick="downloadMonthlyCAReport()">
+                <span>📥</span> Export CA Excel
+            </button>
+        </div>
+
+        <!-- SALES -->
+        <div class="report-tile">
+            <div class="report-tile-header">
+                <div class="report-tile-icon icon-blue">📈</div>
+                <div>
+                    <div class="report-tile-title">Sales & Bookings Register</div>
+                    <div class="report-tile-desc">Complete booking timeline, services executed, and walk-in sales.</div>
+                </div>
+            </div>
+            <button class="report-tile-btn" onclick="downloadBookingsScheduleReport()">
+                <span>📥</span> Export Bookings (.csv)
+            </button>
+        </div>
+
+        <!-- STAFF -->
+        <div class="report-tile">
+            <div class="report-tile-header">
+                <div class="report-tile-icon icon-purple">👥</div>
+                <div>
+                    <div class="report-tile-title">Employee & Stylist Sales</div>
+                    <div class="report-tile-desc">Staff performance, jobs completed, and commission breakdowns.</div>
+                </div>
+            </div>
+            <button class="report-tile-btn" onclick="downloadStaffPerformanceReport()">
+                <span>📥</span> Export Staff Report
+            </button>
+        </div>
+
+        <!-- CUSTOMERS -->
+        <div class="report-tile">
+            <div class="report-tile-header">
+                <div class="report-tile-icon icon-orange">⭐</div>
+                <div>
+                    <div class="report-tile-title">Customer Insights & Spenders</div>
+                    <div class="report-tile-desc">Top spending clients, repeat frequency, and total lifetime value.</div>
+                </div>
+            </div>
+            <button class="report-tile-btn" onclick="downloadCustomerLTVReport()">
+                <span>📥</span> Export Clients (.csv)
+            </button>
+        </div>
+
+        <!-- INVENTORY -->
+        <div class="report-tile">
+            <div class="report-tile-header">
+                <div class="report-tile-icon icon-pink">📦</div>
+                <div>
+                    <div class="report-tile-title">Inventory & Stock Movement</div>
+                    <div class="report-tile-desc">Retail sales deductions, stock valuations, and reorder levels.</div>
+                </div>
+            </div>
+            <button class="report-tile-btn" onclick="window.location.href='inventory.html'">
+                <span>↗</span> Open Inventory
+            </button>
+        </div>
+    </div>
+
 </div>
 
 
@@ -747,57 +1033,12 @@ button{
    SUPABASE
 ========================================= */
 
-const SUPABASE_URL =
-    "https://mnhszkqbtxqvzntusmxp.supabase.co";
-
-const SUPABASE_ANON_KEY =
-    "sb_publishable_gVPcn3AyRRNxj1yGV54vNw_Y5_av5m-";
-
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-
+const supabaseClient = window.client || window.supabase.createClient(
+    "https://mnhszkqbtxqvzntusmxp.supabase.co",
+    "sb_publishable_gVPcn3AyRRNxj1yGV54vNw_Y5_av5m-"
+);
 
 let currentUser = null;
-
-
-/* =========================================
-   INIT
-========================================= */
-
-async function init(){
-
-    const {
-        data:{
-            user
-        }
-    } =
-    await supabaseClient
-        .auth
-        .getUser();
-
-
-    if(!user){
-
-        alert(
-            "Please login first."
-        );
-
-        return;
-
-    }
-
-
-    currentUser =
-        user;
-
-
-    await loadAnalytics();
-
-}
 
 
 /* =========================================
@@ -1746,6 +1987,478 @@ function escapeHtml(
 
 }
 
+
+/* =========================================
+   EXCEL & CSV EXPORT SYSTEM (CA / OWNER)
+========================================= */
+
+function triggerCsvDownload(csvContent, fileName) {
+    // Add UTF-8 BOM so Excel properly opens with ₹ and all characters
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function csvCell(val) {
+    if (val === null || val === undefined) return '""';
+    const str = String(val).replace(/"/g, '""');
+    return `"${str}"`;
+}
+
+function getSelectedMonthRange() {
+    const monthInput = document.getElementById("caReportMonth");
+    let monthVal = monthInput?.value;
+    if (!monthVal) {
+        const now = new Date();
+        monthVal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+    const [year, month] = monthVal.split("-").map(Number);
+    const start = `${year}-${String(month).padStart(2, "0")}-01`;
+    // Last day of month
+    const lastDay = new Date(year, month, 0).getDate();
+    const end = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    return { monthVal, start, end, year, month };
+}
+
+// 1. MONTHLY CA DETAILED ACCOUNTING REPORT (EXCEL / CSV)
+async function downloadMonthlyCAReport() {
+    const btn = document.getElementById("downloadCaReportBtn");
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "<span>⏳</span> Generating...";
+    }
+
+    try {
+        if (!currentUser) return;
+        const { monthVal, start, end } = getSelectedMonthRange();
+
+        // Load profile
+        const { data: profile } = await supabaseClient
+            .from("profiles")
+            .select("business_name, gstin, business_phone")
+            .eq("id", currentUser.id)
+            .single();
+
+        const businessName = profile?.business_name || "Salon";
+        const gstin = profile?.gstin || "N/A";
+
+        // Load staff map
+        const { data: staffData } = await supabaseClient
+            .from("staff")
+            .select("id, name")
+            .eq("profile_id", currentUser.id);
+
+        const staffMap = {};
+        (staffData || []).forEach(s => { staffMap[s.id] = s.name; });
+
+        // Load bills for the selected month
+        const { data: bills, error: billsError } = await supabaseClient
+            .from("bills")
+            .select("*")
+            .eq("profile_id", currentUser.id)
+            .gte("invoice_date", start)
+            .lte("invoice_date", end)
+            .order("invoice_date", { ascending: true });
+
+        if (billsError) throw billsError;
+
+        if (!bills || bills.length === 0) {
+            alert(`No bills found for ${monthVal}.`);
+            return;
+        }
+
+        const billIds = bills.map(b => b.id);
+
+        // Load bill items
+        const { data: items } = await supabaseClient
+            .from("bill_items")
+            .select("*")
+            .in("bill_id", billIds);
+
+        const itemsByBill = {};
+        (items || []).forEach(item => {
+            if (!itemsByBill[item.bill_id]) itemsByBill[item.bill_id] = [];
+            itemsByBill[item.bill_id].push(item);
+        });
+
+        // Build CSV
+        let csv = [];
+        csv.push(`"${businessName} - MONTHLY CA ACCOUNTING & BILLING REGISTER"`);
+        csv.push(`"Month / Period:",${csvCell(monthVal)},"GSTIN:",${csvCell(gstin)},"Export Date:",${csvCell(new Date().toLocaleDateString("en-IN"))}`);
+        csv.push(""); // empty row
+
+        // Headers
+        csv.push([
+            "Invoice No",
+            "Invoice Date",
+            "Customer Name",
+            "Customer Phone",
+            "Item / Service Name",
+            "Item Type",
+            "Staff / Stylist",
+            "Quantity",
+            "Rate (₹)",
+            "Discount (₹)",
+            "Taxable Amount (₹)",
+            "GST Rate (%)",
+            "CGST (₹)",
+            "SGST (₹)",
+            "IGST (₹)",
+            "Total Amount (₹)",
+            "Payment Mode",
+            "Payment Status"
+        ].map(csvCell).join(","));
+
+        let grandTaxable = 0;
+        let grandCGST = 0;
+        let grandSGST = 0;
+        let grandIGST = 0;
+        let grandTotal = 0;
+
+        bills.forEach(bill => {
+            const billItems = itemsByBill[bill.id] || [];
+
+            if (billItems.length === 0) {
+                // Single line bill if no items table row
+                const taxable = Number(bill.taxable_amount || bill.total || 0);
+                const cgst = Number(bill.cgst_amount || 0);
+                const sgst = Number(bill.sgst_amount || 0);
+                const igst = Number(bill.igst_amount || 0);
+                const total = Number(bill.total || 0);
+
+                grandTaxable += taxable;
+                grandCGST += cgst;
+                grandSGST += sgst;
+                grandIGST += igst;
+                grandTotal += total;
+
+                csv.push([
+                    bill.invoice_number || bill.id.slice(0, 8),
+                    bill.invoice_date || "",
+                    bill.customer_name || "",
+                    bill.phone || "",
+                    "General Service",
+                    "Service",
+                    "—",
+                    1,
+                    taxable.toFixed(2),
+                    Number(bill.discount || 0).toFixed(2),
+                    taxable.toFixed(2),
+                    bill.seller_gstin ? "18%" : "0%",
+                    cgst.toFixed(2),
+                    sgst.toFixed(2),
+                    igst.toFixed(2),
+                    total.toFixed(2),
+                    bill.payment_mode || "Cash",
+                    bill.payment_status || "Paid"
+                ].map(csvCell).join(","));
+            } else {
+                billItems.forEach(item => {
+                    const taxable = Number(item.taxable_amount || item.total || 0);
+                    const cgst = Number(item.cgst_amount || 0);
+                    const sgst = Number(item.sgst_amount || 0);
+                    const igst = Number(item.igst_amount || 0);
+                    const total = Number(item.total || 0);
+
+                    grandTaxable += taxable;
+                    grandCGST += cgst;
+                    grandSGST += sgst;
+                    grandIGST += igst;
+                    grandTotal += total;
+
+                    const staffName = item.staff_id ? (staffMap[item.staff_id] || "Staff") : "—";
+
+                    csv.push([
+                        bill.invoice_number || bill.id.slice(0, 8),
+                        bill.invoice_date || "",
+                        bill.customer_name || "",
+                        bill.phone || "",
+                        item.item_name || "Service",
+                        item.item_type || "Service",
+                        staffName,
+                        item.quantity || 1,
+                        Number(item.price || 0).toFixed(2),
+                        "0.00",
+                        taxable.toFixed(2),
+                        `${item.gst_rate || 0}%`,
+                        cgst.toFixed(2),
+                        sgst.toFixed(2),
+                        igst.toFixed(2),
+                        total.toFixed(2),
+                        bill.payment_mode || "Cash",
+                        bill.payment_status || "Paid"
+                    ].map(csvCell).join(","));
+                });
+            }
+        });
+
+        // Totals Row
+        csv.push("");
+        csv.push([
+            "TOTAL",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            grandTaxable.toFixed(2),
+            "",
+            grandCGST.toFixed(2),
+            grandSGST.toFixed(2),
+            grandIGST.toFixed(2),
+            grandTotal.toFixed(2),
+            "",
+            ""
+        ].map(csvCell).join(","));
+
+        const cleanName = businessName.replace(/[^a-zA-Z0-9]/g, "_");
+        triggerCsvDownload(csv.join("\r\n"), `${cleanName}_CA_Report_${monthVal}.csv`);
+
+    } catch (err) {
+        console.error("CA Report Export Error:", err);
+        alert("Could not generate CA report: " + (err.message || "Unknown error"));
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = "<span>📥</span> Download Excel/CSV";
+        }
+    }
+}
+
+// 2. MONTHLY GST GSTR-1 SUMMARY EXPORT
+async function downloadMonthlyGSTReport() {
+    try {
+        if (!currentUser) return;
+        const { monthVal, start, end } = getSelectedMonthRange();
+
+        const { data: profile } = await supabaseClient
+            .from("profiles")
+            .select("business_name, gstin")
+            .eq("id", currentUser.id)
+            .single();
+
+        const { data: bills, error } = await supabaseClient
+            .from("bills")
+            .select("*")
+            .eq("profile_id", currentUser.id)
+            .gte("invoice_date", start)
+            .lte("invoice_date", end);
+
+        if (error) throw error;
+        if (!bills || bills.length === 0) {
+            alert(`No bills found for ${monthVal}.`);
+            return;
+        }
+
+        let csv = [];
+        csv.push(`"${profile?.business_name || 'Salon'} - GSTR-1 MONTHLY TAX SUMMARY"`);
+        csv.push(`"Month:",${csvCell(monthVal)},"GSTIN:",${csvCell(profile?.gstin || 'N/A')}`);
+        csv.push("");
+        csv.push(["Invoice No", "Date", "Customer", "GSTIN", "Taxable Value (₹)", "CGST (₹)", "SGST (₹)", "IGST (₹)", "Total Invoice (₹)", "Payment Mode"].map(csvCell).join(","));
+
+        let totalTaxable = 0, totalCGST = 0, totalSGST = 0, totalIGST = 0, totalGross = 0;
+
+        bills.forEach(b => {
+            const taxable = Number(b.taxable_amount || b.total || 0);
+            const cgst = Number(b.cgst_amount || 0);
+            const sgst = Number(b.sgst_amount || 0);
+            const igst = Number(b.igst_amount || 0);
+            const total = Number(b.total || 0);
+
+            totalTaxable += taxable;
+            totalCGST += cgst;
+            totalSGST += sgst;
+            totalIGST += igst;
+            totalGross += total;
+
+            csv.push([
+                b.invoice_number || b.id.slice(0, 8),
+                b.invoice_date || "",
+                b.customer_name || "",
+                b.seller_gstin || "Unregistered",
+                taxable.toFixed(2),
+                cgst.toFixed(2),
+                sgst.toFixed(2),
+                igst.toFixed(2),
+                total.toFixed(2),
+                b.payment_mode || "Cash"
+            ].map(csvCell).join(","));
+        });
+
+        csv.push("");
+        csv.push(["GRAND TOTAL", "", "", "", totalTaxable.toFixed(2), totalCGST.toFixed(2), totalSGST.toFixed(2), totalIGST.toFixed(2), totalGross.toFixed(2), ""].map(csvCell).join(","));
+
+        triggerCsvDownload(csv.join("\r\n"), `GSTR1_Summary_${monthVal}.csv`);
+    } catch (err) {
+        console.error(err);
+        alert("Failed to export GST report.");
+    }
+}
+
+// 3. BOOKINGS SCHEDULE REGISTER EXPORT
+async function downloadBookingsScheduleReport() {
+    try {
+        if (!currentUser) return;
+        const { monthVal, start, end } = getSelectedMonthRange();
+
+        const { data: bookings, error } = await supabaseClient
+            .from("bookings")
+            .select("*")
+            .eq("profile_id", currentUser.id)
+            .gte("booking_date", start)
+            .lte("booking_date", end)
+            .order("booking_date", { ascending: true });
+
+        if (error) throw error;
+        if (!bookings || bookings.length === 0) {
+            alert(`No bookings found for ${monthVal}.`);
+            return;
+        }
+
+        let csv = [["Booking ID", "Date", "Time", "Customer Name", "Phone", "Service", "Status", "Advance Paid (₹)", "Created At"].map(csvCell).join(",")];
+        bookings.forEach(b => {
+            csv.push([
+                b.id.slice(0, 8),
+                b.booking_date || "",
+                b.booking_time || "",
+                b.customer_name || "",
+                b.phone || "",
+                b.service || "",
+                b.status || "Scheduled",
+                Number(b.advance_paid || 0).toFixed(2),
+                b.created_at ? new Date(b.created_at).toLocaleString("en-IN") : ""
+            ].map(csvCell).join(","));
+        });
+
+        triggerCsvDownload(csv.join("\r\n"), `Bookings_Register_${monthVal}.csv`);
+    } catch (err) {
+        console.error(err);
+        alert("Failed to export bookings.");
+    }
+}
+
+// 4. STAFF PERFORMANCE EXPORT
+async function downloadStaffPerformanceReport() {
+    try {
+        if (!currentUser) return;
+        const { monthVal, start, end } = getSelectedMonthRange();
+
+        const { data: staff } = await supabaseClient
+            .from("staff")
+            .select("*")
+            .eq("profile_id", currentUser.id);
+
+        const { data: bills } = await supabaseClient
+            .from("bills")
+            .select("id, invoice_date")
+            .eq("profile_id", currentUser.id)
+            .gte("invoice_date", start)
+            .lte("invoice_date", end);
+
+        const billIds = (bills || []).map(b => b.id);
+        const { data: items } = await supabaseClient
+            .from("bill_items")
+            .select("*")
+            .in("bill_id", billIds);
+
+        const staffStats = {};
+        (staff || []).forEach(s => {
+            staffStats[s.id] = { name: s.name, role: s.role || "Stylist", count: 0, totalSales: 0 };
+        });
+
+        (items || []).forEach(it => {
+            if (it.staff_id && staffStats[it.staff_id]) {
+                staffStats[it.staff_id].count += Number(it.quantity || 1);
+                staffStats[it.staff_id].totalSales += Number(it.total || 0);
+            }
+        });
+
+        let csv = [["Staff Member", "Role", "Services / Items Sold", "Total Sales Generated (₹)"].map(csvCell).join(",")];
+        Object.values(staffStats).forEach(st => {
+            csv.push([st.name, st.role, st.count, st.totalSales.toFixed(2)].map(csvCell).join(","));
+        });
+
+        triggerCsvDownload(csv.join("\r\n"), `Staff_Performance_${monthVal}.csv`);
+    } catch (err) {
+        console.error(err);
+        alert("Failed to export staff report.");
+    }
+}
+
+// 5. CUSTOMER LIFETIME VALUE EXPORT
+async function downloadCustomerLTVReport() {
+    try {
+        if (!currentUser) return;
+        const { data: customers, error } = await supabaseClient
+            .from("customers")
+            .select("*")
+            .eq("profile_id", currentUser.id)
+            .order("total_spent", { ascending: false });
+
+        if (error) throw error;
+        if (!customers || customers.length === 0) {
+            alert("No customer records found.");
+            return;
+        }
+
+        let csv = [["Customer Name", "Phone", "Total Visits", "Total Spent (₹)", "Last Visit"].map(csvCell).join(",")];
+        customers.forEach(c => {
+            csv.push([
+                c.name || "",
+                c.phone || "",
+                c.total_visits || 1,
+                Number(c.total_spent || 0).toFixed(2),
+                c.last_visit || ""
+            ].map(csvCell).join(","));
+        });
+
+        triggerCsvDownload(csv.join("\r\n"), `Customer_LTV_Report.csv`);
+    } catch (err) {
+        console.error(err);
+        alert("Failed to export customers.");
+    }
+}
+
+// INIT WITH CURRENT MONTH
+async function setupExportMonthInput() {
+    const monthInput = document.getElementById("caReportMonth");
+    if (monthInput) {
+        const now = new Date();
+        const curMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+        monthInput.value = curMonth;
+    }
+}
+
+async function init(){
+    const {
+        data:{
+            user
+        }
+    } =
+    await supabaseClient
+        .auth
+        .getUser();
+
+    if(!user){
+        alert(
+            "Please login first."
+        );
+        return;
+    }
+
+    currentUser = user;
+    await setupExportMonthInput();
+    await loadAnalytics();
+}
 
 init();
 

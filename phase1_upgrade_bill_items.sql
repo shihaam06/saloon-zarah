@@ -1,0 +1,2 @@
+ALTER TABLE bill_items
+ADD COLUMN IF NOT EXISTS staff_id UUID REFERENCES staff(id);
