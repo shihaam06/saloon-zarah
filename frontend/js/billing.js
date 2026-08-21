@@ -817,15 +817,14 @@ document
             return;
         }
 
-        const firstProd = inventoryProducts[0];
         selectedProducts.push({
-            inventory_id: firstProd.id,
-            name: firstProd.name,
-            price: Number(firstProd.price) || 0,
+            inventory_id: "",
+            name: "",
+            price: 0,
             quantity: 1,
             gstRate: 0,
             hsnSac: "",
-            maxStock: Number(firstProd.stock) || 0
+            maxStock: 999
         });
 
         renderProducts();
@@ -844,10 +843,11 @@ function renderProducts() {
     container.innerHTML = "";
 
     selectedProducts.forEach((prod, index) => {
-        let optionsHtml = `<option value="">Select a product...</option>`;
+        let optionsHtml = `<option value="" ${!prod.inventory_id ? "selected" : ""}>Select a product...</option>`;
         inventoryProducts.forEach(inv => {
             const isSelected = inv.id === prod.inventory_id ? "selected" : "";
-            optionsHtml += `<option value="${inv.id}" ${isSelected}>${escapeHtml(inv.name)} (Stock: ${inv.stock || 0}) - ₹${inv.price || 0}</option>`;
+            const gstLabel = Number(inv.gst_rate) > 0 ? ` [GST ${Number(inv.gst_rate)}%]` : "";
+            optionsHtml += `<option value="${inv.id}" ${isSelected}>${escapeHtml(inv.name)} (Stock: ${inv.stock || 0}) - ₹${inv.price || 0}${gstLabel}</option>`;
         });
 
         container.innerHTML += `
@@ -886,10 +886,19 @@ function renderProducts() {
                 selectedProducts[idx].inventory_id = inv.id;
                 selectedProducts[idx].name = inv.name;
                 selectedProducts[idx].price = Number(inv.price) || 0;
+                selectedProducts[idx].gstRate = Number(inv.gst_rate) || 0;
+                selectedProducts[idx].hsnSac = inv.hsn_code || "";
                 selectedProducts[idx].maxStock = Number(inv.stock) || 0;
-                renderProducts();
-                calculateTotal();
+            } else {
+                selectedProducts[idx].inventory_id = "";
+                selectedProducts[idx].name = "";
+                selectedProducts[idx].price = 0;
+                selectedProducts[idx].gstRate = 0;
+                selectedProducts[idx].hsnSac = "";
+                selectedProducts[idx].maxStock = 999;
             }
+            renderProducts();
+            calculateTotal();
         });
     });
 
@@ -934,8 +943,15 @@ window.removeProduct = removeProduct;
 
 document
     .getElementById("discount")
-    .addEventListener(
+    ?.addEventListener(
         "input",
+        calculateTotal
+    );
+
+document
+    .getElementById("inclusiveGstToggle")
+    ?.addEventListener(
+        "change",
         calculateTotal
     );
 
@@ -946,7 +962,8 @@ document
 
 function calculateItemTax(
     price,
-    gstRate
+    gstRate,
+    isInclusive = false
 ) {
 
     price =
@@ -955,25 +972,31 @@ function calculateItemTax(
     gstRate =
         Number(gstRate) || 0;
 
+    let taxable = price;
+    let tax = 0;
 
-    const tax =
-        price *
-        gstRate /
-        100;
-
+    if (gstRate > 0) {
+        if (isInclusive) {
+            // Price is inclusive: Taxable = Price / (1 + Rate/100)
+            taxable = price / (1 + (gstRate / 100));
+            tax = price - taxable;
+        } else {
+            // Price is exclusive: Tax = Price * Rate / 100
+            taxable = price;
+            tax = price * gstRate / 100;
+        }
+    }
 
     const cgst =
         tax / 2;
 
-
     const sgst =
         tax / 2;
-
 
     return {
 
         taxableAmount:
-            price,
+            taxable,
 
         taxAmount:
             tax,
@@ -997,6 +1020,9 @@ function calculateItemTax(
 // ==========================================
 
 function calculateTotal() {
+
+    const isInclusive =
+        document.getElementById("inclusiveGstToggle")?.checked || false;
 
     const subtotal =
         Number(
@@ -1060,11 +1086,8 @@ function calculateTotal() {
 
     /*
      * Discount is deducted before GST.
-     *
-     * For now, the discount is distributed
-     * proportionally across the items.
+     * Distributed proportionally across items.
      */
-
 
     const discountRatio =
         grossAmount > 0
@@ -1093,7 +1116,7 @@ function calculateTotal() {
         discountRatio;
 
 
-    const mainTaxable =
+    const mainNetPrice =
         Math.max(
             0,
             subtotal -
@@ -1103,8 +1126,9 @@ function calculateTotal() {
 
     const mainTax =
         calculateItemTax(
-            mainTaxable,
-            mainGST
+            mainNetPrice,
+            mainGST,
+            isInclusive
         );
 
 
@@ -1113,10 +1137,9 @@ function calculateTotal() {
     // ======================================
 
     let addonTaxTotal = 0;
-
     let addonCGST = 0;
-
     let addonSGST = 0;
+    let addonTaxableTotal = 0;
 
 
     addons.forEach(
@@ -1133,7 +1156,7 @@ function calculateTotal() {
                 discountRatio;
 
 
-            const addonTaxable =
+            const addonNetPrice =
                 Math.max(
                     0,
                     addonPrice -
@@ -1151,10 +1174,14 @@ function calculateTotal() {
 
             const tax =
                 calculateItemTax(
-                    addonTaxable,
-                    addonGST
+                    addonNetPrice,
+                    addonGST,
+                    isInclusive
                 );
 
+
+            addonTaxableTotal +=
+                tax.taxableAmount;
 
             addonTaxTotal +=
                 tax.taxAmount;
@@ -1176,10 +1203,9 @@ function calculateTotal() {
     // ======================================
 
     let productTaxTotal = 0;
-
     let productCGST = 0;
-
     let productSGST = 0;
+    let productTaxableTotal = 0;
 
 
     selectedProducts.forEach(
@@ -1195,7 +1221,7 @@ function calculateTotal() {
                 discountRatio;
 
 
-            const prodTaxable =
+            const prodNetPrice =
                 Math.max(
                     0,
                     prodPrice -
@@ -1213,10 +1239,14 @@ function calculateTotal() {
 
             const tax =
                 calculateItemTax(
-                    prodTaxable,
-                    prodGST
+                    prodNetPrice,
+                    prodGST,
+                    isInclusive
                 );
 
+
+            productTaxableTotal +=
+                tax.taxableAmount;
 
             productTaxTotal +=
                 tax.taxAmount;
@@ -1238,60 +1268,9 @@ function calculateTotal() {
     // ======================================
 
     const taxableAmount =
-        mainTaxable +
-        addons.reduce(
-            (
-                sum,
-                addon
-            ) => {
-
-                const addonPrice =
-                    Number(
-                        addon.price
-                    ) || 0;
-
-
-                const addonDiscount =
-                    addonPrice *
-                    discountRatio;
-
-
-                return sum +
-                    Math.max(
-                        0,
-                        addonPrice -
-                        addonDiscount
-                    );
-
-            },
-            0
-        ) +
-        selectedProducts.reduce(
-            (
-                sum,
-                prod
-            ) => {
-
-                const prodPrice =
-                    (Number(prod.price) || 0) *
-                    (Number(prod.quantity) || 1);
-
-
-                const prodDiscount =
-                    prodPrice *
-                    discountRatio;
-
-
-                return sum +
-                    Math.max(
-                        0,
-                        prodPrice -
-                        prodDiscount
-                    );
-
-            },
-            0
-        );
+        mainTax.taxableAmount +
+        addonTaxableTotal +
+        productTaxableTotal;
 
 
     const cgstAmount =
@@ -1316,23 +1295,34 @@ function calculateTotal() {
         igstAmount;
 
 
-    const total =
-        Math.max(
+    let total;
+    if (isInclusive) {
+        // When inclusive, customer pays exact entered price minus discount
+        total = Math.max(
+            0,
+            grossAmount - discount
+        );
+    } else {
+        total = Math.max(
             0,
             taxableAmount +
             totalTax
         );
+    }
 
 
     // ======================================
     // UPDATE UI
     // ======================================
 
+    // Combined gross (service + addons + products) shown as Subtotal
+    const combinedGross = subtotal + addonTotal + productTotal;
+
     document.getElementById(
         "subtotal"
     ).textContent =
         "₹" +
-        subtotal.toLocaleString(
+        combinedGross.toLocaleString(
             "en-IN",
             {
                 minimumFractionDigits: 2
@@ -1496,6 +1486,8 @@ document.getElementById(
         subtotal,
 
         addonTotal,
+
+        productTotal,
 
         discount,
 
@@ -1811,51 +1803,8 @@ const balanceAmount =
         0
     );
 
-let paymentStatus =
-    "Pending";
+const paymentStatus = "Paid";
 
-if(
-    amountPaid >= billTotal
-){
-
-    paymentStatus =
-        "Paid";
-
-}
-else if(
-    amountPaid > 0
-){
-
-    paymentStatus =
-        "Partially Paid";
-
-}
-
-
-// const balanceAmount =
-//     Math.max(
-//         billTotal -
-//         amountPaid,
-//         0
-//     );
-
-
-// let paymentStatus =
-//     "Pending";
-
-
-if(amountPaid >= billTotal){
-
-    paymentStatus =
-        "Paid";
-
-}
-else if(amountPaid > 0){
-
-    paymentStatus =
-        "Partially Paid";
-
-}
 
 
 // ======================================
@@ -1920,10 +1869,13 @@ const {
             booking.phone,
 
         subtotal:
-            totals.subtotal,
+            totals.subtotal + totals.addonTotal + (totals.productTotal || 0),
 
         addon_total:
             totals.addonTotal,
+
+        product_total:
+            totals.productTotal || 0,
 
         discount:
             totals.discount,
@@ -2016,6 +1968,9 @@ balance_amount:
             // MAIN SERVICE
             // ======================================
 
+            const isInclusive =
+                document.getElementById("inclusiveGstToggle")?.checked || false;
+
             const mainDiscount =
                 totals.subtotal > 0
                     ? (
@@ -2048,7 +2003,8 @@ balance_amount:
             const mainTax =
                 calculateItemTax(
                     mainTaxableAmount,
-                    mainGST
+                    mainGST,
+                    isInclusive
                 );
 
 
@@ -2084,7 +2040,7 @@ balance_amount:
                     mainGST,
 
                 taxable_amount:
-                    mainTaxableAmount,
+                    mainTax.taxableAmount,
 
                 cgst_amount:
                     mainTax.cgstAmount,
@@ -2151,7 +2107,8 @@ balance_amount:
                     const addonTax =
                         calculateItemTax(
                             addonTaxable,
-                            addonGST
+                            addonGST,
+                            isInclusive
                         );
 
 
@@ -2183,7 +2140,7 @@ balance_amount:
                             addonGST,
 
                         taxable_amount:
-                            addonTaxable,
+                            addonTax.taxableAmount,
 
                         cgst_amount:
                             addonTax.cgstAmount,
@@ -2244,7 +2201,8 @@ balance_amount:
                 const prodTax =
                     calculateItemTax(
                         prodTaxable,
-                        prodGST
+                        prodGST,
+                        isInclusive
                     );
 
                 items.push({
@@ -2256,7 +2214,7 @@ balance_amount:
                     total: prodPrice,
                     hsn_sac: prod.hsnSac || null,
                     gst_rate: prodGST,
-                    taxable_amount: prodTaxable,
+                    taxable_amount: prodTax.taxableAmount,
                     cgst_amount: prodTax.cgstAmount,
                     sgst_amount: prodTax.sgstAmount,
                     igst_amount: prodTax.igstAmount,

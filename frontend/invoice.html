@@ -375,6 +375,13 @@
         }
         .btn-whatsapp:hover:not(:disabled) { background: #1ebe5c; box-shadow: 0 6px 18px rgba(37, 211, 102, .45); }
 
+        .btn-sms {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, .35);
+        }
+        .btn-sms:hover:not(:disabled) { background: #1d4ed8; box-shadow: 0 6px 18px rgba(37, 99, 235, .45); }
+
         .btn-print {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -580,6 +587,9 @@
         <button class="action-btn btn-whatsapp" id="whatsappBtn">
             💬 Send on WhatsApp
         </button>
+        <button class="action-btn btn-sms" id="smsBtn">
+            📱 Send on SMS
+        </button>
         <button class="action-btn btn-print" onclick="window.print()">
             🖨️ Print / Save PDF
         </button>
@@ -672,12 +682,9 @@ function renderInvoice(profile) {
         day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
     });
 
-    // ── Payment status badge
-    const status = (bill.payment_status || "Paid").toLowerCase();
-    const badgeClass = status === "paid" ? "status-paid" : status === "partial" ? "status-partial" : "status-unpaid";
-    const badgeIcon  = status === "paid" ? "✓" : status === "partial" ? "◑" : "✗";
+    // ── Payment status badge (Always PAID)
     el("paymentStatusBadge").innerHTML =
-        `<span class="status-badge ${badgeClass}">${badgeIcon} ${(bill.payment_status || "Paid").toUpperCase()}</span>`;
+        `<span class="status-badge status-paid">✓ PAID</span>`;
 
     // ── Customer
     el("customerName").textContent  = bill.customer_name || "—";
@@ -741,9 +748,9 @@ function renderInvoice(profile) {
     el("taxableAmount").textContent = fmtMoney(taxableAmt);
     el("grandTotal").textContent    = fmtMoney(finalTotal);
 
-    // Hide zero rows
-    if (addonTotal === 0)  el("addonRow").style.display    = "none";
-    if (discount   === 0)  el("discountRow").style.display = "none";
+    // Hide rows: addon and discount are included in subtotal now
+    el("addonRow").style.display    = "none";
+    if (discount === 0)  el("discountRow").style.display = "none";
 
     // GST
     if (totalTax > 0) {
@@ -772,10 +779,8 @@ function renderInvoice(profile) {
     // ── Payment section
     el("paymentMethod").textContent = bill.payment_method || "—";
     const pillEl  = el("paymentPill");
-    const pillCls = status === "paid" ? "paid" : status === "partial" ? "partial" : "unpaid";
-    const pillTxt = status === "paid" ? "✓ PAID" : status === "partial" ? "◑ PARTIAL" : "✗ UNPAID";
-    pillEl.className = `pay-status-pill ${pillCls}`;
-    pillEl.textContent = pillTxt;
+    pillEl.className = "pay-status-pill paid";
+    pillEl.textContent = "✓ PAID";
 
     // ── Show invoice
     el("loadingState").style.display = "none";
@@ -790,6 +795,11 @@ function renderInvoice(profile) {
 /* ── ACTIONS ──────────────────────────────────────────── */
 function bindActions() {
 
+    const BACKEND_URL =
+        window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
+            ? "http://localhost:3000"
+            : "https://saloon-zarah.onrender.com";
+
     // WhatsApp send
     el("whatsappBtn").addEventListener("click", async () => {
         const btn = el("whatsappBtn");
@@ -797,7 +807,7 @@ function bindActions() {
         btn.innerHTML = `<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></span> Sending…`;
 
         try {
-            const res = await fetch("https://saloon-zarah.onrender.com/send-bill", {
+            const res = await fetch(`${BACKEND_URL}/send-bill`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ billId: bill.id })
@@ -811,6 +821,30 @@ function bindActions() {
             btn.disabled = false;
             btn.innerHTML = "💬 Send on WhatsApp";
             toast("Could not send: " + err.message, "error");
+        }
+    });
+
+    // SMS send
+    el("smsBtn")?.addEventListener("click", async () => {
+        const btn = el("smsBtn");
+        btn.disabled = true;
+        btn.innerHTML = `<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></span> Sending…`;
+
+        try {
+            const res = await fetch(`${BACKEND_URL}/send-bill-sms`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ billId: bill.id })
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || "Failed to send SMS.");
+            btn.innerHTML = "✅ Sent on SMS";
+            toast("Bill sent via SMS successfully to " + bill.phone, "success");
+        } catch (err) {
+            console.error(err);
+            btn.disabled = false;
+            btn.innerHTML = "📱 Send on SMS";
+            toast("Could not send SMS: " + err.message, "error");
         }
     });
 

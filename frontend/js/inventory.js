@@ -19,7 +19,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const prodId = document.getElementById('prodId');
     const prodName = document.getElementById('prodName');
     const prodCategory = document.getElementById('prodCategory');
+    const prodHsn = document.getElementById('prodHsn');
     const prodPrice = document.getElementById('prodPrice');
+    const prodGstRate = document.getElementById('prodGstRate');
     const prodStock = document.getElementById('prodStock');
     const prodThreshold = document.getElementById('prodThreshold');
     const prodCancel = document.getElementById('prodCancel');
@@ -117,7 +119,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         const query = (searchInput?.value || '').toLowerCase().trim();
         const filtered = inventoryData.filter(item => 
             (item.name || '').toLowerCase().includes(query) || 
-            (item.category || '').toLowerCase().includes(query)
+            (item.category || '').toLowerCase().includes(query) ||
+            (item.hsn_code || '').toLowerCase().includes(query)
         );
 
         if (filtered.length === 0) {
@@ -141,8 +144,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             return `
                 <tr>
                     <td style="font-weight:600; color:#172033;">${item.name}</td>
-                    <td style="color:#718096; font-size:11px;">${item.category || '-'}</td>
-                    <td>₹${item.price || 0}</td>
+                    <td style="color:#718096; font-size:11px;">
+                        ${item.category || '-'}${item.hsn_code ? `<br><span style="font-size:10px; color:#4a5568; font-weight:600;">HSN: ${item.hsn_code}</span>` : ''}
+                    </td>
+                    <td>
+                        ₹${item.price || 0}${Number(item.gst_rate) > 0 ? `<br><span style="font-size:10px; color:#16a34a; font-weight:600;">GST: ${Number(item.gst_rate)}%</span>` : ''}
+                    </td>
                     <td style="font-weight:600;">${stockNum}</td>
                     <td>${statusHtml}</td>
                     <td>
@@ -239,7 +246,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             prodId.value = item.id;
             prodName.value = item.name || '';
             prodCategory.value = item.category || '';
+            if (prodHsn) prodHsn.value = item.hsn_code || '';
             prodPrice.value = item.price || 0;
+            if (prodGstRate) prodGstRate.value = item.gst_rate ?? 0;
             prodStock.value = item.stock || 0;
             prodThreshold.value = item.low_stock_threshold || 5;
         } else {
@@ -247,7 +256,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             prodId.value = '';
             prodName.value = '';
             prodCategory.value = '';
+            if (prodHsn) prodHsn.value = '';
             prodPrice.value = '';
+            if (prodGstRate) prodGstRate.value = '0';
             prodStock.value = '';
             prodThreshold.value = '5';
         }
@@ -267,7 +278,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const name = prodName.value.trim();
         const category = prodCategory.value.trim();
+        const hsn_code = prodHsn ? prodHsn.value.trim() : null;
         const price = Number(prodPrice.value) || 0;
+        const gst_rate = Number(prodGstRate?.value) || 0;
         const stock = Number(prodStock.value) || 0;
         const thresh = Number(prodThreshold.value) || 5;
 
@@ -281,7 +294,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 profile_id: pid,
                 name,
                 category,
+                hsn_code: hsn_code || null,
                 price,
+                gst_rate,
                 stock,
                 low_stock_threshold: thresh
             };

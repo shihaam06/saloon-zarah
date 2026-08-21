@@ -6109,6 +6109,116 @@ Thank you for choosing Bella Salon! 😊`,
 
 
 // =====================================================
+// SEND BILL ON SMS
+// =====================================================
+
+app.post(
+    "/send-bill-sms",
+    async (req, res) => {
+        try {
+            const { billId } = req.body;
+            if (!billId) {
+                return res.status(400).json({ error: "Bill ID is required." });
+            }
+
+            const { data: bill, error: billError } = await supabase
+                .from("bills")
+                .select("*")
+                .eq("id", billId)
+                .single();
+
+            if (billError || !bill) {
+                return res.status(404).json({ error: "Bill not found." });
+            }
+
+            const { data: items, error: itemsError } = await supabase
+                .from("bill_items")
+                .select("*")
+                .eq("bill_id", billId)
+                .order("created_at", { ascending: true });
+
+            if (itemsError) {
+                return res.status(500).json({ error: "Unable to load bill items." });
+            }
+
+            console.log("Generating bill PDF for SMS...");
+            const pdfBuffer = await generateBillPDF(bill, items);
+            const fileName = `bill-${bill.id}.pdf`;
+
+            await supabase.storage
+                .from("bills")
+                .upload(fileName, pdfBuffer, {
+                    contentType: "application/pdf",
+                    upsert: true
+                });
+
+            const { data: publicUrlData } = supabase.storage
+                .from("bills")
+                .getPublicUrl(fileName);
+
+            const pdfUrl = publicUrlData.publicUrl;
+
+            let phone = String(bill.phone || "").trim();
+            if (!phone) {
+                return res.status(400).json({ error: "Customer phone number is missing." });
+            }
+
+            if (phone.startsWith("whatsapp:")) {
+                phone = phone.replace("whatsapp:", "").trim();
+            }
+
+            if (phone.startsWith("+91")) {
+                // Formatted
+            } else if (phone.startsWith("91") && phone.length === 12) {
+                phone = `+${phone}`;
+            } else if (phone.length === 10) {
+                phone = `+91${phone}`;
+            }
+
+            const grossTotal = Number(bill.total || 0);
+            const smsFrom =
+                process.env.TWILIO_PHONE_NUMBER ||
+                process.env.TWILIO_NUMBER ||
+                (process.env.TWILIO_MESSAGING_SERVICE_SID ? undefined : null);
+
+            if (!smsFrom && !process.env.TWILIO_MESSAGING_SERVICE_SID) {
+                return res.status(400).json({
+                    error: "Twilio SMS number is missing. Please add TWILIO_PHONE_NUMBER=+1... to backend/.env"
+                });
+            }
+
+            const sendPayload = {
+                to: phone,
+                body: `Dear ${bill.customer_name || "Customer"}, thank you for visiting! Your invoice total is Rs. ${grossTotal.toLocaleString("en-IN")}. View & download your bill here: ${pdfUrl}`
+            };
+
+            if (process.env.TWILIO_MESSAGING_SERVICE_SID) {
+                sendPayload.messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
+            } else {
+                sendPayload.from = smsFrom;
+            }
+
+            const twilioMessage = await twilioClient.messages.create(sendPayload);
+
+            console.log("BILL SMS SENT:", twilioMessage.sid);
+
+            return res.status(200).json({
+                success: true,
+                message: "Bill SMS sent successfully.",
+                sid: twilioMessage.sid,
+                pdfUrl: pdfUrl
+            });
+        } catch (error) {
+            console.error("SEND BILL SMS ERROR:", error);
+            return res.status(500).json({
+                error: error.message || "Failed to send bill via SMS."
+            });
+        }
+    }
+);
+
+
+// =====================================================
 // HEALTH CHECK
 // =====================================================
 
