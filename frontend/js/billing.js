@@ -192,7 +192,7 @@ if (amountInput) {
 
     const advance =
         Number(
-            booking?.advance_paid
+            window.advanceDeductedAmount
         ) || 0;
 
     const remaining =
@@ -1387,22 +1387,12 @@ function calculateTotal() {
 // GRAND TOTAL AFTER ADVANCE
 // ======================================
 
+// Use the amount the cashier typed in the advance input (0 if nothing typed)
 const advancePaid =
-    Number(booking?.advance_paid) || 0;
-
-const finalAmount =
-    Math.max(
-        total - advancePaid,
-        0
-    );
+    Number(window.advanceDeductedAmount) || 0;
 
 const displayTotal =
-    window.advanceDeducted
-        ? Math.max(
-            total - (Number(booking?.advance_paid) || 0),
-            0
-        )
-        : total;
+    Math.max(total - advancePaid, 0);
 
 document.getElementById(
     "grandTotal"
@@ -1584,10 +1574,9 @@ document
 
 if(amountReceivedInput){
 
+    // Use the advance the cashier typed in (0 by default)
     const advance =
-        Number(
-            booking?.advance_paid
-        ) || 0;
+        Number(window.advanceDeductedAmount) || 0;
 
     const total =
         Number(
@@ -1776,9 +1765,9 @@ const billTotal =
     Number(totals.total) || 0;
 
 
-// Amount already received when booking was made
+// Amount typed in the advance input by the cashier (0 if nothing entered)
 const bookingAdvance =
-    Number(booking.advance_paid) || 0;
+    Number(window.advanceDeductedAmount) || 0;
 
 
 // Amount received NOW at billing

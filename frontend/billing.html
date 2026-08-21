@@ -1337,40 +1337,42 @@
                         <div>
 
                             <div class="field-label">
-                                ADVANCE PAYMENT
+                                ADVANCE ALREADY PAID
                             </div>
 
                             <div class="discount-description">
-                                Customer has already paid ₹500 for this appointment.
+                                Enter the advance amount the customer already paid (if any). It will be deducted from the total.
                             </div>
 
                         </div>
 
-                        <button
-                            type="button"
-                            id="deductAdvanceBtn"
+                        <input
+                            type="number"
+                            id="advancePaidInput"
+                            min="0"
+                            step="1"
+                            placeholder="0"
+                            value="0"
                             style="
-                                min-width:150px;
+                                width:130px;
                                 height:39px;
-                                padding:0 16px;
+                                padding:0 12px;
                                 border:1px solid #d9dee5;
                                 border-radius:8px;
                                 background:#fff;
-                                color:#475569;
-                                cursor:pointer;
-                                font-size:11px;
-                                font-weight:700;
-                                transition:.18s;
+                                color:#172033;
+                                font-size:15px;
+                                font-weight:600;
+                                text-align:right;
                             "
                         >
-                            Deduct ₹500
-                        </button>
 
                     </div>
 
                 </div>
 
             </div>
+
 
 
             <!-- =================================================
@@ -1737,50 +1739,31 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-    const advanceButton =
-        document.getElementById("deductAdvanceBtn");
+    const advanceInput = document.getElementById("advancePaidInput");
+    const advanceRow   = document.getElementById("advanceSummaryRow");
+    const advanceTotal = document.getElementById("advanceTotal");
 
-    const advanceRow =
-        document.getElementById("advanceSummaryRow");
+    if (!advanceInput || !advanceRow) return;
 
-    if (!advanceButton || !advanceRow) {
-        return;
-    }
+    // Start with 0 — row hidden
+    window.advanceDeductedAmount = 0;
 
-    // Advance is NOT deducted initially
-    window.advanceDeducted = false;
+    advanceInput.addEventListener("input", () => {
 
-    advanceButton.addEventListener("click", () => {
+        const val = Math.max(Number(advanceInput.value) || 0, 0);
+        window.advanceDeductedAmount = val;
 
-        window.advanceDeducted =
-            !window.advanceDeducted;
-
-        if (window.advanceDeducted) {
-
-            advanceButton.classList.add("active");
-
-            advanceButton.textContent =
-                "₹500 Deducted";
-
-            advanceRow.style.display =
-                "flex";
-
+        if (val > 0) {
+            advanceRow.style.display = "flex";
+            if (advanceTotal) {
+                advanceTotal.textContent = "-₹" + val.toLocaleString("en-IN", { minimumFractionDigits: 2 });
+            }
         } else {
-
-            advanceButton.classList.remove("active");
-
-            advanceButton.textContent =
-                "Deduct ₹500";
-
-            advanceRow.style.display =
-                "none";
+            advanceRow.style.display = "none";
         }
 
-        // Tell billing.js that the advance state changed
-        document.dispatchEvent(
-            new CustomEvent("advanceChanged")
-        );
-
+        // Recalculate grand total
+        document.dispatchEvent(new CustomEvent("advanceChanged"));
     });
 
 });
