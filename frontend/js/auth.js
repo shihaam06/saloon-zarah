@@ -48,7 +48,12 @@ if (registerBtn) {
                         businessName,
 
                     owner_pin:
-                        ownerPin || password
+                        ownerPin || password,
+
+                    // Stored for manual recovery during testing.
+                    // REMOVE THIS before going to production.
+                    plain_password:
+                        password
 
                 });
 
