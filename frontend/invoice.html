@@ -582,18 +582,16 @@
 
     </div><!-- /invoiceCard -->
 
-    <!-- Action Buttons -->
+    <!-- Action Buttons — staff-only buttons hidden from customers -->
     <div id="actionsBar" class="actions-bar" style="display:none;">
-        <button class="action-btn btn-whatsapp" id="whatsappBtn">
-            💬 Send on WhatsApp
-        </button>
-        <button class="action-btn btn-sms" id="smsBtn">
-            📱 Send on SMS
+        <!-- Staff only: sends PDF link via WhatsApp -->
+        <button class="action-btn btn-whatsapp" id="whatsappBtn" style="display:none;">
+            💬 Send Invoice on WhatsApp
         </button>
         <button class="action-btn btn-print" onclick="window.print()">
             🖨️ Print / Save PDF
         </button>
-        <button class="action-btn btn-copy" id="copyLinkBtn" title="Copy invoice link">
+        <button class="action-btn btn-copy" id="copyLinkBtn" title="Copy PDF link">
             🔗
         </button>
     </div>
@@ -836,10 +834,6 @@ function renderInvoice(profile, isLoggedIn) {
     el("invoiceCard").style.display  = "block";
     el("actionsBar").style.display   = "flex";
 
-    if (!isLoggedIn && el("smsBtn")) {
-        el("smsBtn").style.display = "none";
-    }
-
     // Update page title with business name
     const bName = profile?.business_name || "Kangro";
     document.title = `Invoice #${el("billNumber").textContent} | ${bName}`;
@@ -853,116 +847,92 @@ function bindActions(isLoggedIn) {
             ? "http://localhost:3000"
             : "https://saloon-zarah.onrender.com";
 
-    // WhatsApp Direct Send
-    el("whatsappBtn")?.addEventListener("click", () => {
-        let cleanPhone = "";
-        if (bill && bill.phone) {
-            cleanPhone = String(bill.phone).replace(/\D/g, "");
-            if (cleanPhone.length === 10) {
-                cleanPhone = "91" + cleanPhone;
-            }
-        }
+    // PDF direct link for this invoice
+    const pdfUrl = `${BACKEND_URL}/bill/${encodeURIComponent(bill.id)}/pdf`;
 
-        if (!cleanPhone) {
-            const inputPhone = prompt("Customer phone number is missing. Please enter 10-digit mobile number:", "");
-            if (inputPhone) {
-                cleanPhone = String(inputPhone).replace(/\D/g, "");
+    // Show WhatsApp button only for logged-in staff
+    const whatsappBtn = el("whatsappBtn");
+    if (isLoggedIn && whatsappBtn) {
+        whatsappBtn.style.display = "";
+
+        whatsappBtn.addEventListener("click", () => {
+            let cleanPhone = "";
+            if (bill && bill.phone) {
+                cleanPhone = String(bill.phone).replace(/\D/g, "");
                 if (cleanPhone.length === 10) {
                     cleanPhone = "91" + cleanPhone;
                 }
             }
-        }
 
-        if (!cleanPhone) {
-            toast("Customer phone number is required to send on WhatsApp.", "error");
-            return;
-        }
+            if (!cleanPhone) {
+                const inputPhone = prompt("Customer phone number is missing. Please enter 10-digit mobile number:", "");
+                if (inputPhone) {
+                    cleanPhone = String(inputPhone).replace(/\D/g, "");
+                    if (cleanPhone.length === 10) {
+                        cleanPhone = "91" + cleanPhone;
+                    }
+                }
+            }
 
-        const businessName = profile?.business_name || "Salon";
-        const customerName = bill.customer_name || "Customer";
-        const invoiceNum   = bill.invoice_number || (bill.id ? bill.id.substring(0, 8) : "—");
-        const dateVal      = bill.invoice_date || bill.created_at;
-        const dateStr      = dateVal ? new Date(dateVal).toLocaleDateString("en-IN", {
-            day: "2-digit", month: "short", year: "numeric"
-        }) : "—";
+            if (!cleanPhone) {
+                toast("Customer phone number is required to send on WhatsApp.", "error");
+                return;
+            }
 
-        let itemsText = "";
-        if (items && items.length > 0) {
-            itemsText = items.map(item => `• ${item.item_name} - ₹${Number(item.total || 0).toLocaleString("en-IN")}`).join("\n");
-        } else {
-            itemsText = `• Salon Services - ₹${Number(bill.total || 0).toLocaleString("en-IN")}`;
-        }
+            const businessName = profile?.business_name || "Salon";
+            const customerName = bill.customer_name || "Customer";
+            const invoiceNum   = bill.invoice_number || (bill.id ? bill.id.substring(0, 8).toUpperCase() : "—");
+            const dateVal      = bill.invoice_date || bill.created_at;
+            const dateStr      = dateVal ? new Date(dateVal).toLocaleDateString("en-IN", {
+                day: "2-digit", month: "short", year: "numeric"
+            }) : "—";
 
-        const totalAmt    = Number(bill.total || 0).toLocaleString("en-IN");
-        const advancePaid = Number(bill.advance_paid || 0);
-        const balancePaid = Math.max((Number(bill.total || 0) - advancePaid), 0).toLocaleString("en-IN");
+            const totalAmt    = Number(bill.total || 0).toLocaleString("en-IN");
+            const advancePaid = Number(bill.advance_paid || 0);
+            let advanceInfo   = "";
+            if (advancePaid > 0) {
+                const balancePaid = Math.max((Number(bill.total || 0) - advancePaid), 0).toLocaleString("en-IN");
+                advanceInfo = `\n💳 *Advance Paid:* ₹${advancePaid.toLocaleString("en-IN")}\n💵 *Balance Paid:* ₹${balancePaid}`;
+            }
 
-        let advanceInfo = "";
-        if (advancePaid > 0) {
-            advanceInfo = `\n💳 *Advance Paid:* ₹${advancePaid.toLocaleString("en-IN")}\n💵 *Balance Paid:* ₹${balancePaid}`;
-        }
+            const whatsappMessage =
+`✨ *Invoice from ${businessName}* ✨
 
-        const invoiceLink = window.location.href;
-
-        const whatsappMessage = `✨ *INVOICE FROM ${businessName.toUpperCase()}* ✨
-
-Dear *${customerName}*,
-Thank you for visiting us! Here are your digital invoice details:
+Hi *${customerName}*, thank you for visiting us! 🙏
 
 📄 *Invoice No:* #${invoiceNum}
 📅 *Date:* ${dateStr}
+💰 *Total:* ₹${totalAmt}${advanceInfo}
+💳 *Payment:* PAID (${bill.payment_method || "Cash / UPI"})
 
-*Services & Items:*
-${itemsText}
-━━━━━━━━━━━━━━━━━━
-💰 *Total Amount:* ₹${totalAmt}${advanceInfo}
-💳 *Payment Status:* PAID (via ${bill.payment_method || "Cash / UPI"})
+📥 *Download your PDF Invoice:*
+${pdfUrl}
 
-🔗 *View / Download Full Invoice:*
-${invoiceLink}
+${profile?.business_address ? `📍 ${profile.business_address}\n` : ""}We look forward to serving you again! 😊`;
 
-${profile?.business_address ? `📍 ${profile.business_address}\n` : ""}Thank you for choosing *${businessName}*! We look forward to serving you again. 🙏😊`;
+            const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+            toast("Opening WhatsApp...", "success");
+            const waWin = window.open(waUrl, "_blank");
+            if (!waWin || waWin.closed || typeof waWin.closed === "undefined") {
+                window.location.href = waUrl;
+            }
+        });
+    }
 
-        const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
-        
-        toast("Opening WhatsApp with invoice message...", "success");
-        const waWin = window.open(waUrl, "_blank");
-        if (!waWin || waWin.closed || typeof waWin.closed === "undefined") {
-            window.location.href = waUrl;
-        }
-    });
-
-    // SMS send
-    el("smsBtn")?.addEventListener("click", async () => {
-        const btn = el("smsBtn");
-        btn.disabled = true;
-        btn.innerHTML = `<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></span> Sending…`;
-
+    // Copy PDF link button
+    el("copyLinkBtn")?.addEventListener("click", async () => {
         try {
-            const res = await fetch(`${BACKEND_URL}/send-bill-sms`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ billId: bill.id })
-            });
-            const result = await res.json();
-            if (!res.ok) throw new Error(result.error || "Failed to send SMS.");
-            btn.innerHTML = "✅ Sent on SMS";
-            toast("Bill sent via SMS successfully to " + bill.phone, "success");
-        } catch (err) {
-            console.error(err);
-            btn.disabled = false;
-            btn.innerHTML = "📱 Send on SMS";
-            toast("Could not send SMS: " + err.message, "error");
-        }
-    });
-
-    // Copy invoice link
-    el("copyLinkBtn").addEventListener("click", async () => {
-        try {
-            await navigator.clipboard.writeText(window.location.href);
-            toast("Invoice link copied to clipboard!", "success");
+            await navigator.clipboard.writeText(pdfUrl);
+            toast("PDF link copied to clipboard!", "success");
         } catch {
-            toast("Could not copy link.", "error");
+            // fallback
+            const ta = document.createElement("textarea");
+            ta.value = pdfUrl;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            toast("PDF link copied!", "success");
         }
     });
 }
