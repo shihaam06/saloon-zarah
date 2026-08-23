@@ -53,7 +53,7 @@ app.post(
             if (!signature) {
 
                 console.error(
-                    "❌ Razorpay webhook signature missing"
+                    "âŒ Razorpay webhook signature missing"
                 );
 
                 return res
@@ -83,7 +83,7 @@ app.post(
             ) {
 
                 console.error(
-                    "❌ Invalid Razorpay webhook signature"
+                    "âŒ Invalid Razorpay webhook signature"
                 );
 
                 return res
@@ -155,7 +155,7 @@ app.post(
             if (!paymentLink) {
 
                 console.error(
-                    "❌ Payment link data missing"
+                    "âŒ Payment link data missing"
                 );
 
                 return res
@@ -193,7 +193,7 @@ app.post(
             if (!bookingId) {
 
                 console.error(
-                    "❌ No booking reference found"
+                    "âŒ No booking reference found"
                 );
 
                 return res
@@ -204,7 +204,7 @@ app.post(
 
 
             // ==========================================
-            // ONLY ACCEPT ₹500 ADVANCE
+            // ONLY ACCEPT â‚¹500 ADVANCE
             // ==========================================
 
             if (
@@ -213,7 +213,7 @@ app.post(
             ) {
 
                 console.error(
-                    "❌ Incorrect payment amount:",
+                    "âŒ Incorrect payment amount:",
                     amountPaid
                 );
 
@@ -252,7 +252,7 @@ app.post(
             ) {
 
                 console.error(
-                    "❌ Booking not found:",
+                    "âŒ Booking not found:",
                     bookingError
                 );
 
@@ -274,7 +274,7 @@ app.post(
             ) {
 
                 console.log(
-                    "⚠️ Advance already marked as paid."
+                    "âš ï¸ Advance already marked as paid."
                 );
 
                 return res
@@ -333,7 +333,7 @@ app.post(
             if (updateError) {
 
                 console.error(
-                    "❌ Booking update failed:",
+                    "âŒ Booking update failed:",
                     updateError
                 );
 
@@ -349,7 +349,7 @@ app.post(
             );
 
             console.log(
-                "✅ ADVANCE PAYMENT CONFIRMED"
+                "âœ… ADVANCE PAYMENT CONFIRMED"
             );
 
             console.log(
@@ -359,12 +359,12 @@ app.post(
 
             console.log(
                 "Advance:",
-                `₹${ADVANCE_AMOUNT}`
+                `â‚¹${ADVANCE_AMOUNT}`
             );
 
             console.log(
                 "Balance:",
-                `₹${updatedBooking.balance_amount}`
+                `â‚¹${updatedBooking.balance_amount}`
             );
 
             console.log(
@@ -385,9 +385,9 @@ app.post(
 
 //             const confirmationMessage = `
 
-// Perfect! Your appointment is confirmed. 😊
+// Perfect! Your appointment is confirmed. ðŸ˜Š
 
-// ✨ ${BUSINESS.name}
+// âœ¨ ${BUSINESS.name}
 
 // Service: ${updatedBooking.service}
 
@@ -399,13 +399,13 @@ app.post(
 //     updatedBooking.booking_time
 // )}
 
-// 💳 Advance paid: ₹${ADVANCE_AMOUNT}
+// ðŸ’³ Advance paid: â‚¹${ADVANCE_AMOUNT}
 
-// 💰 Balance remaining: ₹${updatedBooking.balance_amount}
+// ðŸ’° Balance remaining: â‚¹${updatedBooking.balance_amount}
 
-// 📍 ${BUSINESS.address}
+// ðŸ“ ${BUSINESS.address}
 
-// We look forward to seeing you! 😊
+// We look forward to seeing you! ðŸ˜Š
 // `;
 
 
@@ -430,7 +430,7 @@ app.post(
 
 
 //                 console.log(
-//                     "✅ WhatsApp confirmation sent:",
+//                     "âœ… WhatsApp confirmation sent:",
 //                     message.sid
 //                 );
 
@@ -439,7 +439,7 @@ app.post(
 //             catch (whatsappError) {
 
 //                 console.error(
-//                     "⚠️ Payment confirmed but WhatsApp failed:",
+//                     "âš ï¸ Payment confirmed but WhatsApp failed:",
 //                     whatsappError
 //                 );
 
@@ -450,9 +450,9 @@ app.post(
 // ==========================================
 
 const confirmationMessage = `
-Perfect! Your appointment is confirmed. 😊
+Perfect! Your appointment is confirmed. ðŸ˜Š
 
-✨ ${BUSINESS.name}
+âœ¨ ${BUSINESS.name}
 
 Service: ${updatedBooking.service}
 Date: ${formatDateForCustomer(
@@ -462,12 +462,12 @@ Time: ${formatTimeForCustomer(
     updatedBooking.booking_time
 )}
 
-💳 Advance paid: ₹${ADVANCE_AMOUNT}
-💰 Balance remaining: ₹${updatedBooking.balance_amount}
+ðŸ’³ Advance paid: â‚¹${ADVANCE_AMOUNT}
+ðŸ’° Balance remaining: â‚¹${updatedBooking.balance_amount}
 
-📍 ${BUSINESS.address}
+ðŸ“ ${BUSINESS.address}
 
-We look forward to seeing you! 😊
+We look forward to seeing you! ðŸ˜Š
 `;
 
 try {
@@ -482,7 +482,7 @@ try {
 ) {
 
     console.log(
-        "📸 Sending Instagram payment confirmation to:",
+        "ðŸ“¸ Sending Instagram payment confirmation to:",
         updatedBooking.instagram_user_id
     );
 
@@ -493,7 +493,7 @@ try {
 );
 
     console.log(
-        "✅ Instagram confirmation sent"
+        "âœ… Instagram confirmation sent"
     );
 }
 
@@ -526,7 +526,7 @@ try {
                 });
 
         console.log(
-            "✅ WhatsApp confirmation sent:",
+            "âœ… WhatsApp confirmation sent:",
             message.sid
         );
     }
@@ -536,7 +536,7 @@ try {
 catch (notificationError) {
 
     console.error(
-        "⚠️ Payment confirmed but confirmation message failed:",
+        "âš ï¸ Payment confirmed but confirmation message failed:",
         notificationError
     );
 
@@ -552,7 +552,7 @@ catch (notificationError) {
         catch (error) {
 
             console.error(
-                "\n❌ RAZORPAY WEBHOOK ERROR:"
+                "\nâŒ RAZORPAY WEBHOOK ERROR:"
             );
 
             console.error(
@@ -957,7 +957,7 @@ async function findOrCreateCustomer({
 
     if (!profileId || !phone) {
         console.log(
-            "⚠️ Customer not created: missing profileId or phone"
+            "âš ï¸ Customer not created: missing profileId or phone"
         );
         return null;
     }
@@ -1007,7 +1007,7 @@ async function findOrCreateCustomer({
         }
 
         console.log(
-            "👤 Existing customer found:",
+            "ðŸ‘¤ Existing customer found:",
             existingCustomer.name
         );
 
@@ -1050,7 +1050,7 @@ async function findOrCreateCustomer({
     }
 
     console.log(
-        "👤 New customer created:",
+        "ðŸ‘¤ New customer created:",
         newCustomer.name
     );
 
@@ -1312,7 +1312,7 @@ If customer says:
 "payment done"
 "I paid"
 "done with payment"
-"₹500 paid"
+"â‚¹500 paid"
 "advance paid"
 
 and there is a pending booking context,
@@ -1403,7 +1403,7 @@ if (
 ) {
 
     console.error(
-        "❌ AI RESPONSE DID NOT CONTAIN CHOICES:"
+        "âŒ AI RESPONSE DID NOT CONTAIN CHOICES:"
     );
 
     console.error(
@@ -1421,18 +1421,18 @@ if (
 }
 
 
-console.log("🔍 INSTAGRAM HUMAN REPLY RAW AI RESPONSE:");
+console.log("ðŸ” INSTAGRAM HUMAN REPLY RAW AI RESPONSE:");
 console.log(JSON.stringify(completion, null, 2));
 
 let content =
     completion?.choices?.[0]?.message?.content;
 
-console.log("🔍 INSTAGRAM HUMAN REPLY CONTENT:");
+console.log("ðŸ” INSTAGRAM HUMAN REPLY CONTENT:");
 console.log(content);
 
 if (!content) {
     console.error(
-        "❌ INSTAGRAM HUMAN REPLY CONTENT IS EMPTY"
+        "âŒ INSTAGRAM HUMAN REPLY CONTENT IS EMPTY"
     );
 
     throw new Error(
@@ -1646,25 +1646,25 @@ Customer:
 "hi"
 
 Good:
-"Hey! 😊 Welcome to ${BUSINESS.name}. What can I help you with?"
+"Hey! ðŸ˜Š Welcome to ${BUSINESS.name}. What can I help you with?"
 
 Customer:
 "hello"
 
 Good:
-"Hi! 😊 What are you looking to get done today?"
+"Hi! ðŸ˜Š What are you looking to get done today?"
 
 Customer:
 "thanks"
 
 Good:
-"You're very welcome! 😊"
+"You're very welcome! ðŸ˜Š"
 
 Customer:
 "ok"
 
 Good:
-"Sure 😊 Just let me know whenever you're ready."
+"Sure ðŸ˜Š Just let me know whenever you're ready."
 
 ==================================================
 CONVERSATION MEMORY
@@ -1704,7 +1704,7 @@ Customer:
 "How much is facial?"
 
 Receptionist:
-"Facial is ₹900."
+"Facial is â‚¹900."
 
 Customer:
 "Can I book tomorrow?"
@@ -1945,7 +1945,7 @@ async function getInstagramAccessToken(profileId) {
         !profile?.instagram_access_token
     ) {
         console.error(
-            "❌ Instagram token not found:",
+            "âŒ Instagram token not found:",
             error
         );
 
@@ -1970,7 +1970,7 @@ async function getInstagramAccessToken(profileId) {
 
     if (!expiresAt) {
         console.warn(
-            "⚠️ Instagram token has no expiry date."
+            "âš ï¸ Instagram token has no expiry date."
         );
 
         return token;
@@ -2000,7 +2000,7 @@ async function getInstagramAccessToken(profileId) {
     if (timeRemaining <= 0) {
 
         console.error(
-            "❌ Instagram access token has expired."
+            "âŒ Instagram access token has expired."
         );
 
         throw new Error(
@@ -2013,7 +2013,7 @@ async function getInstagramAccessToken(profileId) {
     // -----------------------------------------
 
     console.log(
-        "🔄 Instagram token is close to expiry. Refreshing..."
+        "ðŸ”„ Instagram token is close to expiry. Refreshing..."
     );
 
     const refreshUrl =
@@ -2033,7 +2033,7 @@ async function getInstagramAccessToken(profileId) {
         await refreshResponse.json();
 
     console.log(
-        "📸 Instagram refresh response:",
+        "ðŸ“¸ Instagram refresh response:",
         {
             ok: refreshResponse.ok,
             expires_in:
@@ -2048,7 +2048,7 @@ async function getInstagramAccessToken(profileId) {
         !refreshData.access_token
     ) {
         console.error(
-            "❌ Instagram token refresh failed:",
+            "âŒ Instagram token refresh failed:",
             refreshData
         );
 
@@ -2088,7 +2088,7 @@ async function getInstagramAccessToken(profileId) {
     if (updateError) {
 
         console.error(
-            "❌ Failed to save refreshed Instagram token:",
+            "âŒ Failed to save refreshed Instagram token:",
             updateError
         );
 
@@ -2096,11 +2096,11 @@ async function getInstagramAccessToken(profileId) {
     }
 
     console.log(
-        "✅ Instagram token refreshed successfully"
+        "âœ… Instagram token refreshed successfully"
     );
 
     console.log(
-        "⏳ New Instagram token expires:",
+        "â³ New Instagram token expires:",
         newExpiresAt
     );
 
@@ -2160,7 +2160,7 @@ async function sendInstagramMessage(
     if (!response.ok) {
 
         console.error(
-            "❌ Instagram send message failed:",
+            "âŒ Instagram send message failed:",
             data
         );
 
@@ -2170,7 +2170,7 @@ async function sendInstagramMessage(
     }
 
     console.log(
-        "✅ Instagram reply sent:",
+        "âœ… Instagram reply sent:",
         data
     );
 
@@ -2234,7 +2234,7 @@ async function sendInstagramImage(
 
     if (!response.ok) {
         console.error(
-            "❌ Instagram send image failed:",
+            "âŒ Instagram send image failed:",
             data
         );
 
@@ -2244,7 +2244,7 @@ async function sendInstagramImage(
     }
 
     console.log(
-        "✅ Instagram image sent:",
+        "âœ… Instagram image sent:",
         data
     );
 
@@ -2435,7 +2435,7 @@ The customer's pending booking has been
 confirmed after their payment confirmation.
 
 Payment:
-₹${ADVANCE_AMOUNT}
+â‚¹${ADVANCE_AMOUNT}
 
 Payment method:
 UPI
@@ -2456,15 +2456,15 @@ ${formatTimeForCustomer(
                     )}
 
 Total service price:
-₹${await getServicePrice(
+â‚¹${await getServicePrice(
                         confirmed.service
                     )}
 
 Advance paid:
-₹${ADVANCE_AMOUNT}
+â‚¹${ADVANCE_AMOUNT}
 
 Remaining balance:
-₹${confirmed.balance_amount}
+â‚¹${confirmed.balance_amount}
 
 Tell the customer naturally that their
 appointment is confirmed.
@@ -2648,13 +2648,13 @@ Appointment status:
 Pending payment
 
 Advance required:
-₹${ADVANCE_AMOUNT}
+â‚¹${ADVANCE_AMOUNT}
 
 Razorpay payment link:
 ${paymentLink.short_url}
 
 Ask the customer naturally to complete
-the ₹500 advance using the payment link.
+the â‚¹500 advance using the payment link.
 
 Do NOT ask them to reply PAID.
 
@@ -2793,7 +2793,7 @@ try again.
 A booking has been successfully created
 but it is NOT confirmed yet.
 
-The customer must pay a ₹500 advance.
+The customer must pay a â‚¹500 advance.
 
 Booking ID:
 ${createdBooking.id}
@@ -2812,25 +2812,25 @@ ${formatTimeForCustomer(
                             )}
 
 Service price:
-₹${servicePrice}
+â‚¹${servicePrice}
 
 Advance:
-₹${ADVANCE_AMOUNT}
+â‚¹${ADVANCE_AMOUNT}
 
 Razorpay payment link:
 ${paymentLink.short_url}
 
 Remaining balance after advance:
-₹${Math.max(
+â‚¹${Math.max(
     servicePrice -
     ADVANCE_AMOUNT,
     0
 )}
 
 Tell the customer naturally that the
-slot is reserved pending the ₹500 advance.
+slot is reserved pending the â‚¹500 advance.
 
-Tell them to complete the ₹500 payment
+Tell them to complete the â‚¹500 payment
 using the payment link.
 
 Do NOT ask them to reply "PAID".
@@ -3086,7 +3086,7 @@ The customer asked about:
 ${service.name}
 
 Actual price from the services database:
-₹${Number(service.price).toLocaleString("en-IN")}
+â‚¹${Number(service.price).toLocaleString("en-IN")}
 
 Item type:
 ${service.item_type}
@@ -3167,7 +3167,7 @@ The customer asked about the product: "${dbProduct.name}".
 Product Details from Inventory Database:
 - Name: ${dbProduct.name}
 - Category: ${dbProduct.category || "General"}
-- Price: ₹${dbProduct.price}
+- Price: â‚¹${dbProduct.price}
 - Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
 
 Respond naturally to the customer with the exact price and availability.
@@ -3176,7 +3176,7 @@ If in stock, tell them they can purchase it at the salon during their visit.
                 } else if (allProducts && allProducts.length > 0) {
                     const productListText = allProducts
                         .slice(0, 10)
-                        .map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
+                        .map(p => `- ${p.name} (â‚¹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
                         .join("\n");
 
                     systemResult = `
@@ -3387,7 +3387,7 @@ Do not invent information.
 //                     .font("Helvetica")
 //                     .fillColor("#777777")
 //                     .text(
-//                         "SALON & SPA • SERVICE MENU",
+//                         "SALON & SPA â€¢ SERVICE MENU",
 //                         {
 //                             align: "center"
 //                         }
@@ -3405,7 +3405,7 @@ Do not invent information.
 
 //                 doc
 //                     .text(
-//                         `${BUSINESS.phone} • ${BUSINESS.hours}`,
+//                         `${BUSINESS.phone} â€¢ ${BUSINESS.hours}`,
 //                         {
 //                             align: "center"
 //                         }
@@ -3489,7 +3489,7 @@ Do not invent information.
 //                                         "Helvetica"
 //                                     )
 //                                     .text(
-//                                         `    ₹${price.toLocaleString("en-IN")}`,
+//                                         `    â‚¹${price.toLocaleString("en-IN")}`,
 //                                         {
 //                                             align:
 //                                                 "right"
@@ -3551,7 +3551,7 @@ if (booking.intent === "services") {
             req.body.From,
 
         body:
-            "Sure! 😊 I've shared our service menu. Have a look and let me know what you'd like to book."
+            "Sure! ðŸ˜Š I've shared our service menu. Have a look and let me know what you'd like to book."
 
     });
 
@@ -3575,7 +3575,7 @@ if (booking.intent === "services") {
 
 
     console.log(
-        "✅ Fixed ZARAH ELITE menu PDF sent."
+        "âœ… Fixed ZARAH ELITE menu PDF sent."
     );
 
 }
@@ -3637,7 +3637,7 @@ else {
                             req.body.From,
 
                         body:
-                            "Sorry, I ran into a small issue. Could you try that again? 😊"
+                            "Sorry, I ran into a small issue. Could you try that again? ðŸ˜Š"
 
                     });
 
@@ -3741,7 +3741,7 @@ app.get(
                             border-radius:16px;
                         ">
 
-                            <h2>Booking Confirmed ✓</h2>
+                            <h2>Booking Confirmed âœ“</h2>
 
                             <p>
                                 Your appointment is already confirmed.
@@ -3866,7 +3866,7 @@ app.get(
                                 font-weight:bold;
                                 margin-top:5px;
                             ">
-                                ₹500
+                                â‚¹500
                             </div>
 
                         </div>
@@ -3894,7 +3894,7 @@ app.get(
                                 margin-top:20px;
                             "
                         >
-                            Pay ₹500 via UPI
+                            Pay â‚¹500 via UPI
                         </a>
 
 
@@ -3961,14 +3961,14 @@ app.get("/instagram/webhook", (req, res) => {
         token === process.env.INSTAGRAM_VERIFY_TOKEN
     ) {
 
-        console.log("✅ Instagram webhook verified");
+        console.log("âœ… Instagram webhook verified");
 
         return res
             .status(200)
             .send(challenge);
     }
 
-    console.error("❌ Instagram webhook verification failed");
+    console.error("âŒ Instagram webhook verification failed");
 
     return res.sendStatus(403);
 });
@@ -3986,7 +3986,7 @@ app.get("/instagram/webhook", (req, res) => {
 //     try {
 
 //         console.log("\n================================");
-//         console.log("📩 NEW INSTAGRAM WEBHOOK");
+//         console.log("ðŸ“© NEW INSTAGRAM WEBHOOK");
 //         console.log(JSON.stringify(req.body, null, 2));
 //         console.log("================================");
 
@@ -3999,7 +3999,7 @@ app.get("/instagram/webhook", (req, res) => {
 //             for (const event of messaging) {
 
 //     console.log(
-//         "🔎 Instagram event keys:",
+//         "ðŸ”Ž Instagram event keys:",
 //         Object.keys(event)
 //     );
 
@@ -4015,7 +4015,7 @@ app.get("/instagram/webhook", (req, res) => {
 //         event.message_edit
 //     ) {
 //         console.log(
-//             "ℹ️ Ignoring non-message Instagram event"
+//             "â„¹ï¸ Ignoring non-message Instagram event"
 //         );
 
 //         continue;
@@ -4038,7 +4038,7 @@ app.get("/instagram/webhook", (req, res) => {
 //     if (!senderId || !message) {
 
 //         console.log(
-//             "⚠️ Instagram message missing sender/text:"
+//             "âš ï¸ Instagram message missing sender/text:"
 //         );
 
 //         console.log(
@@ -4053,12 +4053,12 @@ app.get("/instagram/webhook", (req, res) => {
 //     }
 
 //     console.log(
-//         "📨 Instagram sender:",
+//         "ðŸ“¨ Instagram sender:",
 //         senderId
 //     );
 
 //     console.log(
-//         "💬 Instagram message:",
+//         "ðŸ’¬ Instagram message:",
 //         message
 //     );
 
@@ -4087,7 +4087,7 @@ app.get("/instagram/webhook", (req, res) => {
 //                     );
 
 //                 console.log(
-//                     "🤖 INSTAGRAM AI UNDERSTANDING:"
+//                     "ðŸ¤– INSTAGRAM AI UNDERSTANDING:"
 //                 );
 
 //                 console.log(
@@ -4146,7 +4146,7 @@ app.get("/instagram/webhook", (req, res) => {
 //                     });
 
 //                 console.log(
-//                     "🤖 Instagram AI reply:",
+//                     "ðŸ¤– Instagram AI reply:",
 //                     reply
 //                 );
 
@@ -4170,7 +4170,7 @@ app.get("/instagram/webhook", (req, res) => {
 //                 );
 
 //                 console.log(
-//                     "✅ Instagram reply completed"
+//                     "âœ… Instagram reply completed"
 //                 );
 //             }
 //         }
@@ -4179,7 +4179,7 @@ app.get("/instagram/webhook", (req, res) => {
 //     catch (error) {
 
 //         console.error(
-//             "\n❌ INSTAGRAM WEBHOOK ERROR:"
+//             "\nâŒ INSTAGRAM WEBHOOK ERROR:"
 //         );
 
 //         console.error(error);
@@ -4258,7 +4258,7 @@ app.get("/api/instagram/callback", async (req, res) => {
 
         if (error) {
             console.error(
-                "❌ Instagram OAuth error:",
+                "âŒ Instagram OAuth error:",
                 error,
                 error_reason
             );
@@ -4319,7 +4319,7 @@ app.get("/api/instagram/callback", async (req, res) => {
             await tokenResponse.json();
 
         console.log(
-            "📸 Instagram token response:",
+            "ðŸ“¸ Instagram token response:",
             tokenData
         );
 
@@ -4328,7 +4328,7 @@ app.get("/api/instagram/callback", async (req, res) => {
             !tokenData.access_token
         ) {
             console.error(
-                "❌ Instagram token exchange failed:",
+                "âŒ Instagram token exchange failed:",
                 tokenData
             );
 
@@ -4357,7 +4357,7 @@ const longLivedData =
     await longLivedResponse.json();
 
 console.log(
-    "📸 Instagram long-lived token response:",
+    "ðŸ“¸ Instagram long-lived token response:",
     {
         ok: longLivedResponse.ok,
         expires_in: longLivedData.expires_in,
@@ -4370,7 +4370,7 @@ if (
     !longLivedData.access_token
 ) {
     console.error(
-        "❌ Instagram long-lived token exchange failed:",
+        "âŒ Instagram long-lived token exchange failed:",
         longLivedData
     );
 
@@ -4392,11 +4392,11 @@ const tokenExpiresAt =
     ).toISOString();
 
 console.log(
-    "✅ Instagram long-lived token obtained"
+    "âœ… Instagram long-lived token obtained"
 );
 
 console.log(
-    "⏳ Instagram token expires:",
+    "â³ Instagram token expires:",
     tokenExpiresAt
 );
 
@@ -4415,7 +4415,7 @@ const meResponse = await fetch(
 const meData = await meResponse.json();
 
 console.log(
-    "📸 Instagram /me:",
+    "ðŸ“¸ Instagram /me:",
     meData
 );
 
@@ -4424,7 +4424,7 @@ if (
     !meData.user_id
 ) {
     console.error(
-        "❌ Could not get Instagram account ID:",
+        "âŒ Could not get Instagram account ID:",
         meData
     );
 
@@ -4466,7 +4466,7 @@ const instagramUserId =
         if (saveError) {
 
             console.error(
-                "❌ Instagram connection save failed:",
+                "âŒ Instagram connection save failed:",
                 saveError
             );
 
@@ -4481,7 +4481,7 @@ const instagramUserId =
         );
 
         console.log(
-            "✅ INSTAGRAM CONNECTED"
+            "âœ… INSTAGRAM CONNECTED"
         );
 
         console.log(
@@ -4526,7 +4526,7 @@ const instagramUserId =
 
             <body>
 
-                <h2>✅ Instagram connected successfully</h2>
+                <h2>âœ… Instagram connected successfully</h2>
 
                 <p>
                     Your Instagram account is now connected
@@ -4544,7 +4544,7 @@ const instagramUserId =
     } catch (error) {
 
         console.error(
-            "❌ Instagram callback error:",
+            "âŒ Instagram callback error:",
             error
         );
 
@@ -4564,7 +4564,7 @@ app.post("/instagram/webhook", async (req, res) => {
     try {
 
         console.log("\n================================");
-        console.log("📩 NEW INSTAGRAM WEBHOOK");
+        console.log("ðŸ“© NEW INSTAGRAM WEBHOOK");
         console.log(JSON.stringify(req.body, null, 2));
         console.log("================================");
 
@@ -4588,7 +4588,7 @@ const {
 
 if (instagramProfileError) {
     console.error(
-        "❌ Instagram profile lookup error:",
+        "âŒ Instagram profile lookup error:",
         instagramProfileError
     );
 
@@ -4597,7 +4597,7 @@ if (instagramProfileError) {
 
 if (!instagramProfile) {
     console.error(
-        "❌ No Kangro profile found for Instagram account:",
+        "âŒ No Kangro profile found for Instagram account:",
         instagramBusinessId
     );
 
@@ -4605,7 +4605,7 @@ if (!instagramProfile) {
 }
 
 console.log(
-    "✅ Kangro Instagram profile matched:",
+    "âœ… Kangro Instagram profile matched:",
     instagramProfile
 );
 
@@ -4620,7 +4620,7 @@ const activeInstagramProfileId =
             for (const event of messaging) {
 
                 console.log(
-                    "🔎 Instagram event keys:",
+                    "ðŸ”Ž Instagram event keys:",
                     Object.keys(event)
                 );
 
@@ -4638,7 +4638,7 @@ const activeInstagramProfileId =
                 ) {
 
                     console.log(
-                        "ℹ️ Ignoring non-customer Instagram event"
+                        "â„¹ï¸ Ignoring non-customer Instagram event"
                     );
 
                     continue;
@@ -4653,7 +4653,7 @@ const activeInstagramProfileId =
 
                 if (!senderId) {
                     console.log(
-                        "⚠️ Instagram event missing sender id"
+                        "âš ï¸ Instagram event missing sender id"
                     );
                     continue;
                 }
@@ -4680,7 +4680,7 @@ const activeInstagramProfileId =
                 if (proofImageUrl) {
 
                     console.log(
-                        "📸 Detected payment screenshot / image from Instagram customer:",
+                        "ðŸ“¸ Detected payment screenshot / image from Instagram customer:",
                         proofImageUrl
                     );
 
@@ -4737,22 +4737,22 @@ const activeInstagramProfileId =
                         if (!updateError) {
 
                             console.log(
-                                "✅ Booking confirmed via screenshot proof:",
+                                "âœ… Booking confirmed via screenshot proof:",
                                 pendingBooking.id
                             );
 
-                            const confirmationMessage = `Perfect! Payment proof received. Your appointment is confirmed. 😊
+                            const confirmationMessage = `Perfect! Payment proof received. Your appointment is confirmed. ðŸ˜Š
 
-✨ ${BUSINESS.name}
+âœ¨ ${BUSINESS.name}
 
 Service: ${pendingBooking.service}
 Date: ${formatDateForCustomer(pendingBooking.booking_date)}
 Time: ${formatTimeForCustomer(pendingBooking.booking_time)}
-💳 Advance received: ₹${advAmount}
-💰 Balance remaining: ₹${balance}
-📍 ${BUSINESS.address}
+ðŸ’³ Advance received: â‚¹${advAmount}
+ðŸ’° Balance remaining: â‚¹${balance}
+ðŸ“ ${BUSINESS.address}
 
-We look forward to seeing you! 😊`;
+We look forward to seeing you! ðŸ˜Š`;
 
                             await sendInstagramMessage(
                                 senderId,
@@ -4781,19 +4781,19 @@ We look forward to seeing you! 😊`;
                 if (!message) {
 
                     console.log(
-                        "⚠️ Instagram message missing text"
+                        "âš ï¸ Instagram message missing text"
                     );
 
                     continue;
                 }
 
                 console.log(
-                    "📨 Instagram sender:",
+                    "ðŸ“¨ Instagram sender:",
                     senderId
                 );
 
                 console.log(
-                    "💬 Instagram message:",
+                    "ðŸ’¬ Instagram message:",
                     message
                 );
 
@@ -4819,7 +4819,7 @@ We look forward to seeing you! 😊`;
                     );
 
                 console.log(
-                    "🤖 INSTAGRAM AI UNDERSTANDING:"
+                    "ðŸ¤– INSTAGRAM AI UNDERSTANDING:"
                 );
 
                 console.log(booking);
@@ -4916,7 +4916,7 @@ Do not invent availability.
                     else {
 
                         console.log(
-                            "📅 Complete Instagram booking details received"
+                            "ðŸ“… Complete Instagram booking details received"
                         );
 
                         const service =
@@ -4977,7 +4977,7 @@ const servicePrice =
                         ) {
 
                             console.log(
-                                "⚠️ Existing pending Instagram booking found:",
+                                "âš ï¸ Existing pending Instagram booking found:",
                                 existingPending.id
                             );
 
@@ -5007,10 +5007,10 @@ Appointment status:
 Pending payment
 
 Advance required:
-₹${salonAdvance}
+â‚¹${salonAdvance}
 
 Tell the customer:
-"The advance payment for your appointment is ₹${salonAdvance}.
+"The advance payment for your appointment is â‚¹${salonAdvance}.
 Please scan the QR code below to make the payment.
 Once you've paid, please send me a screenshot of the payment confirmation."
 
@@ -5026,7 +5026,7 @@ Do NOT say the appointment is confirmed yet.
                         else {
 
                             console.log(
-                                "📝 Creating Instagram pending booking..."
+                                "ðŸ“ Creating Instagram pending booking..."
                             );
 
                             const {
@@ -5107,7 +5107,7 @@ source:
                             if (error) {
 
                                 console.error(
-                                    "❌ INSTAGRAM BOOKING INSERT ERROR:",
+                                    "âŒ INSTAGRAM BOOKING INSERT ERROR:",
                                     error
                                 );
 
@@ -5128,7 +5128,7 @@ Apologize naturally and ask the customer to try again.
                             else {
 
                                 console.log(
-                                    "✅ INSTAGRAM PENDING BOOKING CREATED:",
+                                    "âœ… INSTAGRAM PENDING BOOKING CREATED:",
                                     createdBooking.id
                                 );
 
@@ -5167,19 +5167,19 @@ ${formatTimeForCustomer(
 )}
 
 Service price:
-₹${servicePrice}
+â‚¹${servicePrice}
 
 Advance:
-₹${salonAdvance}
+â‚¹${salonAdvance}
 
 Remaining balance after advance:
-₹${Math.max(
+â‚¹${Math.max(
     servicePrice - salonAdvance,
     0
 )}
 
 Tell the customer:
-"The advance payment for your appointment is ₹${salonAdvance}.
+"The advance payment for your appointment is â‚¹${salonAdvance}.
 Please scan the QR code below to make the payment.
 Once you've paid, please send me a screenshot of the payment confirmation."
 
@@ -5232,7 +5232,7 @@ The customer asked about the product: "${dbProduct.name}".
 Product Details from Inventory Database:
 - Name: ${dbProduct.name}
 - Category: ${dbProduct.category || "General"}
-- Price: ₹${dbProduct.price}
+- Price: â‚¹${dbProduct.price}
 - Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
 
 Respond naturally to the customer with the exact price and stock availability.
@@ -5240,7 +5240,7 @@ Respond naturally to the customer with the exact price and stock availability.
                     } else if (allProducts && allProducts.length > 0) {
                         const productListText = allProducts
                             .slice(0, 10)
-                            .map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
+                            .map(p => `- ${p.name} (â‚¹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
                             .join("\n");
 
                         systemResult = `
@@ -5315,7 +5315,7 @@ Do not invent:
                     });
 
                 console.log(
-                    "🤖 Instagram AI reply:",
+                    "ðŸ¤– Instagram AI reply:",
                     reply
                 );
 
@@ -5340,7 +5340,7 @@ Do not invent:
                 );
 
                 console.log(
-                    "✅ Instagram reply completed"
+                    "âœ… Instagram reply completed"
                 );
 
                 // -----------------------------------------
@@ -5350,7 +5350,7 @@ Do not invent:
                 if (shouldSendQrCode && activeSalonQrUrl) {
                     try {
                         console.log(
-                            "📸 Sending UPI QR image to Instagram customer:",
+                            "ðŸ“¸ Sending UPI QR image to Instagram customer:",
                             activeSalonQrUrl
                         );
                         await sendInstagramImage(
@@ -5359,11 +5359,11 @@ Do not invent:
                             activeInstagramProfileId
                         );
                         console.log(
-                            "✅ Instagram UPI QR image sent successfully"
+                            "âœ… Instagram UPI QR image sent successfully"
                         );
                     } catch (imgErr) {
                         console.error(
-                            "⚠️ Failed to send Instagram UPI QR image:",
+                            "âš ï¸ Failed to send Instagram UPI QR image:",
                             imgErr
                         );
                     }
@@ -5376,7 +5376,7 @@ Do not invent:
     catch (error) {
 
         console.error(
-            "\n❌ INSTAGRAM WEBHOOK ERROR:"
+            "\nâŒ INSTAGRAM WEBHOOK ERROR:"
         );
 
         console.error(error);
@@ -5390,443 +5390,233 @@ Do not invent:
 // GENERATE BILL PDF
 // =====================================================
 
-async function generateBillPDF(
-    bill,
-    items
-) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            try {
-
-                const doc =
-                    new PDFDocument({
-                        size: "A4",
-                        margin: 50
-                    });
-
-
-                const chunks = [];
-
-
-                doc.on(
-                    "data",
-                    chunk => {
-                        chunks.push(chunk);
-                    }
-                );
-
-
-                doc.on(
-                    "end",
-                    () => {
-
-                        resolve(
-                            Buffer.concat(chunks)
-                        );
-
-                    }
-                );
-
-
-                doc.on(
-                    "error",
-                    reject
-                );
-
-
-                // ==========================================
-                // HEADER
-                // ==========================================
-
-                doc
-                    .fontSize(22)
-                    .font("Helvetica-Bold")
-                    .fillColor("#000000")
-                    .text(
-                        BUSINESS.name
-                    );
-
-
-                doc
-                    .fontSize(10)
-                    .font("Helvetica")
-                    .fillColor("#666666")
-                    .text(
-                        "AI Receptionist"
-                    );
-
-
-                doc
-                    .text(
-                        BUSINESS.address
-                    );
-
-
-                doc.moveDown(2);
-
-
-                // ==========================================
-                // INVOICE
-                // ==========================================
-
-                doc
-                    .fillColor("#000000")
-                    .fontSize(24)
-                    .font("Helvetica-Bold")
-                    .text(
-                        "INVOICE"
-                    );
-
-
-                const billNumber =
-                    String(bill.id)
-                        .substring(0, 8)
-                        .toUpperCase();
-
-
-                doc
-                    .fontSize(10)
-                    .font("Helvetica")
-                    .fillColor("#666666")
-                    .text(
-                        `Bill #${billNumber}`
-                    );
-
-
-                doc.text(
-                    `Date: ${
-                        new Date(
-                            bill.created_at
-                        ).toLocaleString("en-IN")
-                    }`
-                );
-
-
-                // ==========================================
-                // CUSTOMER
-                // ==========================================
-
-                doc.moveDown(1.5);
-
-
-                doc
-                    .fillColor("#000000")
-                    .fontSize(11)
-                    .font("Helvetica-Bold")
-                    .text(
-                        "BILLED TO"
-                    );
-
-
-                doc
-                    .fontSize(11)
-                    .font("Helvetica")
-                    .text(
-                        bill.customer_name || "-"
-                    );
-
-
-                doc
-                    .fillColor("#666666")
-                    .text(
-                        bill.phone || "-"
-                    );
-
-
-                // ==========================================
-                // DIVIDER
-                // ==========================================
-
-                doc.moveDown(1);
-
-
-                doc
-                    .strokeColor("#dddddd")
-                    .moveTo(
-                        50,
-                        doc.y
-                    )
-                    .lineTo(
-                        545,
-                        doc.y
-                    )
-                    .stroke();
-
-
-                // ==========================================
-                // ITEMS
-                // ==========================================
-
-                doc.moveDown(1);
-
-
-                doc
-                    .fillColor("#666666")
-                    .fontSize(10)
-                    .font("Helvetica-Bold")
-                    .text(
-                        "DESCRIPTION",
-                        50
-                    );
-
-
-                doc.text(
-                    "AMOUNT",
-                    450,
-                    doc.y
-                );
-
-
-                doc.moveDown(.8);
-
-
-                (items || []).forEach(
-                    item => {
-
-                        const itemY =
-                            doc.y;
-
-
-                        doc
-                            .fillColor("#000000")
-                            .fontSize(11)
-                            .font("Helvetica")
-                            .text(
-                                item.item_name,
-                                50,
-                                itemY
-                            );
-
-
-                        doc.text(
-                            `₹${Number(
-                                item.total
-                            ).toLocaleString("en-IN")}`,
-                            450,
-                            itemY,
-                            {
-                                width:95,
-                                align:"right"
-                            }
-                        );
-
-
-                        doc.moveDown(.7);
-
-
-                        doc
-                            .strokeColor("#eeeeee")
-                            .moveTo(
-                                50,
-                                doc.y
-                            )
-                            .lineTo(
-                                545,
-                                doc.y
-                            )
-                            .stroke();
-
-
-                        doc.moveDown(.7);
-
-                    }
-                );
-
-
-                // ==========================================
-                // SUMMARY
-                // ==========================================
-
-                doc.moveDown(1);
-
-
-                function summaryRow(
-                    label,
-                    value,
-                    bold = false
-                ) {
-
-                    const y =
-                        doc.y;
-
-
-                    doc
-                        .fontSize(
-                            bold ? 14 : 11
-                        )
-                        .font(
-                            bold
-                                ? "Helvetica-Bold"
-                                : "Helvetica"
-                        )
-                        .fillColor("#000000")
-                        .text(
-                            label,
-                            300,
-                            y
-                        );
-
-
-                    doc.text(
-                        value,
-                        450,
-                        y,
-                        {
-                            width:95,
-                            align:"right"
-                        }
-                    );
-
-
-                    doc.moveDown(
-                        bold ? .8 : .5
-                    );
-
+async function generateBillPDF(bill, items, profileData) {
+    return new Promise((resolve, reject) => {
+        try {
+            const doc = new PDFDocument({ size: "A4", margin: 40, bufferPages: true });
+            const chunks = [];
+            doc.on("data", chunk => chunks.push(chunk));
+            doc.on("end", () => resolve(Buffer.concat(chunks)));
+            doc.on("error", reject);
+
+            const L = 40;   // left margin
+            const R = 555;  // right edge
+            const W = R - L; // content width
+
+            // Use profile data if passed, else fall back to BUSINESS constants
+            const bizName    = profileData?.business_name    || BUSINESS.name;
+            const bizAddress = profileData?.business_address || BUSINESS.address;
+            const bizPhone   = profileData?.business_phone   || BUSINESS.phone || "";
+            const bizGst     = bill.seller_gstin             || "";
+
+            const invoiceNo = bill.invoice_number
+                ? `#${bill.invoice_number}`
+                : `#${bizName} ${new Date().getFullYear()} - ${String(bill.id || "").substring(0, 8).toUpperCase()}`;
+
+            const invoiceDateRaw = bill.invoice_date || bill.created_at;
+            const invoiceDate = invoiceDateRaw
+                ? new Date(invoiceDateRaw).toLocaleString("en-IN", {
+                    day: "2-digit", month: "short", year: "numeric",
+                    hour: "2-digit", minute: "2-digit", hour12: true
+                  })
+                : "";
+
+            const INR = v => `\u20B9${Number(v || 0).toLocaleString("en-IN", { minimumFractionDigits: 1, maximumFractionDigits: 2 })}`;
+
+            // â”€â”€ HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            const headerY = doc.y;
+
+            // Left: logo box + business info
+            doc.rect(L, headerY, 32, 32).strokeColor("#aaaaaa").stroke();
+            doc.fontSize(10).font("Helvetica-Bold").fillColor("#555555")
+               .text("ZE", L + 7, headerY + 10, { width: 32, align: "center" });
+
+            doc.fontSize(14).font("Helvetica-Bold").fillColor("#000000")
+               .text(bizName, L + 38, headerY, { width: 280 });
+
+            doc.fontSize(9).font("Helvetica").fillColor("#444444")
+               .text(bizAddress, L + 38, doc.y, { width: 280 });
+
+            if (bizPhone) {
+                doc.text(`Ph: ${bizPhone}`, L + 38, doc.y, { width: 280 });
+            }
+            if (bizGst) {
+                doc.text(`GST#${bizGst}`, L + 38, doc.y, { width: 280 });
+            }
+
+            // Right: INVOICE heading + invoice number + date
+            doc.fontSize(18).font("Helvetica-Bold").fillColor("#000000")
+               .text("INVOICE", L + 360, headerY, { width: W - 360, align: "right" });
+
+            doc.fontSize(9).font("Helvetica").fillColor("#444444")
+               .text(invoiceNo, L + 360, doc.y, { width: W - 360, align: "right" });
+
+            doc.text(invoiceDate, L + 360, doc.y, { width: W - 360, align: "right" });
+
+            // â”€â”€ DIVIDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            const divY = Math.max(doc.y, headerY + 70) + 8;
+            doc.moveTo(L, divY).lineTo(R, divY).strokeColor("#cccccc").lineWidth(1).stroke();
+
+            // â”€â”€ BILL TO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            let curY = divY + 10;
+            doc.fontSize(9).font("Helvetica-Bold").fillColor("#666666")
+               .text("Bill To", L, curY);
+
+            curY = doc.y + 2;
+            doc.fontSize(10).font("Helvetica-Bold").fillColor("#000000")
+               .text(`Name   ${(bill.customer_name || "-").toUpperCase()}`, L, curY);
+
+            curY = doc.y + 1;
+            doc.fontSize(10).font("Helvetica").fillColor("#333333")
+               .text(`Phone  ${bill.phone || "-"}`, L, curY);
+
+            // â”€â”€ ITEMS TABLE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            curY = doc.y + 12;
+            const col = { sl: L, desc: L + 30, gross: L + 240, qty: L + 330, disc: L + 385, net: L + 455 };
+
+            doc.rect(L, curY, W, 18).fillColor("#f0f0f0").fill();
+
+            const thY = curY + 4;
+            doc.fontSize(8).font("Helvetica-Bold").fillColor("#333333");
+            doc.text("Sl No",         col.sl,    thY, { width: 28,  align: "center" });
+            doc.text("Item Description", col.desc, thY, { width: 200, align: "left" });
+            doc.text("Gross Amount",  col.gross, thY, { width: 85,  align: "right" });
+            doc.text("Qty",           col.qty,   thY, { width: 45,  align: "center" });
+            doc.text("Discount",      col.disc,  thY, { width: 65,  align: "right" });
+            doc.text("Net Amount",    col.net,   thY, { width: 95,  align: "right" });
+
+            curY += 18;
+
+            // â”€â”€ ITEMS TABLE ROWS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            let totalGross = 0;
+            let totalDiscount = 0;
+            let totalNet = 0;
+
+            (items || []).forEach((item, idx) => {
+                const grossAmt = Number(item.price || 0) * Number(item.quantity || 1);
+                const discAmt  = Number(item.discount || 0);
+                const netAmt   = Number(item.total || 0);
+                totalGross    += grossAmt;
+                totalDiscount += discAmt;
+                totalNet      += netAmt;
+
+                const rowY = curY + 4;
+                doc.fontSize(9).font("Helvetica").fillColor("#000000");
+                doc.text(String(idx + 1), col.sl, rowY, { width: 28, align: "center" });
+                doc.text((item.item_name || "-").toUpperCase(), col.desc, rowY, { width: 200 });
+                doc.text(INR(grossAmt), col.gross, rowY, { width: 85, align: "right" });
+                doc.text(String(item.quantity || 1), col.qty, rowY, { width: 45, align: "center" });
+                doc.text(INR(discAmt), col.disc, rowY, { width: 65, align: "right" });
+                doc.text(INR(netAmt), col.net, rowY, { width: 95, align: "right" });
+
+                curY += 18;
+                doc.moveTo(L, curY).lineTo(R, curY).strokeColor("#e5e5e5").lineWidth(0.5).stroke();
+            });
+
+            // â”€â”€ ITEMS TOTAL ROW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            curY += 2;
+            doc.rect(L, curY, W, 18).fillColor("#f7f7f7").fill();
+            const totY = curY + 4;
+            doc.fontSize(9).font("Helvetica-Bold").fillColor("#000000");
+            doc.text("Total", col.desc, totY, { width: 200 });
+            doc.text(INR(totalGross), col.gross, totY, { width: 85, align: "right" });
+            doc.text(INR(totalDiscount), col.disc, totY, { width: 65, align: "right" });
+            doc.text(INR(totalNet), col.net, totY, { width: 95, align: "right" });
+            curY += 20;
+
+            // â”€â”€ BOTTOM TWO PANELS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            curY += 10;
+            const panelW = (W / 2) - 8;
+            const panelR = L + panelW + 16; // right panel x start
+
+            // Panel headers
+            doc.rect(L, curY, panelW, 16).fillColor("#e8e8e8").fill();
+            doc.rect(panelR, curY, panelW, 16).fillColor("#e8e8e8").fill();
+
+            doc.fontSize(9).font("Helvetica-Bold").fillColor("#333333")
+               .text("Payment Details", L + 4, curY + 4, { width: panelW - 8 });
+            doc.text("Invoice Summary", panelR + 4, curY + 4, { width: panelW - 8 });
+
+            curY += 16;
+
+            // Payment Details panel â€” sub-header row
+            doc.rect(L, curY, panelW, 14).fillColor("#f5f5f5").fill();
+            doc.fontSize(8).font("Helvetica-Bold").fillColor("#555555");
+            doc.text("Mode", L + 4, curY + 3, { width: panelW / 2 - 4 });
+            doc.text("Amount", L + panelW / 2, curY + 3, { width: panelW / 2 - 4, align: "right" });
+            curY += 14;
+
+            // Payment Details panel â€” payment row
+            const payMethod = bill.payment_method || "Cash";
+            const grandTotal = Number(bill.total || totalNet);
+            const advPaid = Number(bill.advance_paid || 0);
+            const amountPaid = advPaid > 0 ? advPaid : grandTotal; // what was actually paid
+
+            doc.fontSize(9).font("Helvetica").fillColor("#000000");
+            doc.text(payMethod, L + 4, curY + 3, { width: panelW / 2 - 4 });
+            doc.text(INR(grandTotal), L + panelW / 2, curY + 3, { width: panelW / 2 - 4, align: "right" });
+
+            // Invoice Summary panel rows
+            const subtotalAmt = Number(bill.subtotal || totalGross);
+            const discountAmt = Number(bill.discount || totalDiscount);
+            const netAfterDisc = subtotalAmt - discountAmt;
+            const totalTax    = Number(bill.total_tax || 0);
+            const cgstAmt     = Number(bill.cgst_amount || 0);
+            const sgstAmt     = Number(bill.sgst_amount || 0);
+            const igstAmt     = Number(bill.igst_amount || 0);
+            const cgstRate    = Number(bill.cgst_rate || 0);
+            const sgstRate    = Number(bill.sgst_rate || 0);
+            const igstRate    = Number(bill.igst_rate || 0);
+            const gstRate     = cgstRate + sgstRate + igstRate;
+
+            const summRows = [
+                ["Gross Total",              INR(subtotalAmt),   false],
+                ["Discount",                 INR(discountAmt),   false],
+                ["Net Total (after discount)", INR(netAfterDisc), false],
+            ];
+
+            if (totalTax > 0) {
+                const gstLabel = gstRate > 0 ? `GST @ ${gstRate}%` : "GST";
+                summRows.push([gstLabel, INR(totalTax), false]);
+            }
+            summRows.push(["Grand Total", INR(grandTotal), true]);
+
+            let summY = curY;
+            summRows.forEach(([label, value, bold]) => {
+                const rowH = bold ? 18 : 14;
+                if (bold) {
+                    doc.rect(panelR, summY, panelW, rowH).fillColor("#f0f0f0").fill();
                 }
+                doc.fontSize(bold ? 9 : 8)
+                   .font(bold ? "Helvetica-Bold" : "Helvetica")
+                   .fillColor("#000000")
+                   .text(label, panelR + 4, summY + (rowH - 9) / 2 + 1, { width: panelW * 0.6 - 4 });
+                doc.text(value, panelR + panelW * 0.6, summY + (rowH - 9) / 2 + 1, { width: panelW * 0.4 - 4, align: "right" });
+                summY += rowH;
+                if (!bold) {
+                    doc.moveTo(panelR, summY).lineTo(panelR + panelW, summY).strokeColor("#e5e5e5").lineWidth(0.5).stroke();
+                }
+            });
 
+            // Draw borders around panels
+            const panelEndY = Math.max(summY, curY + 18);
+            doc.rect(L, curY - 14 - 16, panelW, panelEndY - (curY - 14 - 16)).strokeColor("#cccccc").lineWidth(0.7).stroke();
+            doc.rect(panelR, curY - 14 - 16, panelW, panelEndY - (curY - 14 - 16)).strokeColor("#cccccc").lineWidth(0.7).stroke();
 
-                summaryRow(
-                    "Subtotal",
-                    `₹${Number(
-                        bill.subtotal || 0
-                    ).toLocaleString("en-IN")}`
-                );
+            // â”€â”€ FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            const footerY = panelEndY + 24;
+            doc.moveTo(L, footerY).lineTo(R, footerY).strokeColor("#cccccc").lineWidth(1).stroke();
+            doc.fontSize(9).font("Helvetica").fillColor("#777777")
+               .text(`Thank you for visiting ${bizName}.`, L, footerY + 8, { width: W, align: "center" });
+            doc.text("We look forward to seeing you again!", L, doc.y + 2, { width: W, align: "center" });
 
+            doc.end();
 
-                summaryRow(
-                    "Add-ons",
-                    `₹${Number(
-                        bill.addon_total || 0
-                    ).toLocaleString("en-IN")}`
-                );
-
-
-                summaryRow(
-                    "Discount",
-                    `-₹${Number(
-                        bill.discount || 0
-                    ).toLocaleString("en-IN")}`
-                );
-
-
-                // IMPORTANT:
-                // Advance is deducted from final bill
-
-                const grossTotal =
-    Number(bill.total || 0);
-
-const advancePaid =
-    Number(bill.advance_paid || 0);
-
-const balanceDue =
-    Math.max(
-        grossTotal - advancePaid,
-        0
-    );
-
-
-                summaryRow(
-                    "Advance Paid",
-                    `-₹${advancePaid.toLocaleString("en-IN")}`
-                );
-
-
-                doc
-                    .strokeColor("#dddddd")
-                    .moveTo(
-                        300,
-                        doc.y
-                    )
-                    .lineTo(
-                        545,
-                        doc.y
-                    )
-                    .stroke();
-
-
-                doc.moveDown(.8);
-
-
-                summaryRow(
-    "BALANCE DUE",
-    `₹${balanceDue.toLocaleString("en-IN")}`,
-    true
-);
-
-
-                // ==========================================
-                // PAYMENT
-                // ==========================================
-
-                doc.moveDown(1.5);
-
-
-                doc
-                    .fontSize(11)
-                    .font("Helvetica-Bold")
-                    .fillColor("#000000")
-                    .text(
-                        `Payment Method: ${
-                            bill.payment_method ||
-                            "UPI"
-                        }`
-                    );
-
-
-                doc
-                    .fontSize(11)
-                    .font("Helvetica")
-                    .fillColor("#24945a")
-                    .text(
-                        "Payment Status: PAID"
-                    );
-
-
-                // ==========================================
-                // FOOTER
-                // ==========================================
-
-                doc.moveDown(3);
-
-
-                doc
-                    .fontSize(11)
-                    .fillColor("#666666")
-                    .text(
-                        `Thank you for visiting ${BUSINESS.name}.`,
-                        {
-                            align:"center"
-                        }
-                    );
-
-
-                doc
-                    .fontSize(9)
-                    .text(
-                        "We look forward to seeing you again.",
-                        {
-                            align:"center"
-                        }
-                    );
-
-
-                doc.end();
-
-            }
-
-            catch (error) {
-
-                reject(error);
-
-            }
-
+        } catch (error) {
+            reject(error);
         }
-    );
-
+    });
 }
-
 // =====================================================
 // VIEW BILL PDF
 // =====================================================
@@ -5904,12 +5694,23 @@ app.get(
 
             }
 
+            // GET PROFILE (for business name/address/phone)
+            let profileData = null;
+            if (bill.profile_id) {
+                const { data: prof } = await supabase
+                    .from("profiles")
+                    .select("business_name, business_address, business_phone")
+                    .eq("id", bill.profile_id)
+                    .maybeSingle();
+                profileData = prof || null;
+            }
 
             // GENERATE PDF
             const pdfBuffer =
                 await generateBillPDF(
                     bill,
-                    items || []
+                    items || [],
+                    profileData
                 );
 
 
@@ -6278,7 +6079,7 @@ if (phone.startsWith("+91")) {
 
 const whatsappTo = `whatsapp:${phone}`;
 
-console.log("📱 Sending bill to:", whatsappTo);
+console.log("ðŸ“± Sending bill to:", whatsappTo);
 
 
             // ==========================================
@@ -6318,27 +6119,27 @@ const twilioMessage =
                 `Hi ${
                     bill.customer_name ||
                     "there"
-                }! 👋
+                }! ðŸ‘‹
 
 Thank you for visiting Bella Salon.
 
-🧾 Your Bill
+ðŸ§¾ Your Bill
 
 Total Service Amount:
-₹${grossTotal.toLocaleString("en-IN")}
+â‚¹${grossTotal.toLocaleString("en-IN")}
 
 Advance Paid:
--₹${advancePaid.toLocaleString("en-IN")}
+-â‚¹${advancePaid.toLocaleString("en-IN")}
 
 Balance Due:
-₹${balanceDue.toLocaleString("en-IN")}
+â‚¹${balanceDue.toLocaleString("en-IN")}
 
 Payment Method:
 ${bill.payment_method || "UPI"}
 
 Your e-bill is attached.
 
-Thank you for choosing Bella Salon! 😊`,
+Thank you for choosing Bella Salon! ðŸ˜Š`,
 
             mediaUrl: [
                 pdfUrl
@@ -6599,7 +6400,7 @@ async function generateMenuPDF() {
                     .font("Helvetica")
                     .fillColor("#777777")
                     .text(
-                        "SALON & SPA • SERVICE MENU",
+                        "SALON & SPA â€¢ SERVICE MENU",
                         {
                             align: "center"
                         }
@@ -6616,7 +6417,7 @@ async function generateMenuPDF() {
                     );
 
                 doc.text(
-                    `${BUSINESS.phone} • ${BUSINESS.hours}`,
+                    `${BUSINESS.phone} â€¢ ${BUSINESS.hours}`,
                     {
                         align: "center"
                     }
@@ -6672,7 +6473,7 @@ async function generateMenuPDF() {
                                     "Helvetica"
                                 )
                                 .text(
-                                    `    ₹${price.toLocaleString("en-IN")}`
+                                    `    â‚¹${price.toLocaleString("en-IN")}`
                                 );
 
 
@@ -6760,23 +6561,23 @@ app.listen(
         );
 
         console.log(
-            "🚀 Bella Salon Server"
+            "ðŸš€ Bella Salon Server"
         );
 
         console.log(
-            `🚀 Running on port ${PORT}`
+            `ðŸš€ Running on port ${PORT}`
         );
 
         console.log(
-            `💳 UPI: ${UPI_ID}`
+            `ðŸ’³ UPI: ${UPI_ID}`
         );
 
         console.log(
-            `💰 Advance: ₹${ADVANCE_AMOUNT}`
+            `ðŸ’° Advance: â‚¹${ADVANCE_AMOUNT}`
         );
 
         console.log(
-            `🤖 AI Model: ${AI_MODEL}`
+            `ðŸ¤– AI Model: ${AI_MODEL}`
         );
 
         console.log(
@@ -6795,7 +6596,7 @@ app.listen(
 
 
             console.log(
-                "✅ Twilio Connected"
+                "âœ… Twilio Connected"
             );
 
         }
@@ -6803,7 +6604,7 @@ app.listen(
         catch (error) {
 
             console.log(
-                "❌ Twilio Connection Failed"
+                "âŒ Twilio Connection Failed"
             );
 
             console.log(
