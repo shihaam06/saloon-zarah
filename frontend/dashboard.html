@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -1492,27 +1492,48 @@
                         walkinSave.textContent = "Saving...";
                         walkinSave.disabled = true;
 
-                        const BACKEND_URL = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
-                            ? "http://localhost:3000" 
-                            : "https://saloon-zarah.onrender.com";
-
-                        const response = await fetch(`${BACKEND_URL}/api/bookings/manual`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
+                        // Direct Supabase insert
+                        const { data: newBooking, error: bookingError } = await client
+                            .from("bookings")
+                            .insert({
                                 profile_id: profileId,
                                 customer_name: name,
                                 phone: phone || null,
                                 service: service,
                                 booking_date: date,
-                                booking_time: time
+                                booking_time: time,
+                                status: "Confirmed",
+                                source: "Walk-in"
                             })
-                        });
+                            .select()
+                            .single();
 
-                        const result = await response.json();
-                        
-                        if (!response.ok) {
-                            throw new Error(result.error || "Failed to create booking");
+                        if (bookingError) {
+                            throw bookingError;
+                        }
+
+                        // Auto-create or link customer if phone provided
+                        if (phone) {
+                            try {
+                                const { data: existingCust } = await client
+                                    .from("customers")
+                                    .select("id")
+                                    .eq("profile_id", profileId)
+                                    .eq("phone", phone)
+                                    .maybeSingle();
+
+                                if (!existingCust) {
+                                    await client
+                                        .from("customers")
+                                        .insert({
+                                            profile_id: profileId,
+                                            name: name,
+                                            phone: phone
+                                        });
+                                }
+                            } catch (custErr) {
+                                console.warn("Customer auto-create skipped:", custErr);
+                            }
                         }
 
                         walkinModal.classList.remove("active");
@@ -1529,8 +1550,8 @@
                             window.location.reload();
                         }
                     } catch (error) {
-                        console.error(error);
-                        alert(error.message);
+                        console.error("Booking creation error:", error);
+                        alert(error.message || "Failed to create booking.");
                     } finally {
                         walkinSave.textContent = "Save Booking";
                         walkinSave.disabled = false;

@@ -797,102 +797,84 @@ document
     .getElementById(
         "whatsappBtn"
     )
-    .addEventListener(
+    ?.addEventListener(
         "click",
-        async () => {
-
+        () => {
             if (!bill) return;
 
-
-            const button =
-                document.getElementById(
-                    "whatsappBtn"
-                );
-
-
-            button.disabled =
-                true;
-
-
-            button.textContent =
-                "Sending...";
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        "https://saloon-zarah.onrender.com/send-bill",
-                        {
-
-                            method: "POST",
-
-                            headers: {
-
-                                "Content-Type":
-                                    "application/json"
-
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    billId:
-                                        bill.id
-
-                                })
-
-                        }
-                    );
-
-
-                const result =
-                    await response.json();
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        result.error ||
-                        "Failed to send bill."
-                    );
-
+            let cleanPhone = "";
+            if (bill.phone) {
+                cleanPhone = String(bill.phone).replace(/\D/g, "");
+                if (cleanPhone.length === 10) {
+                    cleanPhone = "91" + cleanPhone;
                 }
-
-
-                button.textContent =
-                    "✓ Sent on WhatsApp";
-
-
-                alert(
-                    "Bill sent successfully to " +
-                    bill.phone
-                );
-
             }
 
-            catch (error) {
-
-                console.error(
-                    error
-                );
-
-
-                button.disabled =
-                    false;
-
-
-                button.textContent =
-                    "💬 Send on WhatsApp";
-
-
-                alert(
-                    "Could not send the bill. " +
-                    error.message
-                );
-
+            if (!cleanPhone) {
+                const inputPhone = prompt("Customer phone number is missing. Please enter 10-digit mobile number:", "");
+                if (inputPhone) {
+                    cleanPhone = String(inputPhone).replace(/\D/g, "");
+                    if (cleanPhone.length === 10) {
+                        cleanPhone = "91" + cleanPhone;
+                    }
+                }
             }
 
+            if (!cleanPhone) {
+                alert("Customer phone number is required to send on WhatsApp.");
+                return;
+            }
+
+            const businessName = "ZARAH ELITE";
+            const customerName = bill.customer_name || "Customer";
+            const invoiceNum   = bill.invoice_number || (bill.id ? bill.id.substring(0, 8) : "—");
+            const dateVal      = bill.invoice_date || bill.created_at;
+            const dateStr      = dateVal ? new Date(dateVal).toLocaleDateString("en-IN", {
+                day: "2-digit", month: "short", year: "numeric"
+            }) : "—";
+
+            let itemsText = "";
+            if (items && items.length > 0) {
+                itemsText = items.map(item => `• ${item.item_name} - ₹${Number(item.total || 0).toLocaleString("en-IN")}`).join("\n");
+            } else {
+                itemsText = `• Salon Services - ₹${Number(bill.total || 0).toLocaleString("en-IN")}`;
+            }
+
+            const totalAmt    = Number(bill.total || 0).toLocaleString("en-IN");
+            const advancePaid = Number(bill.advance_paid || 0);
+            const balancePaid = Math.max((Number(bill.total || 0) - advancePaid), 0).toLocaleString("en-IN");
+
+            let advanceInfo = "";
+            if (advancePaid > 0) {
+                advanceInfo = `\n💳 *Advance Paid:* ₹${advancePaid.toLocaleString("en-IN")}\n💵 *Balance Paid:* ₹${balancePaid}`;
+            }
+
+            const invoiceLink = window.location.href;
+
+            const whatsappMessage = `✨ *INVOICE FROM ${businessName.toUpperCase()}* ✨
+
+Dear *${customerName}*,
+Thank you for visiting us! Here are your digital invoice details:
+
+📄 *Invoice No:* #${invoiceNum}
+📅 *Date:* ${dateStr}
+
+*Services & Items:*
+${itemsText}
+━━━━━━━━━━━━━━━━━━
+💰 *Total Amount:* ₹${totalAmt}${advanceInfo}
+💳 *Payment Status:* PAID (via ${bill.payment_method || "Cash / UPI"})
+
+🔗 *View / Download Full Invoice:*
+${invoiceLink}
+
+Thank you for choosing *${businessName}*! We look forward to serving you again. 🙏😊`;
+
+            const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+            const waWin = window.open(waUrl, "_blank");
+            if (!waWin || waWin.closed || typeof waWin.closed === "undefined") {
+                window.location.href = waUrl;
+            }
         }
     );
 

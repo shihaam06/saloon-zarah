@@ -1,9 +1,9 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 // =====================================================
 // IMPORTS
 // =====================================================
-const path = require("path");
 const express = require("express");
 const OpenAI = require("openai");
 const twilio = require("twilio");

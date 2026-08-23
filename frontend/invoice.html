@@ -614,6 +614,7 @@ const billId  = params.get("bill");
 
 let bill    = null;
 let booking = null;
+let profile = null;
 let items   = [];
 
 /* ── INIT ─────────────────────────────────────────────── */
@@ -645,11 +646,13 @@ async function init() {
     }
 
     // Load business profile
-    const { data: profile } = await client
+    const { data: profData } = await client
         .from("profiles")
         .select("business_name, business_address, business_phone")
         .eq("id", user.id)
         .single();
+
+    profile = profData || null;
 
     renderInvoice(profile);
     bindActions();
@@ -800,27 +803,82 @@ function bindActions() {
             ? "http://localhost:3000"
             : "https://saloon-zarah.onrender.com";
 
-    // WhatsApp send
-    el("whatsappBtn").addEventListener("click", async () => {
-        const btn = el("whatsappBtn");
-        btn.disabled = true;
-        btn.innerHTML = `<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></span> Sending…`;
+    // WhatsApp Direct Send
+    el("whatsappBtn")?.addEventListener("click", () => {
+        let cleanPhone = "";
+        if (bill && bill.phone) {
+            cleanPhone = String(bill.phone).replace(/\D/g, "");
+            if (cleanPhone.length === 10) {
+                cleanPhone = "91" + cleanPhone;
+            }
+        }
 
-        try {
-            const res = await fetch(`${BACKEND_URL}/send-bill`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ billId: bill.id })
-            });
-            const result = await res.json();
-            if (!res.ok) throw new Error(result.error || "Failed to send.");
-            btn.innerHTML = "✅ Sent on WhatsApp";
-            toast("Bill sent successfully to " + bill.phone, "success");
-        } catch (err) {
-            console.error(err);
-            btn.disabled = false;
-            btn.innerHTML = "💬 Send on WhatsApp";
-            toast("Could not send: " + err.message, "error");
+        if (!cleanPhone) {
+            const inputPhone = prompt("Customer phone number is missing. Please enter 10-digit mobile number:", "");
+            if (inputPhone) {
+                cleanPhone = String(inputPhone).replace(/\D/g, "");
+                if (cleanPhone.length === 10) {
+                    cleanPhone = "91" + cleanPhone;
+                }
+            }
+        }
+
+        if (!cleanPhone) {
+            toast("Customer phone number is required to send on WhatsApp.", "error");
+            return;
+        }
+
+        const businessName = profile?.business_name || "Salon";
+        const customerName = bill.customer_name || "Customer";
+        const invoiceNum   = bill.invoice_number || (bill.id ? bill.id.substring(0, 8) : "—");
+        const dateVal      = bill.invoice_date || bill.created_at;
+        const dateStr      = dateVal ? new Date(dateVal).toLocaleDateString("en-IN", {
+            day: "2-digit", month: "short", year: "numeric"
+        }) : "—";
+
+        let itemsText = "";
+        if (items && items.length > 0) {
+            itemsText = items.map(item => `• ${item.item_name} - ₹${Number(item.total || 0).toLocaleString("en-IN")}`).join("\n");
+        } else {
+            itemsText = `• Salon Services - ₹${Number(bill.total || 0).toLocaleString("en-IN")}`;
+        }
+
+        const totalAmt    = Number(bill.total || 0).toLocaleString("en-IN");
+        const advancePaid = Number(bill.advance_paid || 0);
+        const balancePaid = Math.max((Number(bill.total || 0) - advancePaid), 0).toLocaleString("en-IN");
+
+        let advanceInfo = "";
+        if (advancePaid > 0) {
+            advanceInfo = `\n💳 *Advance Paid:* ₹${advancePaid.toLocaleString("en-IN")}\n💵 *Balance Paid:* ₹${balancePaid}`;
+        }
+
+        const invoiceLink = window.location.href;
+
+        const whatsappMessage = `✨ *INVOICE FROM ${businessName.toUpperCase()}* ✨
+
+Dear *${customerName}*,
+Thank you for visiting us! Here are your digital invoice details:
+
+📄 *Invoice No:* #${invoiceNum}
+📅 *Date:* ${dateStr}
+
+*Services & Items:*
+${itemsText}
+━━━━━━━━━━━━━━━━━━
+💰 *Total Amount:* ₹${totalAmt}${advanceInfo}
+💳 *Payment Status:* PAID (via ${bill.payment_method || "Cash / UPI"})
+
+🔗 *View / Download Full Invoice:*
+${invoiceLink}
+
+${profile?.business_address ? `📍 ${profile.business_address}\n` : ""}Thank you for choosing *${businessName}*! We look forward to serving you again. 🙏😊`;
+
+        const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+        
+        toast("Opening WhatsApp with invoice message...", "success");
+        const waWin = window.open(waUrl, "_blank");
+        if (!waWin || waWin.closed || typeof waWin.closed === "undefined") {
+            window.location.href = waUrl;
         }
     });
 
