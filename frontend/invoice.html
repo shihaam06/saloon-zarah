@@ -625,37 +625,83 @@ async function init() {
         return;
     }
 
-    const { data: { user } } = await client.auth.getUser();
-    if (!user) { window.location.href = "login.html"; return; }
+    const BACKEND_URL =
+        window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
+            ? "http://localhost:3000"
+            : "https://saloon-zarah.onrender.com";
 
-    // Parallel fetch: bill + its items
-    const [billRes, itemsRes] = await Promise.all([
-        client.from("bills").select("*").eq("id", billId).eq("profile_id", user.id).single(),
-        client.from("bill_items").select("*").eq("bill_id", billId).order("created_at", { ascending: true })
-    ]);
+    let loaded = false;
 
-    if (billRes.error) { showError("Unable to load invoice. " + (billRes.error.message || "")); return; }
-
-    bill  = billRes.data;
-    items = itemsRes.data || [];
-
-    // Optionally load booking
-    if (bill.booking_id) {
-        const { data: bk } = await client.from("bookings").select("*").eq("id", bill.booking_id).single();
-        booking = bk || null;
+    // 1. Try public backend endpoint (works for both guests & salon staff)
+    try {
+        const apiRes = await fetch(`${BACKEND_URL}/api/public/bill/${encodeURIComponent(billId)}`);
+        if (apiRes.ok) {
+            const json = await apiRes.json();
+            if (json.success && json.bill) {
+                bill    = json.bill;
+                items   = json.items || [];
+                profile = json.profile || null;
+                booking = json.booking || null;
+                loaded  = true;
+            }
+        }
+    } catch (apiErr) {
+        console.warn("API bill fetch error, trying direct Supabase query:", apiErr);
     }
 
-    // Load business profile
-    const { data: profData } = await client
-        .from("profiles")
-        .select("business_name, business_address, business_phone")
-        .eq("id", user.id)
-        .single();
+    // 2. Fallback: Direct Supabase client query
+    if (!loaded) {
+        try {
+            const [billRes, itemsRes] = await Promise.all([
+                client.from("bills").select("*").eq("id", billId).maybeSingle(),
+                client.from("bill_items").select("*").eq("bill_id", billId).order("created_at", { ascending: true })
+            ]);
 
-    profile = profData || null;
+            if (billRes.data) {
+                bill  = billRes.data;
+                items = itemsRes.data || [];
 
-    renderInvoice(profile);
-    bindActions();
+                if (bill.booking_id) {
+                    const { data: bk } = await client
+                        .from("bookings")
+                        .select("*")
+                        .eq("id", bill.booking_id)
+                        .maybeSingle();
+                    booking = bk || null;
+                }
+
+                if (bill.profile_id) {
+                    const { data: profData } = await client
+                        .from("profiles")
+                        .select("business_name, business_address, business_phone")
+                        .eq("id", bill.profile_id)
+                        .maybeSingle();
+                    profile = profData || null;
+                }
+
+                loaded = true;
+            }
+        } catch (dbErr) {
+            console.error("Direct Supabase query error:", dbErr);
+        }
+    }
+
+    if (!loaded || !bill) {
+        showError("Invoice not found or no longer available.");
+        return;
+    }
+
+    // Check if staff is logged in
+    let isLoggedIn = false;
+    try {
+        const { data: userData } = await client.auth.getUser();
+        isLoggedIn = !!userData?.user;
+    } catch {
+        isLoggedIn = false;
+    }
+
+    renderInvoice(profile, isLoggedIn);
+    bindActions(isLoggedIn);
 }
 
 /* ── RENDER ───────────────────────────────────────────── */
@@ -790,13 +836,17 @@ function renderInvoice(profile) {
     el("invoiceCard").style.display  = "block";
     el("actionsBar").style.display   = "flex";
 
+    if (!isLoggedIn && el("smsBtn")) {
+        el("smsBtn").style.display = "none";
+    }
+
     // Update page title with business name
     const bName = profile?.business_name || "Kangro";
     document.title = `Invoice #${el("billNumber").textContent} | ${bName}`;
 }
 
 /* ── ACTIONS ──────────────────────────────────────────── */
-function bindActions() {
+function bindActions(isLoggedIn) {
 
     const BACKEND_URL =
         window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"

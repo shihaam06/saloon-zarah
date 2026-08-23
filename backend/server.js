@@ -5947,6 +5947,65 @@ app.get(
     }
 );
 
+// =====================================================
+// PUBLIC BILL / INVOICE API (FOR CUSTOMERS)
+// =====================================================
+
+app.get("/api/public/bill/:billId", async (req, res) => {
+    try {
+        const { billId } = req.params;
+        if (!billId) {
+            return res.status(400).json({ error: "Bill ID is required" });
+        }
+
+        const { data: bill, error: billError } = await supabase
+            .from("bills")
+            .select("*")
+            .eq("id", billId)
+            .maybeSingle();
+
+        if (billError || !bill) {
+            return res.status(404).json({ error: "Invoice not found" });
+        }
+
+        const { data: items } = await supabase
+            .from("bill_items")
+            .select("*")
+            .eq("bill_id", billId)
+            .order("created_at", { ascending: true });
+
+        let profile = null;
+        if (bill.profile_id) {
+            const { data: prof } = await supabase
+                .from("profiles")
+                .select("business_name, business_address, business_phone, upi_id")
+                .eq("id", bill.profile_id)
+                .maybeSingle();
+            profile = prof || null;
+        }
+
+        let booking = null;
+        if (bill.booking_id) {
+            const { data: bk } = await supabase
+                .from("bookings")
+                .select("*")
+                .eq("id", bill.booking_id)
+                .maybeSingle();
+            booking = bk || null;
+        }
+
+        return res.status(200).json({
+            success: true,
+            bill,
+            items: items || [],
+            profile,
+            booking
+        });
+    } catch (err) {
+        console.error("Public bill fetch error:", err);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 // =====================================================
 // MANUAL BOOKING
