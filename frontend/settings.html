@@ -874,6 +874,67 @@ textarea{
     </div>
 
     <!-- =========================
+         UPI & PAYMENT SETTINGS
+    ========================= -->
+
+    <div class="card full">
+
+        <div class="card-header">
+
+            <div class="card-icon icon-gst">
+                📱
+            </div>
+
+            <div>
+                <h2>UPI & Advance Payment</h2>
+                <p>Configure your salon's UPI payment details and QR code for customer bookings</p>
+            </div>
+
+        </div>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>UPI ID (VPA)</label>
+                <input
+                    id="upiId"
+                    type="text"
+                    placeholder="e.g. salon@okaxis"
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Default Advance Amount (₹)</label>
+                <input
+                    id="advanceAmount"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="500"
+                >
+            </div>
+
+            <div class="form-group full">
+                <label>UPI QR Code Image Path or URL</label>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input
+                        id="upiQrImage"
+                        type="text"
+                        placeholder="/images/zarah-elite-qr.png or https://..."
+                        style="flex:1;"
+                        oninput="updateQrPreview(this.value)"
+                    >
+                </div>
+                <div id="qrPreviewContainer" style="margin-top:10px; display:none;">
+                    <img id="qrPreviewImg" src="" alt="QR Code Preview" style="max-height:160px; border-radius:8px; border:1px solid #e2e8f0; padding:4px;">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =========================
      INSTAGRAM
 ========================= -->
 
@@ -953,6 +1014,18 @@ textarea{
 
 
 <script>
+
+function updateQrPreview(url) {
+    const container = document.getElementById("qrPreviewContainer");
+    const img = document.getElementById("qrPreviewImg");
+    if (!container || !img) return;
+    if (url && url.trim().length > 0) {
+        img.src = url.trim();
+        container.style.display = "block";
+    } else {
+        container.style.display = "none";
+    }
+}
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -1150,6 +1223,21 @@ if (data.instagram_connected) {
                     data.next_invoice_number ||
                     1;
 
+                // UPI and payment settings
+                const upiIdInput = document.getElementById("upiId");
+                const advanceAmountInput = document.getElementById("advanceAmount");
+                const upiQrImageInput = document.getElementById("upiQrImage");
+
+                if (upiIdInput) {
+                    upiIdInput.value = data.upi_id || "mohammedshihaamfayaz@okaxis";
+                }
+                if (advanceAmountInput) {
+                    advanceAmountInput.value = data.advance_amount !== undefined && data.advance_amount !== null ? data.advance_amount : 500;
+                }
+                if (upiQrImageInput) {
+                    upiQrImageInput.value = data.upi_qr_image || "/images/zarah-elite-qr.png";
+                    updateQrPreview(upiQrImageInput.value);
+                }
 
             }
             catch(error){
@@ -1279,7 +1367,22 @@ if (data.instagram_connected) {
                                     "nextInvoiceNumber"
                                 )
                                 .value
-                        ) || 1
+                        ) || 1,
+
+                    upi_id:
+                        document.getElementById("upiId")
+                            ? document.getElementById("upiId").value.trim()
+                            : "mohammedshihaamfayaz@okaxis",
+
+                    advance_amount:
+                        document.getElementById("advanceAmount") && document.getElementById("advanceAmount").value
+                            ? Number(document.getElementById("advanceAmount").value)
+                            : 500,
+
+                    upi_qr_image:
+                        document.getElementById("upiQrImage")
+                            ? document.getElementById("upiQrImage").value.trim()
+                            : "/images/zarah-elite-qr.png"
 
                 };
 

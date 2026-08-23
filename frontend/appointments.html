@@ -457,6 +457,39 @@ label {
 
 </div>
 
+<!-- PAYMENT PROOF MODAL -->
+<div
+    id="proofModal"
+    class="modal"
+    style="display:none;"
+>
+    <div class="modal-box" style="max-width:500px; text-align:center;">
+        <div class="modal-header">
+            <h2>Payment Proof Screenshot</h2>
+            <button
+                class="close"
+                onclick="closeProofModal()"
+            >
+                ×
+            </button>
+        </div>
+        <div style="margin-top:15px; margin-bottom:15px;">
+            <img
+                id="proofModalImg"
+                src=""
+                alt="Payment Proof Screenshot"
+                style="max-width:100%; max-height:60vh; border-radius:8px; border:1px solid #e2e8f0; object-fit:contain;"
+            >
+        </div>
+        <button
+            class="secondary"
+            onclick="closeProofModal()"
+            style="width:100%;"
+        >
+            Close
+        </button>
+    </div>
+</div>
 
 <script>
 
@@ -819,15 +852,42 @@ function renderAppointments(){
 
 
                 <td>
-                    ${escapeHtml(
-    appointment.advance_payment_status || "Pending"
-)}
+                    <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+                        <span style="display:inline-block; padding:3px 8px; border-radius:12px; font-size:12px; font-weight:600; ${
+                            appointment.advance_payment_status === 'Verified' || appointment.advance_payment_status === 'Paid'
+                            ? 'background:#dcfce7; color:#166534;'
+                            : appointment.advance_payment_status === 'Proof Received'
+                            ? 'background:#e0e7ff; color:#4338ca;'
+                            : 'background:#fef3c7; color:#92400e;'
+                        }">
+                            ${escapeHtml(appointment.advance_payment_status || "Pending")}
+                        </span>
+                        ${
+                            appointment.payment_proof_image
+                            ? `<a href="javascript:void(0)" onclick="openProofModal('${escapeHtml(appointment.payment_proof_image)}')" style="font-size:11px; color:#6366f1; text-decoration:underline; font-weight:500;">🔍 View Proof</a>`
+                            : ''
+                        }
+                    </div>
                 </td>
 
 
                 <td>
 
                     <div class="actions">
+
+                        ${
+                            appointment.advance_payment_status === 'Proof Received'
+                            ? `
+                            <button
+                                class="secondary"
+                                style="background:#6366f1; color:white; border:none; padding:6px 10px; font-size:12px; border-radius:6px;"
+                                onclick="verifyAdvancePayment('${appointment.id}')"
+                            >
+                                Verify Advance
+                            </button>
+                            `
+                            : ""
+                        }
 
                         ${
                             appointment.status === 'Scheduled' || appointment.status === 'Confirmed'
@@ -1218,6 +1278,51 @@ async function saveAppointment(){
 
 }
 
+
+/* =========================================
+   PAYMENT PROOF & VERIFICATION
+========================================= */
+
+function openProofModal(url) {
+    if (!url) return;
+    const modal = document.getElementById("proofModal");
+    const img = document.getElementById("proofModalImg");
+    if (modal && img) {
+        img.src = url;
+        modal.style.display = "flex";
+    }
+}
+
+function closeProofModal() {
+    const modal = document.getElementById("proofModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+async function verifyAdvancePayment(bookingId) {
+    if (!confirm("Confirm and mark this advance payment as Verified?")) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from("bookings")
+        .update({
+            advance_payment_status: "Verified",
+            verified_timestamp: new Date().toISOString(),
+            verified_by: currentUser.email || "Staff"
+        })
+        .eq("id", bookingId)
+        .eq("profile_id", currentUser.id);
+
+    if (error) {
+        console.error("VERIFY PAYMENT ERROR:", error);
+        alert("Unable to verify payment: " + error.message);
+        return;
+    }
+
+    await loadAppointments();
+}
 
 /* =========================================
    UPDATE STATUS

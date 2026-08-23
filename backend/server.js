@@ -31,6 +31,8 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+app.use("/images", express.static(path.join(__dirname, "../frontend/images")));
 // =====================================================
 // RAZORPAY WEBHOOK
 // IMPORTANT: MUST COME BEFORE express.json()
@@ -2169,6 +2171,80 @@ async function sendInstagramMessage(
 
     console.log(
         "✅ Instagram reply sent:",
+        data
+    );
+
+    return data;
+}
+
+// =====================================================
+// SEND INSTAGRAM IMAGE
+// =====================================================
+
+async function sendInstagramImage(
+    recipientId,
+    imageUrl,
+    profileId
+) {
+    if (!profileId) {
+        throw new Error(
+            "Instagram profile ID is required."
+        );
+    }
+
+    const accessToken =
+        await getInstagramAccessToken(
+            profileId
+        );
+
+    const response =
+        await fetch(
+            "https://graph.instagram.com/v23.0/me/messages",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    "Authorization":
+                        `Bearer ${accessToken}`
+                },
+
+                body: JSON.stringify({
+                    recipient: {
+                        id: recipientId
+                    },
+
+                    message: {
+                        attachment: {
+                            type: "image",
+                            payload: {
+                                url: imageUrl,
+                                is_reusable: true
+                            }
+                        }
+                    }
+                })
+            }
+        );
+
+    const data =
+        await response.json();
+
+    if (!response.ok) {
+        console.error(
+            "❌ Instagram send image failed:",
+            data
+        );
+
+        throw new Error(
+            JSON.stringify(data)
+        );
+    }
+
+    console.log(
+        "✅ Instagram image sent:",
         data
     );
 
@@ -4569,19 +4645,143 @@ const activeInstagramProfileId =
                 }
 
                 // -----------------------------------------
-                // GET CUSTOMER MESSAGE
+                // GET CUSTOMER DETAILS & ATTACHMENTS
                 // -----------------------------------------
 
                 const senderId =
                     event.sender?.id;
 
+                if (!senderId) {
+                    console.log(
+                        "⚠️ Instagram event missing sender id"
+                    );
+                    continue;
+                }
+
+                const instagramPhone =
+                    `instagram:${senderId}`;
+
+                let shouldSendQrCode = false;
+                let activeSalonQrUrl = null;
+
+                // -----------------------------------------
+                // DETECT PAYMENT SCREENSHOT / IMAGE ATTACHMENT
+                // -----------------------------------------
+
+                const attachments =
+                    event.message?.attachments || [];
+
+                const imageAttachment =
+                    attachments.find(a => a.type === "image");
+
+                const proofImageUrl =
+                    imageAttachment?.payload?.url;
+
+                if (proofImageUrl) {
+
+                    console.log(
+                        "📸 Detected payment screenshot / image from Instagram customer:",
+                        proofImageUrl
+                    );
+
+                    const { data: pendingBooking } =
+                        await supabase
+                            .from("bookings")
+                            .select("*")
+                            .eq("profile_id", activeInstagramProfileId)
+                            .eq("instagram_user_id", senderId)
+                            .eq("status", "Pending")
+                            .order("created_at", { ascending: false })
+                            .limit(1)
+                            .maybeSingle();
+
+                    if (pendingBooking) {
+
+                        const servicePrice =
+                            await getServicePrice(pendingBooking.service);
+
+                        const advAmount =
+                            Number(pendingBooking.advance_amount) ||
+                            ADVANCE_AMOUNT;
+
+                        const balance =
+                            Math.max(servicePrice - advAmount, 0);
+
+                        const { error: updateError } =
+                            await supabase
+                                .from("bookings")
+                                .update({
+                                    status:
+                                        "Confirmed",
+
+                                    advance_paid:
+                                        advAmount,
+
+                                    advance_payment_method:
+                                        "UPI",
+
+                                    advance_payment_status:
+                                        "Proof Received",
+
+                                    payment_proof_image:
+                                        proofImageUrl,
+
+                                    payment_proof_timestamp:
+                                        new Date().toISOString(),
+
+                                    balance_amount:
+                                        balance
+                                })
+                                .eq("id", pendingBooking.id);
+
+                        if (!updateError) {
+
+                            console.log(
+                                "✅ Booking confirmed via screenshot proof:",
+                                pendingBooking.id
+                            );
+
+                            const confirmationMessage = `Perfect! Payment proof received. Your appointment is confirmed. 😊
+
+✨ ${BUSINESS.name}
+
+Service: ${pendingBooking.service}
+Date: ${formatDateForCustomer(pendingBooking.booking_date)}
+Time: ${formatTimeForCustomer(pendingBooking.booking_time)}
+💳 Advance received: ₹${advAmount}
+💰 Balance remaining: ₹${balance}
+📍 ${BUSINESS.address}
+
+We look forward to seeing you! 😊`;
+
+                            await sendInstagramMessage(
+                                senderId,
+                                confirmationMessage,
+                                activeInstagramProfileId
+                            );
+
+                            addConversation(
+                                instagramPhone,
+                                "assistant",
+                                confirmationMessage
+                            );
+
+                            continue;
+                        }
+                    }
+                }
+
+                // -----------------------------------------
+                // GET TEXT MESSAGE
+                // -----------------------------------------
+
                 const message =
                     event.message?.text?.trim();
 
-                if (!senderId || !message) {
+                if (!message) {
 
                     console.log(
-                        "⚠️ Instagram message missing sender/text"
+                        "⚠️ Instagram message missing text"
                     );
 
                     continue;
@@ -4596,13 +4796,6 @@ const activeInstagramProfileId =
                     "💬 Instagram message:",
                     message
                 );
-
-                // -----------------------------------------
-                // INSTAGRAM CUSTOMER ID
-                // -----------------------------------------
-
-                const instagramPhone =
-                    `instagram:${senderId}`;
 
                 // -----------------------------------------
                 // SAVE CUSTOMER MESSAGE
@@ -4737,6 +4930,34 @@ const servicePrice =
                             "Instagram Customer";
 
                         // -----------------------------------------
+                        // FETCH SALON PROFILE PAYMENT SETTINGS
+                        // -----------------------------------------
+
+                        const { data: salonProf } =
+                            await supabase
+                                .from("profiles")
+                                .select("upi_id, upi_qr_image, advance_amount, business_name")
+                                .eq("id", activeInstagramProfileId)
+                                .maybeSingle();
+
+                        const salonAdvance =
+                            salonProf?.advance_amount
+                                ? Number(salonProf.advance_amount)
+                                : ADVANCE_AMOUNT;
+
+                        let salonQrUrl =
+                            salonProf?.upi_qr_image ||
+                            "/images/zarah-elite-qr.png";
+
+                        if (
+                            !salonQrUrl.startsWith("http://") &&
+                            !salonQrUrl.startsWith("https://")
+                        ) {
+                            salonQrUrl =
+                                `${PUBLIC_BASE_URL}/${salonQrUrl.replace(/^\//, "")}`;
+                        }
+
+                        // -----------------------------------------
                         // CHECK EXISTING PENDING BOOKING
                         // -----------------------------------------
 
@@ -4760,11 +4981,8 @@ const servicePrice =
                                 existingPending.id
                             );
 
-                            const paymentLink =
-                                await createRazorpayPaymentLink(
-                                    existingPending,
-                                    profileName
-                                );
+                            shouldSendQrCode = true;
+                            activeSalonQrUrl = salonQrUrl;
 
                             systemResult = `
 A pending booking already exists.
@@ -4789,14 +5007,14 @@ Appointment status:
 Pending payment
 
 Advance required:
-₹${ADVANCE_AMOUNT}
+₹${salonAdvance}
 
-Razorpay payment link:
-${paymentLink.short_url}
+Tell the customer:
+"The advance payment for your appointment is ₹${salonAdvance}.
+Please scan the QR code below to make the payment.
+Once you've paid, please send me a screenshot of the payment confirmation."
 
-Ask the customer naturally to complete the ₹${ADVANCE_AMOUNT} advance using the payment link.
-
-Do NOT say the appointment is confirmed.
+Do NOT say the appointment is confirmed yet.
 `;
 
                         }
@@ -4859,20 +5077,20 @@ source:
                                         true,
 
                                     advance_amount:
-                                        ADVANCE_AMOUNT,
+                                        salonAdvance,
 
                                     advance_paid:
                                         0,
 
                                     advance_payment_method:
-                                        "Razorpay",
+                                        "UPI",
 
                                     advance_payment_status:
                                         "Pending",
 
                                     balance_amount:
     Math.max(
-        servicePrice - ADVANCE_AMOUNT,
+        servicePrice - salonAdvance,
         0
     )
 
@@ -4922,20 +5140,8 @@ Apologize naturally and ask the customer to try again.
     phone: booking.phone
 });
 
-                                // -----------------------------------------
-                                // CREATE RAZORPAY PAYMENT LINK
-                                // -----------------------------------------
-
-                                const paymentLink =
-                                    await createRazorpayPaymentLink(
-                                        createdBooking,
-                                        profileName
-                                    );
-
-                                console.log(
-                                    "💳 INSTAGRAM RAZORPAY LINK:",
-                                    paymentLink.short_url
-                                );
+                                shouldSendQrCode = true;
+                                activeSalonQrUrl = salonQrUrl;
 
                                 // -----------------------------------------
                                 // SEND PAYMENT INFO TO AI
@@ -4964,22 +5170,18 @@ Service price:
 ₹${servicePrice}
 
 Advance:
-₹${ADVANCE_AMOUNT}
-
-Razorpay payment link:
-${paymentLink.short_url}
+₹${salonAdvance}
 
 Remaining balance after advance:
 ₹${Math.max(
-    servicePrice - ADVANCE_AMOUNT,
+    servicePrice - salonAdvance,
     0
 )}
 
-Tell the customer naturally that their slot is reserved pending the ₹${ADVANCE_AMOUNT} advance.
-
-Tell them to complete the payment using the Razorpay payment link.
-
-Do NOT ask them to reply PAID.
+Tell the customer:
+"The advance payment for your appointment is ₹${salonAdvance}.
+Please scan the QR code below to make the payment.
+Once you've paid, please send me a screenshot of the payment confirmation."
 
 Do NOT say the appointment is confirmed.
 `;
@@ -5132,14 +5334,40 @@ Do not invent:
                 // -----------------------------------------
 
                 await sendInstagramMessage(
-    senderId,
-    reply,
-    activeInstagramProfileId
-);
+                    senderId,
+                    reply,
+                    activeInstagramProfileId
+                );
 
                 console.log(
                     "✅ Instagram reply completed"
                 );
+
+                // -----------------------------------------
+                // SEND UPI QR CODE IMAGE IF REQUIRED
+                // -----------------------------------------
+
+                if (shouldSendQrCode && activeSalonQrUrl) {
+                    try {
+                        console.log(
+                            "📸 Sending UPI QR image to Instagram customer:",
+                            activeSalonQrUrl
+                        );
+                        await sendInstagramImage(
+                            senderId,
+                            activeSalonQrUrl,
+                            activeInstagramProfileId
+                        );
+                        console.log(
+                            "✅ Instagram UPI QR image sent successfully"
+                        );
+                    } catch (imgErr) {
+                        console.error(
+                            "⚠️ Failed to send Instagram UPI QR image:",
+                            imgErr
+                        );
+                    }
+                }
             }
         }
 
