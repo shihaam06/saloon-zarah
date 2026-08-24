@@ -854,6 +854,9 @@ async function getServicesFromDatabase() {
             id,
             name,
             item_type,
+            category,
+            available_for,
+            duration,
             price,
             hsn_sac,
             gst_rate
@@ -6427,7 +6430,7 @@ async function generateMenuPDF() {
 
 
                 // =====================================
-                // SERVICES
+                // SERVICES GROUPED BY CATEGORY
                 // =====================================
 
                 if (!services.length) {
@@ -6445,42 +6448,52 @@ async function generateMenuPDF() {
 
                 } else {
 
-                    services.forEach(
-                        service => {
+                    // Group services by category
+                    const grouped = {};
+                    services.forEach(service => {
+                        const cat = (service.category || "General Services").toUpperCase();
+                        if (!grouped[cat]) grouped[cat] = [];
+                        grouped[cat].push(service);
+                    });
 
-                            const price =
-                                Number(
-                                    service.price
-                                ) || 0;
+                    Object.entries(grouped).forEach(([categoryName, catServices]) => {
+                        // Category Header
+                        doc
+                            .fontSize(13)
+                            .font("Helvetica-Bold")
+                            .fillColor("#e98272")
+                            .text(categoryName);
 
+                        doc
+                            .strokeColor("#e2e8f0")
+                            .lineWidth(0.5)
+                            .moveTo(45, doc.y + 2)
+                            .lineTo(550, doc.y + 2)
+                            .stroke();
 
-                            doc
-                                .fontSize(12)
-                                .font(
-                                    "Helvetica-Bold"
-                                )
-                                .fillColor("#111111")
-                                .text(
-                                    service.name,
-                                    {
-                                        continued: true
-                                    }
-                                );
+                        doc.moveDown(0.4);
 
-
-                            doc
-                                .font(
-                                    "Helvetica"
-                                )
-                                .text(
-                                    `    â‚¹${price.toLocaleString("en-IN")}`
-                                );
-
+                        catServices.forEach(service => {
+                            const price = Number(service.price) || 0;
+                            const durationText = service.duration ? ` (${service.duration})` : "";
+                            const itemY = doc.y;
 
                             doc
-                                .moveDown(0.5);
-                        }
-                    );
+                                .fontSize(10)
+                                .font("Helvetica-Bold")
+                                .fillColor("#1e293b")
+                                .text(service.name + durationText, 45, itemY, { width: 380 });
+
+                            doc
+                                .font("Helvetica")
+                                .fillColor("#0f172a")
+                                .text(`₹${price.toLocaleString("en-IN")}`, 430, itemY, { width: 120, align: "right" });
+
+                            doc.moveDown(0.3);
+                        });
+
+                        doc.moveDown(0.8);
+                    });
 
                 }
 

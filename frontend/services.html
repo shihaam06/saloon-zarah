@@ -510,8 +510,19 @@ tr:hover {
     <div class="toolbar">
         <input id="search" class="search" type="text" placeholder="Search services...">
 
+        <select id="genderFilter" class="filter">
+            <option value="all">All Genders</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Everyone">Everyone</option>
+        </select>
+
+        <select id="categoryFilter" class="filter">
+            <option value="all">All Categories</option>
+        </select>
+
         <select id="filter" class="filter">
-            <option value="all">All Services</option>
+            <option value="all">All Statuses</option>
             <option value="active">Active Only</option>
             <option value="inactive">Inactive Only</option>
         </select>
@@ -533,7 +544,7 @@ tr:hover {
                     </tr>
                 </thead>
                 <tbody id="servicesTable">
-                    <tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Loading services...</td></tr>
+                    <tr><td colspan="8" style="text-align:center; padding:30px; color:#94a3b8;">Loading services...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -551,29 +562,37 @@ tr:hover {
         </div>
 
         <div class="form-grid">
-            <div class="form-group full">
-                <label>Service Name *</label>
-                <input id="name" type="text" placeholder="e.g. Haircut & Styling">
-            </div>
-
+            <!-- 1. Gender Selection -->
             <div class="form-group">
-                <label>Category</label>
-                <select id="category">
-                    <option value="Uncategorized">Uncategorized</option>
-                    <option value="Hair Cut">Hair Cut</option>
-                    <option value="Hair Colouring">Hair Colouring</option>
-                    <option value="Waxing">Waxing</option>
-                    <option value="Massage">Massage</option>
-                    <option value="Facial">Facial</option>
-                    <option value="Nails">Nails</option>
+                <label>Gender / Available For *</label>
+                <select id="availableFor">
+                    <option value="Female" selected>Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Everyone">Everyone</option>
                 </select>
             </div>
 
+            <!-- 2. Category Dropdown (dynamically populated based on gender) -->
+            <div class="form-group">
+                <label>Category *</label>
+                <select id="category">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+
+            <!-- 3. Service Name -->
+            <div class="form-group full">
+                <label>Service Name *</label>
+                <input id="name" type="text" placeholder="e.g. Regular Wax - Full Hands / O3+ Facial">
+            </div>
+
+            <!-- 4. Price -->
             <div class="form-group">
                 <label>Price (₹) *</label>
                 <input id="price" type="number" min="0" step="0.01" placeholder="400">
             </div>
 
+            <!-- 5. Duration -->
             <div class="form-group">
                 <label>Duration</label>
                 <select id="duration">
@@ -586,15 +605,7 @@ tr:hover {
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Available For</label>
-                <select id="availableFor">
-                    <option value="Everyone" selected>Everyone</option>
-                    <option value="Female">Female</option>
-                    <option value="Male">Male</option>
-                </select>
-            </div>
-
+            <!-- 6. Other existing fields -->
             <div class="form-group">
                 <label>Turn Around Time (TAT)</label>
                 <input id="tat" type="text" placeholder="e.g. 5 min">
@@ -631,6 +642,118 @@ tr:hover {
 <script src="js/ownerLock.js"></script>
 
 <script>
+// ==========================================
+// SIMPLIFIED CATEGORY STRUCTURES
+// ==========================================
+const FEMALE_CATEGORIES = [
+    "Hair",
+    "Threading",
+    "Waxing",
+    "Facials & Skin Care",
+    "Manicure & Pedicure",
+    "Body Care",
+    "Massage",
+    "Makeup & Styling",
+    "Bridal",
+    "Packages"
+];
+
+const MALE_CATEGORIES = [
+    "Hair & Beard",
+    "Threading",
+    "Waxing",
+    "Facials & Skin Care",
+    "Manicure & Pedicure",
+    "Body Care",
+    "Massage",
+    "Grooming",
+    "Makeup",
+    "Packages"
+];
+
+const ALL_CATEGORIES = [
+    "Hair",
+    "Hair & Beard",
+    "Threading",
+    "Waxing",
+    "Facials & Skin Care",
+    "Manicure & Pedicure",
+    "Body Care",
+    "Massage",
+    "Makeup & Styling",
+    "Bridal",
+    "Grooming",
+    "Makeup",
+    "Packages"
+];
+
+// Map any legacy or sub-type category names into standard parent categories
+function normalizeCategory(catName, gender = "Female") {
+    if (!catName || catName === "Uncategorized") {
+        return gender === "Male" ? "Hair & Beard" : "Hair";
+    }
+    const c = String(catName).trim().toLowerCase();
+
+    // Waxing
+    if (c.includes("wax")) return "Waxing";
+
+    // Facials & Skin Care
+    if (c.includes("facial") || c.includes("skin") || c.includes("o3") || c.includes("kanpeki") || 
+        c.includes("masque") || c.includes("bleach") || c.includes("cleanup") || c.includes("clean up") || 
+        c.includes("detox") || c.includes("lightening")) {
+        return "Facials & Skin Care";
+    }
+
+    // Threading
+    if (c.includes("thread")) return "Threading";
+
+    // Manicure & Pedicure / Nails
+    if (c.includes("manicure") || c.includes("pedicure") || c.includes("nail") || c.includes("mani") || c.includes("pedi")) {
+        return "Manicure & Pedicure";
+    }
+
+    // Body Care / Scrub / Polish
+    if (c.includes("body") || c.includes("scrub") || c.includes("polish") || c.includes("polishing") || c.includes("wrap")) {
+        return "Body Care";
+    }
+
+    // Massage / Spa
+    if (c.includes("massage") || c.includes("spa")) return "Massage";
+
+    // Bridal
+    if (c.includes("bridal") || c.includes("bride")) {
+        return gender === "Male" ? "Grooming" : "Bridal";
+    }
+
+    // Grooming (Male)
+    if (c.includes("groom")) return "Grooming";
+
+    // Makeup / Styling
+    if (c.includes("makeup") || c.includes("make up") || c.includes("styling") || c.includes("draping") || c.includes("saree")) {
+        return gender === "Male" ? "Makeup" : "Makeup & Styling";
+    }
+
+    // Packages
+    if (c.includes("package") || c.includes("combo")) return "Packages";
+
+    // Hair / Hair & Beard
+    if (c.includes("hair") || c.includes("beard") || c.includes("shave") || c.includes("cut") || 
+        c.includes("colour") || c.includes("color") || c.includes("keratin") || c.includes("botox") || 
+        c.includes("wash") || c.includes("blowdry") || c.includes("straightening") || c.includes("smoothening")) {
+        return gender === "Male" ? "Hair & Beard" : "Hair";
+    }
+
+    // Exact matches
+    const all = gender === "Male" ? MALE_CATEGORIES : FEMALE_CATEGORIES;
+    const match = all.find(x => x.toLowerCase() === c);
+    if (match) return match;
+
+    const generalMatch = ALL_CATEGORIES.find(x => x.toLowerCase() === c);
+    if (generalMatch) return generalMatch;
+
+    return gender === "Male" ? "Hair & Beard" : "Hair";
+}
+
 document.addEventListener("DOMContentLoaded", async function(){
     const client = window.client;
     let currentUser = null;
@@ -641,6 +764,74 @@ document.addEventListener("DOMContentLoaded", async function(){
     const servicesTable = document.getElementById("servicesTable");
     const search = document.getElementById("search");
     const filter = document.getElementById("filter");
+    const genderFilter = document.getElementById("genderFilter");
+    const categoryFilter = document.getElementById("categoryFilter");
+    const availableForSelect = document.getElementById("availableFor");
+    const categorySelect = document.getElementById("category");
+
+    // Populate category dropdown based on selected gender
+    function updateCategoryDropdown(gender, selectedCategory = "") {
+        let categories = FEMALE_CATEGORIES;
+        if (gender === "Male") {
+            categories = MALE_CATEGORIES;
+        } else if (gender === "Everyone") {
+            categories = ALL_CATEGORIES;
+        }
+
+        categorySelect.innerHTML = "";
+        categories.forEach(cat => {
+            const opt = document.createElement("option");
+            opt.value = cat;
+            opt.textContent = cat;
+            categorySelect.appendChild(opt);
+        });
+
+        // Set selected value
+        const normalized = normalizeCategory(selectedCategory, gender);
+        if (normalized && categories.includes(normalized)) {
+            categorySelect.value = normalized;
+        } else if (selectedCategory && categories.includes(selectedCategory)) {
+            categorySelect.value = selectedCategory;
+        } else {
+            categorySelect.value = categories[0];
+        }
+    }
+
+    // Populate Category Filter dropdown in toolbar
+    function populateCategoryFilter() {
+        const currentVal = categoryFilter.value;
+        categoryFilter.innerHTML = `<option value="all">All Categories</option>`;
+        
+        const selectedGender = genderFilter.value;
+        let cats = ALL_CATEGORIES;
+        if (selectedGender === "Female") cats = FEMALE_CATEGORIES;
+        if (selectedGender === "Male") cats = MALE_CATEGORIES;
+
+        cats.forEach(cat => {
+            const opt = document.createElement("option");
+            opt.value = cat;
+            opt.textContent = cat;
+            categoryFilter.appendChild(opt);
+        });
+
+        if (cats.includes(currentVal)) {
+            categoryFilter.value = currentVal;
+        } else {
+            categoryFilter.value = "all";
+        }
+    }
+
+    // When modal gender changes, update category dropdown
+    availableForSelect.addEventListener("change", function() {
+        const currentCat = categorySelect.value;
+        updateCategoryDropdown(this.value, currentCat);
+    });
+
+    // When toolbar gender filter changes, update category filter options
+    genderFilter.addEventListener("change", function() {
+        populateCategoryFilter();
+        render();
+    });
 
     async function getUser(){
         const { data, error } = await client.auth.getUser();
@@ -672,28 +863,43 @@ document.addEventListener("DOMContentLoaded", async function(){
 
         if(error){
             console.error("Error loading services:", error);
-            servicesTable.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:#dc2626;">Failed to load services.</td></tr>`;
+            servicesTable.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:#dc2626;">Failed to load services.</td></tr>`;
             return;
         }
 
         allServices = data || [];
+        populateCategoryFilter();
         render();
     }
 
     function render(){
         const query = search.value.toLowerCase().trim();
-        const selectedFilter = filter.value;
+        const selectedStatus = filter.value;
+        const selectedGender = genderFilter.value;
+        const selectedCategory = categoryFilter.value;
 
         servicesTable.innerHTML = "";
 
         const filtered = allServices.filter(item => {
-            const matchesSearch = (item.name || "").toLowerCase().includes(query);
-            let matchesFilter = true;
+            const matchesSearch = (item.name || "").toLowerCase().includes(query) ||
+                                  (item.category || "").toLowerCase().includes(query);
+            
+            let matchesStatus = true;
+            if(selectedStatus === "active") matchesStatus = item.active === true;
+            if(selectedStatus === "inactive") matchesStatus = item.active === false;
 
-            if(selectedFilter === "active") matchesFilter = item.active === true;
-            if(selectedFilter === "inactive") matchesFilter = item.active === false;
+            let matchesGender = true;
+            if(selectedGender !== "all") {
+                matchesGender = (item.available_for || "Everyone") === selectedGender;
+            }
 
-            return matchesSearch && matchesFilter;
+            let matchesCategory = true;
+            if(selectedCategory !== "all") {
+                const normCat = normalizeCategory(item.category, item.available_for);
+                matchesCategory = (item.category === selectedCategory || normCat === selectedCategory);
+            }
+
+            return matchesSearch && matchesStatus && matchesGender && matchesCategory;
         });
 
         if(filtered.length === 0){
@@ -702,10 +908,11 @@ document.addEventListener("DOMContentLoaded", async function(){
         }
 
         filtered.forEach(item => {
+            const displayCategory = normalizeCategory(item.category, item.available_for);
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><span class="name">${escapeHtml(item.name)}</span></td>
-                <td><span class="category">${escapeHtml(item.category || "Uncategorized")}</span></td>
+                <td><span class="category" style="background:#f1f5f9; color:#475569; padding:4px 8px; border-radius:6px; font-weight:600; font-size:11px;">${escapeHtml(displayCategory)}</span></td>
                 <td><span class="duration">${escapeHtml(item.duration || "30 min")}</span></td>
                 <td><span class="available-for">${escapeHtml(item.available_for || "Everyone")}</span></td>
                 <td>₹${Number(item.price || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
@@ -743,11 +950,15 @@ document.addEventListener("DOMContentLoaded", async function(){
         editingId = id;
         document.getElementById("modalTitle").textContent = "Edit Service";
         document.getElementById("saveServiceBtn").textContent = "Save Changes";
+        
+        const gender = item.available_for || "Female";
+        document.getElementById("availableFor").value = gender;
+        
+        updateCategoryDropdown(gender, item.category);
+
         document.getElementById("name").value = item.name || "";
         document.getElementById("price").value = item.price || 0;
-        document.getElementById("category").value = item.category || "Uncategorized";
         document.getElementById("duration").value = item.duration || "30 min";
-        document.getElementById("availableFor").value = item.available_for || "Everyone";
         document.getElementById("tat").value = item.turnaround_time || "";
         document.getElementById("hsnSac").value = item.hsn_sac || "";
         document.getElementById("gstRate").value = item.gst_rate || 0;
@@ -756,11 +967,11 @@ document.addEventListener("DOMContentLoaded", async function(){
     };
 
     document.getElementById("saveServiceBtn").addEventListener("click", async function(){
+        const availableFor = document.getElementById("availableFor").value;
+        const category = document.getElementById("category").value;
         const name = document.getElementById("name").value.trim();
         const price = Number(document.getElementById("price").value);
-        const category = document.getElementById("category").value;
         const duration = document.getElementById("duration").value;
-        const availableFor = document.getElementById("availableFor").value;
         const tat = document.getElementById("tat").value.trim();
         const hsnSac = document.getElementById("hsnSac").value.trim();
         const gstRate = Number(document.getElementById("gstRate").value);
@@ -832,11 +1043,11 @@ document.addEventListener("DOMContentLoaded", async function(){
     };
 
     function clearForm(){
+        document.getElementById("availableFor").value = "Female";
+        updateCategoryDropdown("Female", "Hair");
         document.getElementById("name").value = "";
         document.getElementById("price").value = "";
-        document.getElementById("category").value = "Uncategorized";
         document.getElementById("duration").value = "30 min";
-        document.getElementById("availableFor").value = "Everyone";
         document.getElementById("tat").value = "";
         document.getElementById("hsnSac").value = "";
         document.getElementById("gstRate").value = "18";
@@ -857,6 +1068,7 @@ document.addEventListener("DOMContentLoaded", async function(){
 
     search.addEventListener("input", render);
     filter.addEventListener("change", render);
+    categoryFilter.addEventListener("change", render);
 
     function escapeHtml(value){
         return String(value || "")
