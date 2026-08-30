@@ -3068,30 +3068,30 @@ The customer asked about the product: "${dbProduct.name}".
 Product Details from Inventory Database:
 - Name: ${dbProduct.name}
 - Category: ${dbProduct.category || "General"}
-- Price: Ã¢â€šÂ¹${dbProduct.price}
+- Price: ₹${dbProduct.price}
 - Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
 
 Respond naturally to the customer with the exact price and availability.
-If in stock, tell them they can purchase it at the salon during their visit.
+If in stock, tell them how they can order or purchase it.
 `;
                 } else if (allProducts && allProducts.length > 0) {
                     const productListText = allProducts
                         .slice(0, 10)
-                        .map(p => `- ${p.name} (Ã¢â€šÂ¹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
+                        .map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
                         .join("\n");
 
                     systemResult = `
-The customer is asking about products/retail items available in the salon.
+The customer is asking about available products/services.
 Available Products in Inventory Database:
 ${productListText}
 
-Tell the customer what products we currently carry and their prices.
+Tell the customer what we currently carry and their prices.
 Do NOT invent products that are not listed here.
 `;
                 } else {
                     systemResult = `
-The customer asked about products, but no retail products are currently listed in the inventory database.
-Tell the customer politely that retail product stock is currently being updated and offer to help with salon services or appointments.
+The customer asked about products or services, but nothing is currently listed in the catalog.
+Tell the customer politely that the catalog is being updated and offer to answer any other questions.
 `;
                 }
             }
@@ -3102,11 +3102,11 @@ Tell the customer politely that retail product stock is currently being updated 
             else if (
     booking.intent === "hours"
 ) {
-
+    const bizProfile = await getBusinessProfile(activeProfileId);
     systemResult = `
 The business is open during these hours:
 
-${BUSINESS.hours}
+${bizProfile.hours || BUSINESS.hours}
 
 Answer naturally.
 `;
@@ -3120,11 +3120,11 @@ Answer naturally.
             else if (
     booking.intent === "location"
 ) {
-
+    const bizProfile = await getBusinessProfile(activeProfileId);
     systemResult = `
 The business is located at:
 
-${BUSINESS.address}
+${bizProfile.address || BUSINESS.address}
 
 Answer naturally.
 `;
@@ -5077,19 +5077,19 @@ ${formatTimeForCustomer(
 )}
 
 Service price:
-Ã¢â€šÂ¹${servicePrice}
+₹${servicePrice}
 
 Advance:
-Ã¢â€šÂ¹${salonAdvance}
+₹${salonAdvance}
 
 Remaining balance after advance:
-Ã¢â€šÂ¹${Math.max(
+₹${Math.max(
     servicePrice - salonAdvance,
     0
 )}
 
 Tell the customer:
-"The advance payment for your appointment is Ã¢â€šÂ¹${salonAdvance}.
+"The advance payment for your appointment is ₹${salonAdvance}.
 Please scan the QR code below to make the payment.
 Once you've paid, please send me a screenshot of the payment confirmation."
 
@@ -5110,9 +5110,10 @@ Do NOT say the appointment is confirmed.
 else if (
     booking?.intent === "services"
 ) {
-
+    const igBiz = await getBusinessProfile(activeInstagramProfileId);
+    if (igBiz.isSalon) {
     systemResult = `
-The customer is asking for the salon's service menu.
+The customer is asking for the business's service menu.
 
 The complete current service menu is available here:
 
@@ -5125,6 +5126,24 @@ Send the URL exactly as provided.
 Do NOT list individual services or prices in the message.
 Do NOT invent any services or prices.
 `;
+    } else {
+        const allProds = await getInventoryFromDatabase(activeInstagramProfileId);
+        if (allProds && allProds.length > 0) {
+            const prodText = allProds.slice(0, 10).map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Made to Order"}`).join("\n");
+            systemResult = `
+The customer is asking about available products.
+Available Products:
+${prodText}
+
+Tell the customer about what we sell and their prices in a friendly way.
+`;
+        } else {
+            systemResult = `
+The customer is asking about products or services.
+Tell the customer that the catalog is being updated and to DM for the latest availability and pricing.
+`;
+        }
+    }
 }
 
                 else if (
@@ -5142,19 +5161,18 @@ The customer asked about the product: "${dbProduct.name}".
 Product Details from Inventory Database:
 - Name: ${dbProduct.name}
 - Category: ${dbProduct.category || "General"}
-- Price: Ã¢â€šÂ¹${dbProduct.price}
-- Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
+- Price: ₹${dbProduct.price}
+- Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock / Made to Order"}
 
 Respond naturally to the customer with the exact price and stock availability.
 `;
                     } else if (allProducts && allProducts.length > 0) {
                         const productListText = allProducts
                             .slice(0, 10)
-                            .map(p => `- ${p.name} (Ã¢â€šÂ¹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
+                            .map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
                             .join("\n");
 
                         systemResult = `
-The customer is asking about products available in the salon.
 Available Products in Inventory Database:
 ${productListText}
 
@@ -5162,16 +5180,16 @@ Tell the customer what products we currently carry and their prices.
 `;
                     } else {
                         systemResult = `
-The customer asked about products, but no retail products are currently listed in the inventory.
-Tell the customer politely that retail product stock is currently being updated.
+The customer asked about products or services, but nothing is currently listed in the catalog.
+Tell the customer politely that the catalog is being updated and offer to answer any other questions.
 `;
                     }
                 }
 
                 else {
-
+                    const igBizFallback = await getBusinessProfile(activeInstagramProfileId);
                     systemResult = `
-The customer contacted the salon through Instagram.
+The customer contacted ${igBizFallback.name} through Instagram.
 
 Customer message:
 ${message}
@@ -5179,23 +5197,18 @@ ${message}
 Intent:
 ${booking?.intent || ""}
 
-Service:
-${booking?.service || ""}
-
-Date:
-${booking?.booking_date || ""}
-
-Time:
-${booking?.booking_time || ""}
+${igBizFallback.isSalon
+    ? `Service: ${booking?.service || ""}\nDate: ${booking?.booking_date || ""}\nTime: ${booking?.booking_time || ""}`
+    : `Product/Order: ${booking?.service || booking?.product_name || ""}`
+}
 
 Respond naturally and helpfully.
 
 Do not invent:
-- services
+- services or products
 - prices
 - availability
-- bookings
-- payments
+- bookings or payments
 `;
                 }
 
