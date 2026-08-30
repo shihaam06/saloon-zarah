@@ -144,33 +144,42 @@ h1,h2,h3{letter-spacing:-.045em}
 .hero-note b{color:#344054}
 .dot-green{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
 
-/* MOCKUP - STRAIGHT & POLISHED */
-.salon-mockup{background:#0F172A;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:12px;box-shadow:0 28px 75px rgba(0,0,0,.25);transform:none}
-.mockup-bar{height:30px;display:flex;align-items:center;gap:7px;padding:0 8px;margin-bottom:8px}
-.wdot{width:10px;height:10px;border-radius:50%;display:inline-block}
-.wdot.red{background:#FF5F56}
-.wdot.yellow{background:#FFBD2E}
-.wdot.green{background:#27C93F}
-.wtitle{font-size:11px;font-weight:600;color:#94A3B8;margin-left:8px;letter-spacing:.02em}
+/* AI PHONE BOOKING CHAT SIMULATOR */
+.chat-sim-wrapper{position:relative;max-width:440px;margin:auto;width:100%}
+.chat-sim-phone{background:#0B0F19;border:1px solid rgba(255,255,255,.14);border-radius:28px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 50px rgba(225,29,72,.15);position:relative}
+.chat-sim-header{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:16px}
+.chat-sim-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#E11D48,#BE123C);display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff;box-shadow:0 4px 14px rgba(225,29,72,.45)}
+.chat-sim-title{font-size:13.5px;font-weight:700;color:#F8FAFC}
+.chat-sim-status{font-size:11px;color:#22C55E;display:flex;align-items:center;gap:5px;margin-top:1px}
+.chat-sim-pulse{width:6px;height:6px;border-radius:50%;background:#22C55E;animation:pulseDot 2s infinite}
 
-.mockup-body{background:#F8FAFC;border-radius:14px;overflow:hidden;display:grid;grid-template-columns:116px 1fr;min-height:390px}
-.mock-side{background:#111827;color:#98A2B3;padding:18px 10px}
-.mock-brand{font-family:Manrope;font-size:11px;font-weight:800;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:5px}
-.mock-link{font-size:9px;padding:8px 8px;border-radius:7px;margin:3px 0}
-.mock-link.active{background:#273449;color:#fff}
-.mock-content{padding:18px}
-.mock-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.mock-head h4{font-size:15px}
-.mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.mock-stat{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:10px}
-.mock-stat label{font-size:8px;color:#98A2B3;display:block}
-.mock-stat strong{font-family:Manrope;font-size:15px;display:block;margin-top:2px}
-.mock-table{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:12px}
-.mock-table-head{font-size:9px;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between}
-.mock-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F2F4F7;font-size:8px}
-.mock-row:last-child{border:0}
-.badge-paid{background:#ECFDF3;color:#027A48;padding:2px 6px;border-radius:4px;font-weight:700}
-.badge-ai{background:#EFF6FF;color:#2563EB;padding:2px 6px;border-radius:4px;font-weight:700}
+.chat-sim-messages{display:flex;flex-direction:column;gap:10px;min-height:300px}
+.sim-msg{padding:10px 14px;font-size:12.5px;line-height:1.45;opacity:0;transform:translateY(12px);transition:all .35s cubic-bezier(0.16, 1, 0.3, 1)}
+.sim-msg.show{opacity:1;transform:translateY(0)}
+.sim-msg.user{background:#1E293B;color:#E2E8F0;border-radius:16px 16px 16px 4px;align-self:flex-start;max-width:82%;border:1px solid rgba(255,255,255,.06)}
+.sim-msg.ai{background:linear-gradient(135deg,#E11D48,#BE123C);color:#fff;border-radius:16px 16px 4px 16px;align-self:flex-end;max-width:85%;box-shadow:0 4px 16px rgba(225,29,72,.35)}
+
+/* TYPING INDICATOR */
+.sim-typing{display:none;align-self:flex-start;background:#1E293B;padding:10px 14px;border-radius:14px;gap:5px;align-items:center;border:1px solid rgba(255,255,255,.06);margin-bottom:4px}
+.sim-typing.show{display:inline-flex}
+.sim-dot{width:6px;height:6px;background:#94A3B8;border-radius:50%;animation:simBounce 1.2s infinite ease-in-out}
+.sim-dot:nth-child(2){animation-delay:.2s}
+.sim-dot:nth-child(3){animation-delay:.4s}
+
+/* CONFIRMATION CARD */
+.sim-confirm{background:rgba(15,23,42,.95);border:1px solid rgba(34,197,94,.4);border-radius:14px;padding:14px;margin-top:6px;opacity:0;transform:scale(0.95);transition:all .4s ease}
+.sim-confirm.show{opacity:1;transform:scale(1)}
+.sim-confirm-head{display:flex;align-items:center;gap:6px;color:#22C55E;font-size:12.5px;font-weight:700;margin-bottom:8px}
+.sim-confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px}
+.sim-confirm-row{color:#94A3B8}
+.sim-confirm-row b{color:#F1F5F9;font-weight:600;display:block}
+
+/* FLOATING BADGES */
+.sim-float-top{position:absolute;top:-12px;left:-16px;background:#0F172A;border:1px solid rgba(34,197,94,.4);color:#F8FAFC;padding:7px 14px;border-radius:12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 12px 30px rgba(0,0,0,.4);z-index:2}
+.sim-float-bottom{position:absolute;bottom:14px;right:-18px;background:#0F172A;border:1px solid rgba(225,29,72,.4);color:#F8FAFC;padding:8px 14px;border-radius:12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 12px 30px rgba(0,0,0,.4);z-index:2}
+
+@keyframes simBounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
 /* TRUST */
 .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;background:#fff}
@@ -324,38 +333,62 @@ h1,h2,h3{letter-spacing:-.045em}
     </div>
 
     <div>
-      <div class="salon-mockup">
-        <div class="mockup-bar">
-          <span class="wdot red"></span>
-          <span class="wdot yellow"></span>
-          <span class="wdot green"></span>
-          <span class="wtitle">SAL Salon OS — Live Console</span>
+      <div class="chat-sim-wrapper">
+        <div class="sim-float-top">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>97% booked automatically</span>
         </div>
-        <div class="mockup-body">
-          <div class="mock-side">
-            <div class="mock-brand">✂️ SAL</div>
-            <div class="mock-link active">Dashboard</div>
-            <div class="mock-link">Appointments</div>
-            <div class="mock-link">Calendar</div>
-            <div class="mock-link">Services</div>
-            <div class="mock-link">Staff</div>
-            <div class="mock-link">Billing</div>
-            <div class="mock-link">Analytics</div>
-          </div>
-          <div class="mock-content">
-            <div class="mock-head"><h4>Today's Appointments</h4><span class="badge-ai">🤖 AI Active</span></div>
-            <div class="mock-grid">
-              <div class="mock-stat"><label>Today's Bookings</label><strong>18</strong></div>
-              <div class="mock-stat"><label>Revenue</label><strong>₹14,850</strong></div>
-              <div class="mock-stat"><label>Advance Verified</label><strong>₹4,500</strong></div>
-            </div>
-            <div class="mock-table">
-              <div class="mock-table-head"><span>Client & Service</span><span>Status</span></div>
-              <div class="mock-row"><span>Pooja S. — Hair Spa & Cut</span><span class="badge-paid">Paid (UPI)</span></div>
-              <div class="mock-row"><span>Rahul K. — Beard Trim & Facial</span><span class="badge-paid">Advance Paid</span></div>
-              <div class="mock-row"><span>Ananya M. — O3+ Facial</span><span class="badge-paid">Confirmed</span></div>
+
+        <div class="chat-sim-phone">
+          <div class="chat-sim-header">
+            <div class="chat-sim-avatar">✂️</div>
+            <div>
+              <div class="chat-sim-title">SAL Receptionist</div>
+              <div class="chat-sim-status"><span class="chat-sim-pulse"></span> replies instantly</div>
             </div>
           </div>
+
+          <div class="chat-sim-messages" id="chatSimMessages">
+            <div class="sim-msg user" id="msg1">
+              Hi, I want to book a haircut tomorrow at 5pm.
+            </div>
+
+            <div class="sim-msg ai" id="msg2">
+              Sure! May I have your name and phone number for the booking?
+            </div>
+
+            <div class="sim-msg user" id="msg3">
+              John, 9876543210
+            </div>
+
+            <div class="sim-msg ai" id="msg4">
+              Perfect. Your haircut has been booked for tomorrow at 5:00 PM. If you have any queries feel free to ask. Thank you!
+            </div>
+
+            <div class="sim-typing" id="msgTyping">
+              <span class="sim-dot"></span>
+              <span class="sim-dot"></span>
+              <span class="sim-dot"></span>
+            </div>
+
+            <div class="sim-confirm" id="msgConfirm">
+              <div class="sim-confirm-head">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="16 9 10 15 7 12"/></svg>
+                <span>Booking confirmed</span>
+              </div>
+              <div class="sim-confirm-grid">
+                <div class="sim-confirm-row">Service <b>Haircut & Styling</b></div>
+                <div class="sim-confirm-row">Client <b>John (9876543210)</b></div>
+                <div class="sim-confirm-row">Time <b>Tomorrow, 5:00 PM</b></div>
+                <div class="sim-confirm-row">Reminder <b>WhatsApp · 2h before</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-float-bottom">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>+38% fewer no-shows</span>
         </div>
       </div>
     </div>
@@ -554,6 +587,66 @@ if(menuBtn){
   menuBtn.addEventListener("click",()=>mobile.classList.toggle("open"));
   document.querySelectorAll(".mobile a").forEach(a=>a.addEventListener("click",()=>mobile.classList.remove("open")));
 }
+
+// LIVE MESSAGE SEQUENCER ANIMATION
+function runChatSimulation() {
+  const m1 = document.getElementById("msg1");
+  const m2 = document.getElementById("msg2");
+  const m3 = document.getElementById("msg3");
+  const m4 = document.getElementById("msg4");
+  const typing = document.getElementById("msgTyping");
+  const confirm = document.getElementById("msgConfirm");
+
+  if (!m1 || !m2 || !m3 || !m4 || !typing || !confirm) return;
+
+  // Reset all states
+  [m1, m2, m3, m4, confirm].forEach(el => el.classList.remove("show"));
+  typing.classList.remove("show");
+
+  // Step 1: User message 1 appears
+  setTimeout(() => {
+    m1.classList.add("show");
+  }, 400);
+
+  // Step 2: AI Typing indicator starts
+  setTimeout(() => {
+    typing.classList.add("show");
+  }, 1200);
+
+  // Step 3: AI reply 1 appears
+  setTimeout(() => {
+    typing.classList.remove("show");
+    m2.classList.add("show");
+  }, 2300);
+
+  // Step 4: User message 2 (Name & Phone) appears
+  setTimeout(() => {
+    m3.classList.add("show");
+  }, 3500);
+
+  // Step 5: AI Typing indicator starts
+  setTimeout(() => {
+    typing.classList.add("show");
+  }, 4300);
+
+  // Step 6: AI reply 2 (Confirmation) appears
+  setTimeout(() => {
+    typing.classList.remove("show");
+    m4.classList.add("show");
+  }, 5500);
+
+  // Step 7: Booking Confirmation Card pops up
+  setTimeout(() => {
+    confirm.classList.add("show");
+  }, 6400);
+
+  // Step 8: Smooth loop after viewing
+  setTimeout(() => {
+    runChatSimulation();
+  }, 12500);
+}
+
+runChatSimulation();
 </script>
 </body>
 </html>
