@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Catalog | POUCH by Kangro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#101828;
+  --muted:#667085;
+  --muted2:#98A2B3;
+  --line:#E4E7EC;
+  --surface:#F8FAFC;
+  --surface2:#F2F4F7;
+  --white:#fff;
+  --pouch:#7C3AED;
+  --pouch-light:#F5F3FF;
+  --green:#12B76A;
+  --shadow:0 12px 35px rgba(16,24,40,.08);
+}
+body.dark{
+  --ink:#F8FAFC;--muted:#A7B0C0;--muted2:#7F8A9D;--line:#263244;
+  --surface:#0F172A;--surface2:#182234;--white:#111827;
+  --pouch-light:#23153C;
+  background:#0B1220;color:var(--ink);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(--surface);min-height:100vh;display:flex}
+
+/* SIDEBAR */
+.sidebar{width:260px;background:#111827;color:#98A2B3;padding:24px 16px;display:flex;flex-direction:column;flex-shrink:0;min-height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 10px;margin-bottom:32px}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;display:grid;place-items:center;font-family:Manrope;font-weight:800;font-size:16px}
+.brand-name{font-family:Manrope;font-size:17px;font-weight:800;color:#fff}
+.brand-sub{font-size:10px;color:#A78BFA;letter-spacing:1px}
+
+.nav{display:flex;flex-direction:column;gap:5px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;color:#94A3B8;cursor:pointer;transition:.2s;text-decoration:none}
+.nav-item:hover{background:#1F2937;color:#fff}
+.nav-item.active{background:#7C3AED;color:#fff}
+.nav-item span.icon{font-size:16px;width:20px;text-align:center}
+
+.user-box{background:#1F2937;border-radius:12px;padding:12px;margin-top:auto}
+.user-name{font-size:12px;font-weight:700;color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:#A78BFA}
+.logout-btn{width:100%;margin-top:10px;padding:8px;border-radius:8px;border:1px solid #374151;background:#111827;color:#E5E7EB;font-size:11px;font-weight:700;cursor:pointer;transition:.2s}
+.logout-btn:hover{background:#dc2626;border-color:#dc2626;color:#fff}
+
+/* MAIN */
+.main{flex:1;padding:32px 36px;overflow-y:auto;max-height:100vh}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+.top-title h1{font-family:Manrope;font-size:24px;font-weight:800}
+.top-title p{font-size:13px;color:var(--muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:.2s}
+.btn-pouch{background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff}
+.btn-pouch:hover{box-shadow:0 8px 20px rgba(124,58,237,.3);transform:translateY(-1px)}
+.btn-outline{background:var(--white);border-color:var(--line);color:var(--ink)}
+
+/* FILTER TOOLBAR */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap}
+.search-input{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);font-size:13px;outline:none;width:280px}
+.category-pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{padding:7px 14px;border-radius:20px;border:1px solid var(--line);background:var(--white);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
+.pill.active,.pill:hover{background:var(--pouch);border-color:var(--pouch);color:#fff}
+
+/* PRODUCT GRID */
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.prod-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.03);display:flex;flex-direction:column;position:relative;transition:.2s}
+.prod-card:hover{border-color:#A78BFA;transform:translateY(-2px);box-shadow:var(--shadow)}
+.prod-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.prod-tag{font-size:10px;font-weight:800;color:var(--pouch);background:var(--pouch-light);padding:3px 8px;border-radius:6px;text-transform:uppercase}
+.prod-price{font-family:Manrope;font-size:20px;font-weight:800;color:var(--ink)}
+.prod-card h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.prod-card p{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px;flex:1}
+.prod-stock{font-size:11px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:5px;margin-bottom:14px}
+.prod-actions{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.btn-sm{padding:6px 12px;font-size:11px;border-radius:8px}
+
+/* AI CALLOUT */
+.ai-note{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(91,95,239,.08));border:1px solid rgba(124,58,237,.25);border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:14px}
+.ai-note span.emoji{font-size:24px}
+.ai-note-text strong{font-size:13px;display:block;color:var(--ink)}
+.ai-note-text p{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;place-items:center;z-index:999;padding:20px}
+.modal.show{display:grid}
+.modal-box{background:var(--white);width:min(480px,100%);border-radius:20px;padding:28px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-head h3{font-family:Manrope;font-size:18px;font-weight:800}
+.close-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:13px;outline:none}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--pouch)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+@media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;min-height:auto}.toolbar{flex-direction:column;align-items:stretch}.search-input{width:100%}}
+</style>
+</head>
+
+<body>
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">P</div>
+    <div>
+      <div class="brand-name">POUCH</div>
+      <div class="brand-sub">BY KANGRO</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <a href="pouch-dashboard.html" class="nav-item"><span class="icon">📦</span> Order Pipeline</a>
+    <a href="pouch-catalog.html" class="nav-item active"><span class="icon">🛍️</span> Product Catalog</a>
+    <a href="pouch-customers.html" class="nav-item"><span class="icon">👥</span> Customer Book</a>
+    <a href="pouch-analytics.html" class="nav-item"><span class="icon">📈</span> Analytics</a>
+    <a href="pouch-settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
+    <a href="index.html" class="nav-item"><span class="icon">🌐</span> Kangro Home</a>
+  </nav>
+
+  <div class="user-box">
+    <span class="user-name" id="sidebarBizName">POUCH Store</span>
+    <span class="user-role">POUCH Seller Account</span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="top-title">
+      <h1>Product Catalog</h1>
+      <p>Manage your items, prices, and options. Your Instagram AI automatically reads this catalog to quote prices to customers.</p>
+    </div>
+    <button class="btn btn-pouch" onclick="openAddModal()">➕ Add Product</button>
+  </div>
+
+  <div class="ai-note">
+    <span class="emoji">🤖</span>
+    <div class="ai-note-text">
+      <strong>AI Auto-Pricing Active</strong>
+      <p>When customers DM your Instagram or WhatsApp asking about prices, flavor choices, or product details, the AI answers directly from this database.</p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" class="search-input" id="searchBox" placeholder="🔍 Search products..." oninput="filterProducts()">
+    <div class="category-pills" id="catPills">
+      <button class="pill active" onclick="selectCat('ALL')">All Items</button>
+      <button class="pill" onclick="selectCat('Cakes')">Cakes & Bakes</button>
+      <button class="pill" onclick="selectCat('Crochet')">Crochet & Yarn</button>
+      <button class="pill" onclick="selectCat('Handmade')">Handmade & Crafts</button>
+      <button class="pill" onclick="selectCat('Gifts')">Gift Hampers</button>
+    </div>
+  </div>
+
+  <div class="product-grid" id="productGrid">
+    <!-- Populated via JS / Supabase -->
+  </div>
+</main>
+
+<!-- ADD / EDIT PRODUCT MODAL -->
+<div class="modal" id="prodModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">Add Product to Catalog</h3>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+    <div class="form-group">
+      <label>Product / Creation Name *</label>
+      <input type="text" id="pName" placeholder="e.g. Lavender Crochet Tote Bag">
+    </div>
+    <div class="form-group">
+      <label>Category *</label>
+      <select id="pCat">
+        <option value="Cakes">Cakes & Bakes</option>
+        <option value="Crochet">Crochet & Yarn</option>
+        <option value="Handmade">Handmade & Crafts</option>
+        <option value="Gifts">Gift Hampers</option>
+        <option value="General">General / Custom</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Price (₹) *</label>
+      <input type="number" id="pPrice" placeholder="e.g. 1200">
+    </div>
+    <div class="form-group">
+      <label>Stock / Lead Time *</label>
+      <input type="text" id="pStock" placeholder="e.g. Made to Order (2-3 days) or 10 in stock">
+    </div>
+    <div class="form-group">
+      <label>Description & Customization Options (Flavors, Colors, Sizes)</label>
+      <textarea id="pDesc" rows="3" placeholder="e.g. Handcrafted with 100% cotton yarn. Available in beige, lavender, and matcha green. Custom strap lengths on request."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-pouch" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/theme.js"></script>
+<script>
+let currentUser = null;
+let products = [];
+let activeCategory = "ALL";
+
+async function init() {
+  const { data, error } = await client.auth.getSession();
+  if (error || !data.session) {
+    window.location.href = "login.html";
+    return;
+  }
+  currentUser = data.session.user;
+  loadProfile();
+  loadProductsFromDB();
+}
+
+async function loadProfile() {
+  const { data: prof } = await client.from("profiles").select("business_name").eq("id", currentUser.id).maybeSingle();
+  if (prof && prof.business_name) {
+    document.getElementById("sidebarBizName").textContent = prof.business_name;
+  }
+}
+
+async function loadProductsFromDB() {
+  try {
+    const { data, error } = await client.from("inventory").select("*").eq("profile_id", currentUser.id);
+    if (data && data.length > 0) {
+      products = data.map(p => ({
+        id: p.id,
+        name: p.name,
+        category: p.category || "General",
+        price: p.price || 0,
+        stock: p.stock > 0 ? `${p.stock} in stock` : "Made to Order",
+        desc: p.description || "Handcrafted item"
+      }));
+    } else {
+      products = [];
+    }
+  } catch (e) {
+    console.warn("Catalog load:", e);
+    products = [];
+  }
+  renderProducts();
+}
+
+function renderProducts() {
+  const grid = document.getElementById("productGrid");
+  const query = (document.getElementById("searchBox").value || "").toLowerCase();
+
+  const filtered = products.filter(p => {
+    const matchCat = activeCategory === "ALL" || p.category.toLowerCase().includes(activeCategory.toLowerCase());
+    const matchQuery = p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
+    return matchCat && matchQuery;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:48px 16px;background:var(--white);border:1px dashed var(--line);border-radius:16px;">
+        <div style="font-size:36px;margin-bottom:8px;">🛍️</div>
+        <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px;">No products in catalog</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Add your baked goods, crochet items, art, or craft products so POUCH AI can sell them automatically.</p>
+        <button class="btn btn-pouch" onclick="openAddModal()">+ Add First Product</button>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => `
+    <div class="prod-card">
+      <div class="prod-top">
+        <span class="prod-tag">${p.category}</span>
+        <div class="prod-price">₹${p.price}</div>
+      </div>
+      <h3>${p.name}</h3>
+      <p>${p.desc}</p>
+      <div class="prod-stock">📦 ${p.stock}</div>
+      <div class="prod-actions">
+        <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">✏️ Edit</button>
+        <button class="btn btn-outline btn-sm" style="color:#DC2626" onclick="deleteProduct(${p.id})">🗑️ Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function selectCat(cat) {
+  activeCategory = cat;
+  document.querySelectorAll("#catPills .pill").forEach(p => p.classList.remove("active"));
+  event.target.classList.add("active");
+  renderProducts();
+}
+
+function filterProducts() {
+  renderProducts();
+}
+
+function openAddModal() {
+  document.getElementById("pName").value = "";
+  document.getElementById("pPrice").value = "";
+  document.getElementById("pStock").value = "";
+  document.getElementById("pDesc").value = "";
+  document.getElementById("prodModal").classList.add("show");
+}
+
+function closeModal() {
+  document.getElementById("prodModal").classList.remove("show");
+}
+
+async function saveProduct() {
+  const name = document.getElementById("pName").value.trim();
+  const cat = document.getElementById("pCat").value;
+  const price = Number(document.getElementById("pPrice").value) || 0;
+  const stock = document.getElementById("pStock").value.trim() || "Made to Order";
+  const desc = document.getElementById("pDesc").value.trim();
+
+  if (!name || !price) {
+    alert("Please fill in product name and price.");
+    return;
+  }
+
+  const newProd = {
+    id: Date.now(),
+    name: name,
+    category: cat,
+    price: price,
+    stock: stock,
+    desc: desc
+  };
+
+  products.unshift(newProd);
+
+  // Sync with Supabase inventory table
+  try {
+    await client.from("inventory").insert({
+      profile_id: currentUser.id,
+      name: name,
+      category: cat,
+      price: price,
+      stock: 10,
+      description: desc
+    });
+  } catch (err) {
+    console.warn("Saved locally in catalog:", err);
+  }
+
+  closeModal();
+  renderProducts();
+  alert(`"${name}" added to your catalog! Your Instagram AI can now quote this item to customers.`);
+}
+
+function editProduct(id) {
+  const prod = products.find(p => p.id === id);
+  if (!prod) return;
+  document.getElementById("pName").value = prod.name;
+  document.getElementById("pCat").value = prod.category;
+  document.getElementById("pPrice").value = prod.price;
+  document.getElementById("pStock").value = prod.stock;
+  document.getElementById("pDesc").value = prod.desc;
+  document.getElementById("prodModal").classList.add("show");
+}
+
+function deleteProduct(id) {
+  if (confirm("Are you sure you want to remove this item from your catalog?")) {
+    products = products.filter(p => p.id !== id);
+    renderProducts();
+  }
+}
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await client.auth.signOut();
+  window.location.href = "login.html";
+});
+
+init();
+</script>
+</body>
+</html>

@@ -637,9 +637,6 @@ textarea{
                         placeholder="Used for Analytics & Settings protection"
                     >
 
-                </div>
-
-
                 <div class="form-group full">
 
                     <label>
@@ -650,6 +647,52 @@ textarea{
                         id="businessAddress"
                         placeholder="Full salon address"
                     ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Opening Hours (Read by AI)
+                    </label>
+
+                    <input
+                        id="businessHours"
+                        type="text"
+                        placeholder="e.g. Every day, 9:00 AM to 10:00 PM"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Business Description / Specialties
+                    </label>
+
+                    <input
+                        id="businessDescription"
+                        type="text"
+                        placeholder="e.g. Luxury hair styling, skin care, bridal and beauty treatments"
+                    >
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label>
+                        🤖 AI Custom Instructions & Tone
+                    </label>
+
+                    <textarea
+                        id="aiInstructions"
+                        rows="3"
+                        placeholder="e.g. Always mention our seasonal bridal package discount. Be extra warm and recommend our keratin treatment if asked about frizzy hair."
+                    ></textarea>
+                    <small style="color:var(--muted); font-size:11px; margin-top:4px; display:block;">These custom rules will be followed by your AI receptionist on WhatsApp and Instagram.</small>
 
                 </div>
 
@@ -915,18 +958,23 @@ textarea{
             </div>
 
             <div class="form-group full">
-                <label>UPI QR Code Image Path or URL</label>
-                <div style="display:flex; gap:10px; align-items:center;">
+                <label>GPay / UPI QR Code (Sent by AI when customer asks to pay)</label>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                     <input
                         id="upiQrImage"
                         type="text"
-                        placeholder="/images/zarah-elite-qr.png or https://..."
-                        style="flex:1;"
+                        placeholder="Image URL or click Upload ->"
+                        style="flex:1; min-width:240px;"
                         oninput="updateQrPreview(this.value)"
                     >
+                    <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="handleQrFileUpload(event)">
+                    <button type="button" class="btn btn-secondary" style="padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer;" onclick="document.getElementById('qrFileInput').click()">
+                        📁 Upload QR Image (GPay/PhonePe)
+                    </button>
                 </div>
+                <div id="qrUploadStatus" style="font-size:12px; color:#059669; margin-top:6px; font-weight:600; display:none;"></div>
                 <div id="qrPreviewContainer" style="margin-top:10px; display:none;">
-                    <img id="qrPreviewImg" src="" alt="QR Code Preview" style="max-height:160px; border-radius:8px; border:1px solid #e2e8f0; padding:4px;">
+                    <img id="qrPreviewImg" src="" alt="QR Code Preview" style="max-height:180px; border-radius:8px; border:1px solid #e2e8f0; padding:6px; background:#fff;">
                 </div>
             </div>
 
@@ -1025,6 +1073,56 @@ function updateQrPreview(url) {
     } else {
         container.style.display = "none";
     }
+}
+
+async function handleQrFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById("qrUploadStatus");
+    if (statusEl) {
+        statusEl.style.display = "block";
+        statusEl.style.color = "#4f46e5";
+        statusEl.textContent = "Uploading QR image...";
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const base64 = e.target.result;
+        updateQrPreview(base64);
+
+        try {
+            const { data: { user } } = await window.client.auth.getUser();
+            const res = await fetch("http://localhost:3000/api/upload-qr", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    profile_id: user ? user.id : null,
+                    image_data: base64
+                })
+            });
+            const json = await res.json();
+            if (json.success && json.qr_url) {
+                document.getElementById("upiQrImage").value = json.qr_url;
+                if (statusEl) {
+                    statusEl.style.color = "#059669";
+                    statusEl.textContent = "✓ QR image uploaded and saved!";
+                }
+            } else {
+                document.getElementById("upiQrImage").value = base64;
+                if (statusEl) {
+                    statusEl.style.color = "#059669";
+                    statusEl.textContent = "✓ QR image ready to save.";
+                }
+            }
+        } catch (err) {
+            document.getElementById("upiQrImage").value = base64;
+            if (statusEl) {
+                statusEl.style.color = "#059669";
+                statusEl.textContent = "✓ QR image ready to save.";
+            }
+        }
+    };
+    reader.readAsDataURL(file);
 }
 
 document.addEventListener(
@@ -1223,6 +1321,16 @@ if (data.instagram_connected) {
                     data.next_invoice_number ||
                     1;
 
+                if (document.getElementById("businessHours")) {
+                    document.getElementById("businessHours").value = data.business_hours || "";
+                }
+                if (document.getElementById("businessDescription")) {
+                    document.getElementById("businessDescription").value = data.business_description || "";
+                }
+                if (document.getElementById("aiInstructions")) {
+                    document.getElementById("aiInstructions").value = data.ai_instructions || "";
+                }
+
                 // UPI and payment settings
                 const upiIdInput = document.getElementById("upiId");
                 const advanceAmountInput = document.getElementById("advanceAmount");
@@ -1235,7 +1343,7 @@ if (data.instagram_connected) {
                     advanceAmountInput.value = data.advance_amount !== undefined && data.advance_amount !== null ? data.advance_amount : 500;
                 }
                 if (upiQrImageInput) {
-                    upiQrImageInput.value = data.upi_qr_image || "/images/zarah-elite-qr.png";
+                    upiQrImageInput.value = data.gpay_qr_url || data.upi_qr_image || "";
                     updateQrPreview(upiQrImageInput.value);
                 }
 
@@ -1305,6 +1413,21 @@ if (data.instagram_connected) {
                             )
                             .value
                             .trim(),
+
+                    business_hours:
+                        document.getElementById("businessHours")
+                            ? document.getElementById("businessHours").value.trim()
+                            : "",
+
+                    business_description:
+                        document.getElementById("businessDescription")
+                            ? document.getElementById("businessDescription").value.trim()
+                            : "",
+
+                    ai_instructions:
+                        document.getElementById("aiInstructions")
+                            ? document.getElementById("aiInstructions").value.trim()
+                            : "",
 
                     owner_pin:
                         document
@@ -1382,7 +1505,12 @@ if (data.instagram_connected) {
                     upi_qr_image:
                         document.getElementById("upiQrImage")
                             ? document.getElementById("upiQrImage").value.trim()
-                            : "/images/zarah-elite-qr.png"
+                            : "",
+
+                    gpay_qr_url:
+                        document.getElementById("upiQrImage")
+                            ? document.getElementById("upiQrImage").value.trim()
+                            : ""
 
                 };
 

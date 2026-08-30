@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Book | POUCH by Kangro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#101828;
+  --muted:#667085;
+  --muted2:#98A2B3;
+  --line:#E4E7EC;
+  --surface:#F8FAFC;
+  --surface2:#F2F4F7;
+  --white:#fff;
+  --pouch:#7C3AED;
+  --pouch-light:#F5F3FF;
+  --green:#12B76A;
+  --shadow:0 12px 35px rgba(16,24,40,.08);
+}
+body.dark{
+  --ink:#F8FAFC;--muted:#A7B0C0;--muted2:#7F8A9D;--line:#263244;
+  --surface:#0F172A;--surface2:#182234;--white:#111827;
+  --pouch-light:#23153C;
+  background:#0B1220;color:var(--ink);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(--surface);min-height:100vh;display:flex}
+
+/* SIDEBAR */
+.sidebar{width:260px;background:#111827;color:#98A2B3;padding:24px 16px;display:flex;flex-direction:column;flex-shrink:0;min-height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 10px;margin-bottom:32px}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;display:grid;place-items:center;font-family:Manrope;font-weight:800;font-size:16px}
+.brand-name{font-family:Manrope;font-size:17px;font-weight:800;color:#fff}
+.brand-sub{font-size:10px;color:#A78BFA;letter-spacing:1px}
+
+.nav{display:flex;flex-direction:column;gap:5px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;color:#94A3B8;cursor:pointer;transition:.2s;text-decoration:none}
+.nav-item:hover{background:#1F2937;color:#fff}
+.nav-item.active{background:#7C3AED;color:#fff}
+.nav-item span.icon{font-size:16px;width:20px;text-align:center}
+
+.user-box{background:#1F2937;border-radius:12px;padding:12px;margin-top:auto}
+.user-name{font-size:12px;font-weight:700;color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:#A78BFA}
+.logout-btn{width:100%;margin-top:10px;padding:8px;border-radius:8px;border:1px solid #374151;background:#111827;color:#E5E7EB;font-size:11px;font-weight:700;cursor:pointer;transition:.2s}
+.logout-btn:hover{background:#dc2626;border-color:#dc2626;color:#fff}
+
+/* MAIN */
+.main{flex:1;padding:32px 36px;overflow-y:auto;max-height:100vh}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+.top-title h1{font-family:Manrope;font-size:24px;font-weight:800}
+.top-title p{font-size:13px;color:var(--muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:.2s}
+.btn-pouch{background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff}
+.btn-pouch:hover{box-shadow:0 8px 20px rgba(124,58,237,.3);transform:translateY(-1px)}
+.btn-outline{background:var(--white);border-color:var(--line);color:var(--ink)}
+
+/* CUSTOMER LIST */
+.search-box{width:100%;max-width:320px;padding:11px 15px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);font-size:13px;outline:none;margin-bottom:20px}
+.customer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.customer-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.03);cursor:pointer;transition:.2s}
+.customer-card:hover{border-color:#A78BFA;transform:translateY(-2px);box-shadow:var(--shadow)}
+.cust-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cust-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff;display:grid;place-items:center;font-family:Manrope;font-weight:800;font-size:16px}
+.cust-meta h3{font-size:15px;font-weight:700}
+.cust-meta span{font-size:11px;color:var(--muted)}
+.cust-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--surface2);border-radius:10px;padding:10px;margin-bottom:12px}
+.cust-stat label{font-size:9px;color:var(--muted);text-transform:uppercase;display:block}
+.cust-stat strong{font-size:13px;font-weight:800;font-family:Manrope}
+.cust-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--pouch);font-weight:700}
+
+/* DETAIL MODAL / DRAWER */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;place-items:center;z-index:999;padding:20px}
+.modal.show{display:grid}
+.modal-box{background:var(--white);width:min(540px,100%);border-radius:22px;padding:30px;box-shadow:var(--shadow);border:1px solid var(--line);max-height:90vh;overflow-y:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.modal-head h3{font-family:Manrope;font-size:20px;font-weight:800}
+.close-btn{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted)}
+
+.detail-section{margin-bottom:18px}
+.detail-section label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px}
+.detail-val{font-size:13px;color:var(--ink);background:var(--surface2);padding:10px 14px;border-radius:10px}
+
+.order-history-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface2);border-radius:10px;font-size:12px}
+.history-item strong{font-weight:700}
+.history-item span{color:var(--muted)}
+.tag-paid{background:#ECFDF3;color:#027A48;padding:2px 6px;border-radius:4px;font-weight:700;font-size:10px}
+
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;border-top:1px solid var(--line);padding-top:16px}
+
+@media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;min-height:auto}.customer-grid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">P</div>
+    <div>
+      <div class="brand-name">POUCH</div>
+      <div class="brand-sub">BY KANGRO</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <a href="pouch-dashboard.html" class="nav-item"><span class="icon">📦</span> Order Pipeline</a>
+    <a href="pouch-catalog.html" class="nav-item"><span class="icon">🛍️</span> Product Catalog</a>
+    <a href="pouch-customers.html" class="nav-item active"><span class="icon">👥</span> Customer Book</a>
+    <a href="pouch-analytics.html" class="nav-item"><span class="icon">📈</span> Analytics</a>
+    <a href="pouch-settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
+    <a href="index.html" class="nav-item"><span class="icon">🌐</span> Kangro Home</a>
+  </nav>
+
+  <div class="user-box">
+    <span class="user-name" id="sidebarBizName">POUCH Store</span>
+    <span class="user-role">POUCH Seller Account</span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="top-title">
+      <h1>Customer Book</h1>
+      <p>Click any customer to view full contact numbers, Instagram handles, addresses, and complete order history.</p>
+    </div>
+    <button class="btn btn-pouch" onclick="openAddCustomerModal()">➕ Add Customer</button>
+  </div>
+
+  <input type="text" class="search-box" id="custSearch" placeholder="🔍 Search customers or phone numbers..." oninput="filterCustomers()">
+
+  <div class="customer-grid" id="customerGrid">
+    <!-- Populated via JS -->
+  </div>
+</main>
+
+<!-- EXPANDED CUSTOMER DETAILS MODAL -->
+<div class="modal" id="custModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="cust-avatar" id="mAvatar">—</div>
+        <div>
+          <h3 id="mName">—</h3>
+          <span id="mHandle" style="font-size:12px;color:var(--muted)">—</span>
+        </div>
+      </div>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="detail-section">
+      <label>📱 Phone & WhatsApp Number</label>
+      <div class="detail-val" id="mPhone">—</div>
+    </div>
+
+    <div class="detail-section">
+      <label>📍 Delivery / Shipping Address</label>
+      <div class="detail-val" id="mAddress">—</div>
+    </div>
+
+    <div class="detail-section">
+      <label>⭐ Preferences & Notes</label>
+      <div class="detail-val" id="mNotes">—</div>
+    </div>
+
+    <div class="detail-section">
+      <label>📦 Order History (<span id="mOrderCount">3</span> orders)</label>
+      <div class="order-history-list" id="mHistoryList">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+      <button class="btn btn-pouch" id="mWaBtn" onclick="openWhatsAppChat()">💬 Message on WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/theme.js"></script>
+<script>
+let currentUser = null;
+let currentSelectedPhone = "";
+let customers = [];
+
+async function init() {
+  const { data, error } = await client.auth.getSession();
+  if (error || !data.session) {
+    window.location.href = "login.html";
+    return;
+  }
+  currentUser = data.session.user;
+  loadProfile();
+  await loadCustomersFromDB();
+}
+
+async function loadProfile() {
+  const { data: prof } = await client.from("profiles").select("business_name").eq("id", currentUser.id).maybeSingle();
+  if (prof && prof.business_name) {
+    document.getElementById("sidebarBizName").textContent = prof.business_name;
+  }
+}
+
+async function loadCustomersFromDB() {
+  try {
+    const { data: bookings, error } = await client
+      .from("bookings")
+      .select("*")
+      .eq("profile_id", currentUser.id)
+      .order("created_at", { ascending: false });
+
+    if (bookings && bookings.length > 0) {
+      const customerMap = {};
+      bookings.forEach(b => {
+        const key = (b.phone || b.customer_name || "Guest").trim();
+        if (!customerMap[key]) {
+          customerMap[key] = {
+            id: key,
+            name: b.customer_name || "Customer",
+            phone: b.phone || "—",
+            handle: b.source?.includes("Instagram") ? "@" + (b.customer_name || "").toLowerCase().replace(/\s+/g, "_") : "Direct",
+            address: b.notes || "Customer details captured via AI chat",
+            notes: b.service ? `Recent: ${b.service}` : "Captured via POUCH AI",
+            orders: []
+          };
+        }
+        customerMap[key].orders.push({
+          id: "#P-" + String(b.id).substring(0, 6).toUpperCase(),
+          item: b.service || "Order Item",
+          price: Number(b.advance_amount || b.balance_amount || 0) || 500,
+          date: b.booking_date || new Date(b.created_at).toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
+          status: b.status || "Pending"
+        });
+      });
+      customers = Object.values(customerMap);
+    } else {
+      customers = [];
+    }
+  } catch (err) {
+    console.warn("Failed to load customers from DB:", err);
+    customers = [];
+  }
+  renderCustomers();
+}
+
+function renderCustomers() {
+  const grid = document.getElementById("customerGrid");
+  const query = (document.getElementById("custSearch").value || "").toLowerCase();
+
+  const filtered = customers.filter(c => 
+    c.name.toLowerCase().includes(query) || 
+    c.phone.toLowerCase().includes(query) || 
+    c.handle.toLowerCase().includes(query)
+  );
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 16px; background: var(--white); border: 1px dashed var(--line); border-radius: 16px;">
+        <div style="font-size: 36px; margin-bottom: 8px;">👥</div>
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 6px;">No customers found</h3>
+        <p style="font-size: 13px; color: var(--muted);">Customers will automatically appear here as they message you on Instagram DMs or place orders.</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => {
+    const totalSpend = c.orders.reduce((sum, o) => sum + o.price, 0);
+    return `
+      <div class="customer-card" onclick="openCustomerDetails(${c.id})">
+        <div class="cust-head">
+          <div class="cust-avatar">${c.name.charAt(0)}</div>
+          <div class="cust-meta">
+            <h3>${c.name}</h3>
+            <span>${c.phone} · ${c.handle}</span>
+          </div>
+        </div>
+        <div class="cust-stats">
+          <div class="cust-stat"><label>Orders</label><strong>${c.orders.length} Orders</strong></div>
+          <div class="cust-stat"><label>Lifetime Spend</label><strong>₹${totalSpend}</strong></div>
+        </div>
+        <div class="cust-footer">
+          <span>🔍 Click to expand details</span>
+          <span>💬 WhatsApp →</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function filterCustomers() {
+  renderCustomers();
+}
+
+function openCustomerDetails(id) {
+  const c = customers.find(x => x.id === id);
+  if (!c) return;
+
+  currentSelectedPhone = c.phone.replace(/[^0-9]/g, "");
+  document.getElementById("mAvatar").textContent = c.name.charAt(0);
+  document.getElementById("mName").textContent = c.name;
+  document.getElementById("mHandle").textContent = `${c.handle} · ${c.phone}`;
+  document.getElementById("mPhone").textContent = c.phone;
+  document.getElementById("mAddress").textContent = c.address;
+  document.getElementById("mNotes").textContent = c.notes;
+  document.getElementById("mOrderCount").textContent = c.orders.length;
+
+  const list = document.getElementById("mHistoryList");
+  list.innerHTML = c.orders.map(o => `
+    <div class="history-item">
+      <div>
+        <strong>${o.id} · ${o.item}</strong>
+        <div><span>${o.date}</span></div>
+      </div>
+      <div style="text-align:right">
+        <strong style="display:block;font-size:13px">₹${o.price}</strong>
+        <span class="tag-paid">${o.status}</span>
+      </div>
+    </div>
+  `).join("");
+
+  document.getElementById("custModal").classList.add("show");
+}
+
+function closeModal() {
+  document.getElementById("custModal").classList.remove("show");
+}
+
+function openWhatsAppChat() {
+  if (!currentSelectedPhone) {
+    alert("No phone number saved for this customer.");
+    return;
+  }
+  window.open(`https://wa.me/${currentSelectedPhone}`, "_blank");
+}
+
+function openAddCustomerModal() {
+  const name = prompt("Enter Customer Name:");
+  if (!name) return;
+  const phone = prompt("Enter Phone / WhatsApp Number (+91...):");
+  const handle = prompt("Enter Instagram Handle (@...):") || "@instagram";
+  const address = prompt("Enter Delivery Address:") || "Pickup / Direct";
+
+  const newCust = {
+    id: Date.now(),
+    name: name,
+    phone: phone || "+91 98000 00000",
+    handle: handle,
+    address: address,
+    notes: "New customer added via dashboard.",
+    orders: []
+  };
+
+  customers.unshift(newCust);
+  renderCustomers();
+  alert(`Customer "${name}" added!`);
+}
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await client.auth.signOut();
+  window.location.href = "login.html";
+});
+
+init();
+</script>
+</body>
+</html>

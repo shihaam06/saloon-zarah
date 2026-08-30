@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 // =====================================================
@@ -53,7 +54,7 @@ app.post(
             if (!signature) {
 
                 console.error(
-                    "âŒ Razorpay webhook signature missing"
+                    "Ã¢ÂÅ’ Razorpay webhook signature missing"
                 );
 
                 return res
@@ -83,7 +84,7 @@ app.post(
             ) {
 
                 console.error(
-                    "âŒ Invalid Razorpay webhook signature"
+                    "Ã¢ÂÅ’ Invalid Razorpay webhook signature"
                 );
 
                 return res
@@ -155,7 +156,7 @@ app.post(
             if (!paymentLink) {
 
                 console.error(
-                    "âŒ Payment link data missing"
+                    "Ã¢ÂÅ’ Payment link data missing"
                 );
 
                 return res
@@ -193,7 +194,7 @@ app.post(
             if (!bookingId) {
 
                 console.error(
-                    "âŒ No booking reference found"
+                    "Ã¢ÂÅ’ No booking reference found"
                 );
 
                 return res
@@ -204,7 +205,7 @@ app.post(
 
 
             // ==========================================
-            // ONLY ACCEPT â‚¹500 ADVANCE
+            // ONLY ACCEPT Ã¢â€šÂ¹500 ADVANCE
             // ==========================================
 
             if (
@@ -213,7 +214,7 @@ app.post(
             ) {
 
                 console.error(
-                    "âŒ Incorrect payment amount:",
+                    "Ã¢ÂÅ’ Incorrect payment amount:",
                     amountPaid
                 );
 
@@ -252,7 +253,7 @@ app.post(
             ) {
 
                 console.error(
-                    "âŒ Booking not found:",
+                    "Ã¢ÂÅ’ Booking not found:",
                     bookingError
                 );
 
@@ -274,7 +275,7 @@ app.post(
             ) {
 
                 console.log(
-                    "âš ï¸ Advance already marked as paid."
+                    "Ã¢Å¡Â Ã¯Â¸Â Advance already marked as paid."
                 );
 
                 return res
@@ -333,7 +334,7 @@ app.post(
             if (updateError) {
 
                 console.error(
-                    "âŒ Booking update failed:",
+                    "Ã¢ÂÅ’ Booking update failed:",
                     updateError
                 );
 
@@ -349,7 +350,7 @@ app.post(
             );
 
             console.log(
-                "âœ… ADVANCE PAYMENT CONFIRMED"
+                "Ã¢Å“â€¦ ADVANCE PAYMENT CONFIRMED"
             );
 
             console.log(
@@ -359,12 +360,12 @@ app.post(
 
             console.log(
                 "Advance:",
-                `â‚¹${ADVANCE_AMOUNT}`
+                `Ã¢â€šÂ¹${ADVANCE_AMOUNT}`
             );
 
             console.log(
                 "Balance:",
-                `â‚¹${updatedBooking.balance_amount}`
+                `Ã¢â€šÂ¹${updatedBooking.balance_amount}`
             );
 
             console.log(
@@ -385,9 +386,9 @@ app.post(
 
 //             const confirmationMessage = `
 
-// Perfect! Your appointment is confirmed. ðŸ˜Š
+// Perfect! Your appointment is confirmed. Ã°Å¸ËœÅ 
 
-// âœ¨ ${BUSINESS.name}
+// Ã¢Å“Â¨ ${BUSINESS.name}
 
 // Service: ${updatedBooking.service}
 
@@ -399,13 +400,13 @@ app.post(
 //     updatedBooking.booking_time
 // )}
 
-// ðŸ’³ Advance paid: â‚¹${ADVANCE_AMOUNT}
+// Ã°Å¸â€™Â³ Advance paid: Ã¢â€šÂ¹${ADVANCE_AMOUNT}
 
-// ðŸ’° Balance remaining: â‚¹${updatedBooking.balance_amount}
+// Ã°Å¸â€™Â° Balance remaining: Ã¢â€šÂ¹${updatedBooking.balance_amount}
 
-// ðŸ“ ${BUSINESS.address}
+// Ã°Å¸â€œÂ ${BUSINESS.address}
 
-// We look forward to seeing you! ðŸ˜Š
+// We look forward to seeing you! Ã°Å¸ËœÅ 
 // `;
 
 
@@ -430,7 +431,7 @@ app.post(
 
 
 //                 console.log(
-//                     "âœ… WhatsApp confirmation sent:",
+//                     "Ã¢Å“â€¦ WhatsApp confirmation sent:",
 //                     message.sid
 //                 );
 
@@ -439,7 +440,7 @@ app.post(
 //             catch (whatsappError) {
 
 //                 console.error(
-//                     "âš ï¸ Payment confirmed but WhatsApp failed:",
+//                     "Ã¢Å¡Â Ã¯Â¸Â Payment confirmed but WhatsApp failed:",
 //                     whatsappError
 //                 );
 
@@ -450,9 +451,9 @@ app.post(
 // ==========================================
 
 const confirmationMessage = `
-Perfect! Your appointment is confirmed. ðŸ˜Š
+Perfect! Your appointment is confirmed. Ã°Å¸ËœÅ 
 
-âœ¨ ${BUSINESS.name}
+Ã¢Å“Â¨ ${BUSINESS.name}
 
 Service: ${updatedBooking.service}
 Date: ${formatDateForCustomer(
@@ -462,12 +463,12 @@ Time: ${formatTimeForCustomer(
     updatedBooking.booking_time
 )}
 
-ðŸ’³ Advance paid: â‚¹${ADVANCE_AMOUNT}
-ðŸ’° Balance remaining: â‚¹${updatedBooking.balance_amount}
+Ã°Å¸â€™Â³ Advance paid: Ã¢â€šÂ¹${ADVANCE_AMOUNT}
+Ã°Å¸â€™Â° Balance remaining: Ã¢â€šÂ¹${updatedBooking.balance_amount}
 
-ðŸ“ ${BUSINESS.address}
+Ã°Å¸â€œÂ ${BUSINESS.address}
 
-We look forward to seeing you! ðŸ˜Š
+We look forward to seeing you! Ã°Å¸ËœÅ 
 `;
 
 try {
@@ -482,7 +483,7 @@ try {
 ) {
 
     console.log(
-        "ðŸ“¸ Sending Instagram payment confirmation to:",
+        "Ã°Å¸â€œÂ¸ Sending Instagram payment confirmation to:",
         updatedBooking.instagram_user_id
     );
 
@@ -493,7 +494,7 @@ try {
 );
 
     console.log(
-        "âœ… Instagram confirmation sent"
+        "Ã¢Å“â€¦ Instagram confirmation sent"
     );
 }
 
@@ -526,7 +527,7 @@ try {
                 });
 
         console.log(
-            "âœ… WhatsApp confirmation sent:",
+            "Ã¢Å“â€¦ WhatsApp confirmation sent:",
             message.sid
         );
     }
@@ -536,7 +537,7 @@ try {
 catch (notificationError) {
 
     console.error(
-        "âš ï¸ Payment confirmed but confirmation message failed:",
+        "Ã¢Å¡Â Ã¯Â¸Â Payment confirmed but confirmation message failed:",
         notificationError
     );
 
@@ -552,7 +553,7 @@ catch (notificationError) {
         catch (error) {
 
             console.error(
-                "\nâŒ RAZORPAY WEBHOOK ERROR:"
+                "\nÃ¢ÂÅ’ RAZORPAY WEBHOOK ERROR:"
             );
 
             console.error(
@@ -568,8 +569,8 @@ catch (notificationError) {
     }
 );
 
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
+app.use(express.json({ limit: "25mb" }));
 
 
 // =====================================================
@@ -625,6 +626,75 @@ const UPI_ID =
 const AI_MODEL =
     process.env.OPENROUTER_MODEL ||
     "openrouter/auto";
+
+// =====================================================
+// QR CODE UPLOAD ENDPOINT (FOR GPAY / UPI QR CODES)
+// =====================================================
+
+app.post("/api/upload-qr", async (req, res) => {
+    try {
+        const { profile_id, image_data } = req.body;
+        if (!image_data) {
+            return res.status(400).json({ error: "Missing image data" });
+        }
+
+        const safeId = (profile_id || "default").replace(/[^a-zA-Z0-9_-]/g, "");
+        const base64Data = image_data.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+
+        // 1. Save to frontend/images for local serving
+        const imagesDir = path.join(__dirname, "../frontend/images");
+        if (!fs.existsSync(imagesDir)) {
+            fs.mkdirSync(imagesDir, { recursive: true });
+        }
+        const fileName = `qr-${safeId}-${Date.now()}.png`;
+        const filePath = path.join(imagesDir, fileName);
+        fs.writeFileSync(filePath, buffer);
+
+        let finalUrl = `/images/${fileName}`;
+
+        // 2. Also try uploading to Supabase Storage if available
+        try {
+            const { data: uploadData, error: uploadErr } = await supabase.storage
+                .from("bills")
+                .upload(`qr/${fileName}`, buffer, {
+                    contentType: "image/png",
+                    upsert: true
+                });
+
+            if (!uploadErr && uploadData) {
+                const { data: publicUrlData } = supabase.storage
+                    .from("bills")
+                    .getPublicUrl(`qr/${fileName}`);
+                if (publicUrlData?.publicUrl) {
+                    finalUrl = publicUrlData.publicUrl;
+                }
+            }
+        } catch (storageErr) {
+            console.warn("Storage upload fallback to local URL:", storageErr.message);
+        }
+
+        // 3. Update profile if profile_id provided
+        if (profile_id) {
+            await supabase
+                .from("profiles")
+                .update({
+                    upi_qr_image: finalUrl,
+                    gpay_qr_url: finalUrl
+                })
+                .eq("id", profile_id);
+        }
+
+        return res.status(200).json({
+            success: true,
+            qr_url: finalUrl,
+            message: "QR code uploaded and saved successfully"
+        });
+    } catch (err) {
+        console.error("QR upload error:", err);
+        return res.status(500).json({ error: "Failed to upload QR code" });
+    }
+});
 
 
 // =====================================================
@@ -910,6 +980,95 @@ async function getServicePrice(serviceName, profileId) {
 
 
 // =====================================================
+// DYNAMIC BUSINESS PROFILE LOADER
+// =====================================================
+
+/**
+ * Load full business profile from Supabase profiles table.
+ * Replaces static BUSINESS constant so every AI prompt is
+ * personalised per account, not hardcoded to Zarah Elite.
+ */
+async function getBusinessProfile(profileId) {
+    const id = profileId || PROFILE_ID;
+    const { data, error } = await supabase
+        .from("profiles")
+        .select(
+            "business_name, business_address, business_phone, " +
+            "business_hours, business_description, ai_instructions, " +
+            "product, upi_id, upi_qr_image, gpay_qr_url, advance_amount"
+        )
+        .eq("id", id)
+        .maybeSingle();
+
+    if (error) {
+        console.warn("getBusinessProfile error:", error.message);
+    }
+
+    const p = data || {};
+
+    // Determine persona based on product type
+    const productType = p.product || "sal"; // "sal" | "pouch"
+    const isSalon     = productType !== "pouch";
+
+    return {
+        name:        p.business_name    || BUSINESS.name,
+        address:     p.business_address || BUSINESS.address,
+        phone:       p.business_phone   || BUSINESS.phone,
+        hours:       p.business_hours   || BUSINESS.hours,
+        description: p.business_description || "",
+        aiInstructions: p.ai_instructions || "",
+        product:     productType,
+        isSalon,
+        upiId:       p.upi_id           || "",
+        qrUrl:       p.gpay_qr_url      || p.upi_qr_image || "",
+        advance:     Number(p.advance_amount) || 0,
+    };
+}
+
+/**
+ * Build the AI system persona string dynamically from the profile.
+ * Used by both WhatsApp and Instagram AI handlers.
+ */
+function buildAISystemPrompt(biz) {
+    const roleDesc = biz.isSalon
+        ? `You are the AI assistant / receptionist for ${biz.name}, a professional salon and beauty studio.
+Your job is to help customers with bookings, prices, service information, and general queries — exactly like a warm, professional human receptionist would on WhatsApp.`
+        : `You are the AI assistant for ${biz.name}, an Instagram-first small business.
+Your job is to help customers with product inquiries, pricing, customisation options, order placement, and payment — the way a friendly, responsive seller would reply on Instagram DM or WhatsApp.`;
+
+    const businessBlock = `
+BUSINESS DETAILS:
+Name: ${biz.name}
+${biz.address   ? `Address: ${biz.address}`           : ""}
+${biz.phone     ? `Phone: ${biz.phone}`                : ""}
+${biz.hours     ? `Hours: ${biz.hours}`                : ""}
+${biz.description ? `About: ${biz.description}`        : ""}
+`.trim();
+
+    const customRules = biz.aiInstructions
+        ? `\n\nOWNER CUSTOM INSTRUCTIONS:\n${biz.aiInstructions}`
+        : "";
+
+    return `${roleDesc}
+
+You are NOT a chatbot. You are NOT a customer-support form. Never sound robotic.
+
+CONVERSATION STYLE:
+- Be natural, warm, attentive and professional.
+- Keep messages short — usually 1–4 sentences.
+- Do not over-explain or dump information.
+- Do not ask "How can I help you?" repeatedly — vary your greetings.
+- Use emojis sparingly, the way a friendly person would.
+- Never invent prices or service names. If you don't know, say you'll check.
+
+CONVERSATION MEMORY:
+- Pay close attention to previous messages.
+- Never make the customer repeat information they already gave.
+
+${businessBlock}${customRules}`;
+}
+
+// =====================================================
 // INVENTORY & PRODUCT HELPERS
 // =====================================================
 
@@ -960,7 +1119,7 @@ async function findOrCreateCustomer({
 
     if (!profileId || !phone) {
         console.log(
-            "âš ï¸ Customer not created: missing profileId or phone"
+            "Ã¢Å¡Â Ã¯Â¸Â Customer not created: missing profileId or phone"
         );
         return null;
     }
@@ -1010,7 +1169,7 @@ async function findOrCreateCustomer({
         }
 
         console.log(
-            "ðŸ‘¤ Existing customer found:",
+            "Ã°Å¸â€˜Â¤ Existing customer found:",
             existingCustomer.name
         );
 
@@ -1053,7 +1212,7 @@ async function findOrCreateCustomer({
     }
 
     console.log(
-        "ðŸ‘¤ New customer created:",
+        "Ã°Å¸â€˜Â¤ New customer created:",
         newCustomer.name
     );
 
@@ -1315,7 +1474,7 @@ If customer says:
 "payment done"
 "I paid"
 "done with payment"
-"â‚¹500 paid"
+"Ã¢â€šÂ¹500 paid"
 "advance paid"
 
 and there is a pending booking context,
@@ -1406,7 +1565,7 @@ if (
 ) {
 
     console.error(
-        "âŒ AI RESPONSE DID NOT CONTAIN CHOICES:"
+        "Ã¢ÂÅ’ AI RESPONSE DID NOT CONTAIN CHOICES:"
     );
 
     console.error(
@@ -1424,18 +1583,18 @@ if (
 }
 
 
-console.log("ðŸ” INSTAGRAM HUMAN REPLY RAW AI RESPONSE:");
+console.log("Ã°Å¸â€Â INSTAGRAM HUMAN REPLY RAW AI RESPONSE:");
 console.log(JSON.stringify(completion, null, 2));
 
 let content =
     completion?.choices?.[0]?.message?.content;
 
-console.log("ðŸ” INSTAGRAM HUMAN REPLY CONTENT:");
+console.log("Ã°Å¸â€Â INSTAGRAM HUMAN REPLY CONTENT:");
 console.log(content);
 
 if (!content) {
     console.error(
-        "âŒ INSTAGRAM HUMAN REPLY CONTENT IS EMPTY"
+        "Ã¢ÂÅ’ INSTAGRAM HUMAN REPLY CONTENT IS EMPTY"
     );
 
     throw new Error(
@@ -1549,8 +1708,12 @@ async function generateHumanReply({
     intent,
     booking,
     systemResult,
-    phone
+    phone,
+    profileId
 }) {
+
+    // Load live business profile from DB (falls back to BUSINESS const if missing)
+    const biz = await getBusinessProfile(profileId);
 
     const history = getConversation(phone);
 
@@ -1570,10 +1733,14 @@ ${customerName || "Customer"}
 CURRENT INTENT:
 ${intent}
 
-CURRENT BOOKING CONTEXT:
-Service: ${booking?.service || ""}
+CURRENT BOOKING / ORDER CONTEXT:
+${biz.isSalon
+    ? `Service: ${booking?.service || ""}
 Date: ${booking?.booking_date || ""}
-Time: ${booking?.booking_time || ""}
+Time: ${booking?.booking_time || ""}`
+    : `Product: ${booking?.service || booking?.product_name || ""}
+Order Status: ${booking?.status || ""}`
+}
 
 WHAT THE BUSINESS SYSTEM ACTUALLY DID:
 ${systemResult}
@@ -1582,18 +1749,15 @@ PREVIOUS CONVERSATION:
 ${historyText}
 
 BUSINESS INFORMATION:
-Name: ${BUSINESS.name}
-Address: ${BUSINESS.address}
-Phone: ${BUSINESS.phone}
-Opening hours: ${BUSINESS.hours}
+Name: ${biz.name}
+Address: ${biz.address}
+Phone: ${biz.phone}
+Hours: ${biz.hours}
+${biz.description ? `About: ${biz.description}` : ""}
 
-SERVICE INFORMATION:
-Use the information provided in
-"WHAT THE BUSINESS SYSTEM ACTUALLY DID".
-
-Do not invent service names or prices.
-If a specific service or price is not provided
-by the business system, do not guess.
+SERVICE / PRODUCT INFORMATION:
+Use ONLY the information provided in "WHAT THE BUSINESS SYSTEM ACTUALLY DID".
+Do not invent service names, product names, or prices.
 `;
 
     const completion =
@@ -1607,299 +1771,32 @@ by the business system, do not guess.
 
                 {
                     role: "system",
-
-                    content: `
-You are the receptionist of ${BUSINESS.name}.
-
-You communicate with customers through WhatsApp.
-
-Your job is to make the conversation feel like it is
-happening with a genuinely good human receptionist.
-
-You are NOT a chatbot.
+                    content: buildAISystemPrompt(biz) + `
 
 ==================================================
-CONVERSATION STYLE
+BOOKING & PAYMENT RULES
 ==================================================
 
-Be natural, relaxed, attentive and professional.
+NEVER claim that a booking or order was created, confirmed, cancelled, or paid
+unless SYSTEM RESULT explicitly says so.
 
-Write like a real WhatsApp receptionist.
+SYSTEM RESULT is the source of truth for payment confirmation.
 
-Keep messages short and easy to read.
-
-Usually use 1-4 sentences.
-
-Do not over-explain.
-
-Do not dump information unless the customer asks for it.
-
-Do not sound robotic.
-
-Do not sound like a customer-support form.
-
-Do not repeatedly say:
-"How can I help you?"
-
-Use natural variations.
-
-Examples:
-
-Customer:
-"hi"
-
-Good:
-"Hey! ðŸ˜Š Welcome to ${BUSINESS.name}. What can I help you with?"
-
-Customer:
-"hello"
-
-Good:
-"Hi! ðŸ˜Š What are you looking to get done today?"
-
-Customer:
-"thanks"
-
-Good:
-"You're very welcome! ðŸ˜Š"
-
-Customer:
-"ok"
-
-Good:
-"Sure ðŸ˜Š Just let me know whenever you're ready."
+Never invent: availability, prices, services, products, discounts, staff information.
 
 ==================================================
-CONVERSATION MEMORY
+IMPORTANT — NEVER MENTION
 ==================================================
 
-Pay close attention to previous messages.
-
-Remember information the customer has already provided.
-
-NEVER make the customer repeat information unnecessarily.
-
-Example:
-
-Customer:
-"I want a haircut tomorrow."
-
-Receptionist:
-"Sure! What time would you prefer?"
-
-Customer:
-"5"
-
-Understand that they mean:
-Haircut + tomorrow + 5 PM.
-
-Do NOT ask:
-"Which service?"
-
-Do NOT ask:
-"Which date?"
-
-Continue naturally.
-
-Another example:
-
-Customer:
-"How much is facial?"
-
-Receptionist:
-"Facial is â‚¹900."
-
-Customer:
-"Can I book tomorrow?"
-
-Understand that "it" / the booking refers to the facial.
-
-Do not ask which service unless genuinely unclear.
-
-==================================================
-BOOKING
-==================================================
-
-The booking/system logic is responsible for actually
-creating or confirming appointments.
-
-You must NEVER claim that a booking was created,
-confirmed, cancelled or rescheduled unless
-SYSTEM RESULT explicitly says that it happened.
-
-If SYSTEM RESULT says information is missing,
-ask naturally ONLY for the missing information.
-
-Example:
-
-SYSTEM RESULT:
-Missing information: time
-
-Good:
-"Sure. What time would you prefer?"
-
-Bad:
-"Please provide the required booking fields."
-
-If service and date are already known, never ask for them again.
-
-==================================================
-PAYMENTS
-==================================================
-
-SYSTEM RESULT is the ONLY source of truth for payment.
-
-Never assume that a customer has paid.
-
-Never say payment was received unless SYSTEM RESULT
-explicitly confirms it.
-
-If payment is confirmed, clearly tell the customer
-that the appointment is confirmed.
-
-Do not ask them to pay again.
-
-If no pending booking was found, do NOT claim payment
-was received.
-
-==================================================
-PRICES
-==================================================
-
-Use ONLY the prices provided in BUSINESS INFORMATION.
-
-Never invent a price.
-
-If a service price is not available, say that you don't
-have the price information rather than guessing.
-
-==================================================
-SERVICES
-==================================================
-
-Use ONLY the services provided in BUSINESS INFORMATION.
-
-Never invent services.
-
-==================================================
-AVAILABILITY
-==================================================
-
-NEVER invent appointment availability.
-
-Only say that a time is available if the SYSTEM RESULT
-explicitly says so.
-
-==================================================
-GENERAL QUESTIONS
-==================================================
-
-For questions about:
-
-- services
-- pricing
-- opening hours
-- location
-- bookings
-- payments
-
-use the information provided.
-
-If you don't have enough information, be honest.
-
-Do not invent policies, discounts, staff information,
-availability or business details.
-
-==================================================
-HUMAN BEHAVIOUR
-==================================================
-
-Understand casual WhatsApp language.
-
-Examples:
-
-"tmrw" = tomorrow
-"5" = 5 PM if the conversation is asking for a time
-"ya" = yes
-"yep" = yes
-"ok" = acknowledgement
-"cool" = acknowledgement
-"thanks" = appreciation
-"done" = acknowledgement/payment context depending on conversation
-
-Use context rather than treating every message independently.
-
-If the customer changes their mind, follow the latest request.
-
-If they ask a simple question, give a simple answer.
-
-If they are just chatting, respond naturally.
-
-==================================================
-IMPORTANT
-==================================================
-
-NEVER mention:
-
-AI
-artificial intelligence
-bot
-chatbot
-JSON
-database
-backend
-API
-system processing
-intent
-automation
-model
-internal processing
-
-Never say:
-
-"According to our system."
-
-"Your request has been processed."
-
-"Intent detected."
-
-"Please provide the required fields."
-
-Instead, talk like a real receptionist.
-
-==================================================
-CRITICAL SAFETY
-==================================================
-
-Never invent:
-
-- availability
-- prices
-- services
-- payment confirmation
-- booking confirmation
-- cancellation confirmation
-- staff information
-- policies
-- discounts
-
-Never contradict SYSTEM RESULT.
-
-SYSTEM RESULT is the source of truth.
+AI, bot, chatbot, JSON, database, backend, API, intent, automation, model.
+Never say: "According to our system." / "Your request has been processed."
 
 ==================================================
 FINAL RESPONSE
 ==================================================
 
 Return ONLY the WhatsApp message.
-
-No analysis.
-
-No JSON.
-
-No explanation.
-
-No quotation marks around the response.
+No analysis. No JSON. No explanation. No quotation marks.
 `
                 },
 
@@ -1910,6 +1807,7 @@ No quotation marks around the response.
 
             ]
         });
+
 
     const reply =
         completion
@@ -1948,7 +1846,7 @@ async function getInstagramAccessToken(profileId) {
         !profile?.instagram_access_token
     ) {
         console.error(
-            "âŒ Instagram token not found:",
+            "Ã¢ÂÅ’ Instagram token not found:",
             error
         );
 
@@ -1973,7 +1871,7 @@ async function getInstagramAccessToken(profileId) {
 
     if (!expiresAt) {
         console.warn(
-            "âš ï¸ Instagram token has no expiry date."
+            "Ã¢Å¡Â Ã¯Â¸Â Instagram token has no expiry date."
         );
 
         return token;
@@ -2003,7 +1901,7 @@ async function getInstagramAccessToken(profileId) {
     if (timeRemaining <= 0) {
 
         console.error(
-            "âŒ Instagram access token has expired."
+            "Ã¢ÂÅ’ Instagram access token has expired."
         );
 
         throw new Error(
@@ -2016,7 +1914,7 @@ async function getInstagramAccessToken(profileId) {
     // -----------------------------------------
 
     console.log(
-        "ðŸ”„ Instagram token is close to expiry. Refreshing..."
+        "Ã°Å¸â€â€ž Instagram token is close to expiry. Refreshing..."
     );
 
     const refreshUrl =
@@ -2036,7 +1934,7 @@ async function getInstagramAccessToken(profileId) {
         await refreshResponse.json();
 
     console.log(
-        "ðŸ“¸ Instagram refresh response:",
+        "Ã°Å¸â€œÂ¸ Instagram refresh response:",
         {
             ok: refreshResponse.ok,
             expires_in:
@@ -2051,7 +1949,7 @@ async function getInstagramAccessToken(profileId) {
         !refreshData.access_token
     ) {
         console.error(
-            "âŒ Instagram token refresh failed:",
+            "Ã¢ÂÅ’ Instagram token refresh failed:",
             refreshData
         );
 
@@ -2091,7 +1989,7 @@ async function getInstagramAccessToken(profileId) {
     if (updateError) {
 
         console.error(
-            "âŒ Failed to save refreshed Instagram token:",
+            "Ã¢ÂÅ’ Failed to save refreshed Instagram token:",
             updateError
         );
 
@@ -2099,11 +1997,11 @@ async function getInstagramAccessToken(profileId) {
     }
 
     console.log(
-        "âœ… Instagram token refreshed successfully"
+        "Ã¢Å“â€¦ Instagram token refreshed successfully"
     );
 
     console.log(
-        "â³ New Instagram token expires:",
+        "Ã¢ÂÂ³ New Instagram token expires:",
         newExpiresAt
     );
 
@@ -2163,7 +2061,7 @@ async function sendInstagramMessage(
     if (!response.ok) {
 
         console.error(
-            "âŒ Instagram send message failed:",
+            "Ã¢ÂÅ’ Instagram send message failed:",
             data
         );
 
@@ -2173,7 +2071,7 @@ async function sendInstagramMessage(
     }
 
     console.log(
-        "âœ… Instagram reply sent:",
+        "Ã¢Å“â€¦ Instagram reply sent:",
         data
     );
 
@@ -2237,7 +2135,7 @@ async function sendInstagramImage(
 
     if (!response.ok) {
         console.error(
-            "âŒ Instagram send image failed:",
+            "Ã¢ÂÅ’ Instagram send image failed:",
             data
         );
 
@@ -2247,7 +2145,7 @@ async function sendInstagramImage(
     }
 
     console.log(
-        "âœ… Instagram image sent:",
+        "Ã¢Å“â€¦ Instagram image sent:",
         data
     );
 
@@ -2438,7 +2336,7 @@ The customer's pending booking has been
 confirmed after their payment confirmation.
 
 Payment:
-â‚¹${ADVANCE_AMOUNT}
+Ã¢â€šÂ¹${ADVANCE_AMOUNT}
 
 Payment method:
 UPI
@@ -2459,15 +2357,15 @@ ${formatTimeForCustomer(
                     )}
 
 Total service price:
-â‚¹${await getServicePrice(
+Ã¢â€šÂ¹${await getServicePrice(
                         confirmed.service
                     )}
 
 Advance paid:
-â‚¹${ADVANCE_AMOUNT}
+Ã¢â€šÂ¹${ADVANCE_AMOUNT}
 
 Remaining balance:
-â‚¹${confirmed.balance_amount}
+Ã¢â€šÂ¹${confirmed.balance_amount}
 
 Tell the customer naturally that their
 appointment is confirmed.
@@ -2651,13 +2549,13 @@ Appointment status:
 Pending payment
 
 Advance required:
-â‚¹${ADVANCE_AMOUNT}
+Ã¢â€šÂ¹${ADVANCE_AMOUNT}
 
 Razorpay payment link:
 ${paymentLink.short_url}
 
 Ask the customer naturally to complete
-the â‚¹500 advance using the payment link.
+the Ã¢â€šÂ¹500 advance using the payment link.
 
 Do NOT ask them to reply PAID.
 
@@ -2796,7 +2694,7 @@ try again.
 A booking has been successfully created
 but it is NOT confirmed yet.
 
-The customer must pay a â‚¹500 advance.
+The customer must pay a Ã¢â€šÂ¹500 advance.
 
 Booking ID:
 ${createdBooking.id}
@@ -2815,25 +2713,25 @@ ${formatTimeForCustomer(
                             )}
 
 Service price:
-â‚¹${servicePrice}
+Ã¢â€šÂ¹${servicePrice}
 
 Advance:
-â‚¹${ADVANCE_AMOUNT}
+Ã¢â€šÂ¹${ADVANCE_AMOUNT}
 
 Razorpay payment link:
 ${paymentLink.short_url}
 
 Remaining balance after advance:
-â‚¹${Math.max(
+Ã¢â€šÂ¹${Math.max(
     servicePrice -
     ADVANCE_AMOUNT,
     0
 )}
 
 Tell the customer naturally that the
-slot is reserved pending the â‚¹500 advance.
+slot is reserved pending the Ã¢â€šÂ¹500 advance.
 
-Tell them to complete the â‚¹500 payment
+Tell them to complete the Ã¢â€šÂ¹500 payment
 using the payment link.
 
 Do NOT ask them to reply "PAID".
@@ -3089,7 +2987,7 @@ The customer asked about:
 ${service.name}
 
 Actual price from the services database:
-â‚¹${Number(service.price).toLocaleString("en-IN")}
+Ã¢â€šÂ¹${Number(service.price).toLocaleString("en-IN")}
 
 Item type:
 ${service.item_type}
@@ -3170,7 +3068,7 @@ The customer asked about the product: "${dbProduct.name}".
 Product Details from Inventory Database:
 - Name: ${dbProduct.name}
 - Category: ${dbProduct.category || "General"}
-- Price: â‚¹${dbProduct.price}
+- Price: Ã¢â€šÂ¹${dbProduct.price}
 - Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
 
 Respond naturally to the customer with the exact price and availability.
@@ -3179,7 +3077,7 @@ If in stock, tell them they can purchase it at the salon during their visit.
                 } else if (allProducts && allProducts.length > 0) {
                     const productListText = allProducts
                         .slice(0, 10)
-                        .map(p => `- ${p.name} (â‚¹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
+                        .map(p => `- ${p.name} (Ã¢â€šÂ¹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
                         .join("\n");
 
                     systemResult = `
@@ -3306,7 +3204,10 @@ Do not invent information.
                         systemResult,
 
                     phone:
-                        phone
+                        phone,
+
+                    profileId:
+                        activeProfileId
 
                 });
 
@@ -3390,7 +3291,7 @@ Do not invent information.
 //                     .font("Helvetica")
 //                     .fillColor("#777777")
 //                     .text(
-//                         "SALON & SPA â€¢ SERVICE MENU",
+//                         "SALON & SPA Ã¢â‚¬Â¢ SERVICE MENU",
 //                         {
 //                             align: "center"
 //                         }
@@ -3408,7 +3309,7 @@ Do not invent information.
 
 //                 doc
 //                     .text(
-//                         `${BUSINESS.phone} â€¢ ${BUSINESS.hours}`,
+//                         `${BUSINESS.phone} Ã¢â‚¬Â¢ ${BUSINESS.hours}`,
 //                         {
 //                             align: "center"
 //                         }
@@ -3492,7 +3393,7 @@ Do not invent information.
 //                                         "Helvetica"
 //                                     )
 //                                     .text(
-//                                         `    â‚¹${price.toLocaleString("en-IN")}`,
+//                                         `    Ã¢â€šÂ¹${price.toLocaleString("en-IN")}`,
 //                                         {
 //                                             align:
 //                                                 "right"
@@ -3554,7 +3455,7 @@ if (booking.intent === "services") {
             req.body.From,
 
         body:
-            "Sure! ðŸ˜Š I've shared our service menu. Have a look and let me know what you'd like to book."
+            "Sure! Ã°Å¸ËœÅ  I've shared our service menu. Have a look and let me know what you'd like to book."
 
     });
 
@@ -3578,7 +3479,7 @@ if (booking.intent === "services") {
 
 
     console.log(
-        "âœ… Fixed ZARAH ELITE menu PDF sent."
+        "Ã¢Å“â€¦ Fixed ZARAH ELITE menu PDF sent."
     );
 
 }
@@ -3640,7 +3541,7 @@ else {
                             req.body.From,
 
                         body:
-                            "Sorry, I ran into a small issue. Could you try that again? ðŸ˜Š"
+                            "Sorry, I ran into a small issue. Could you try that again? Ã°Å¸ËœÅ "
 
                     });
 
@@ -3744,7 +3645,7 @@ app.get(
                             border-radius:16px;
                         ">
 
-                            <h2>Booking Confirmed âœ“</h2>
+                            <h2>Booking Confirmed Ã¢Å“â€œ</h2>
 
                             <p>
                                 Your appointment is already confirmed.
@@ -3869,7 +3770,7 @@ app.get(
                                 font-weight:bold;
                                 margin-top:5px;
                             ">
-                                â‚¹500
+                                Ã¢â€šÂ¹500
                             </div>
 
                         </div>
@@ -3897,7 +3798,7 @@ app.get(
                                 margin-top:20px;
                             "
                         >
-                            Pay â‚¹500 via UPI
+                            Pay Ã¢â€šÂ¹500 via UPI
                         </a>
 
 
@@ -3964,14 +3865,14 @@ app.get("/instagram/webhook", (req, res) => {
         token === process.env.INSTAGRAM_VERIFY_TOKEN
     ) {
 
-        console.log("âœ… Instagram webhook verified");
+        console.log("Ã¢Å“â€¦ Instagram webhook verified");
 
         return res
             .status(200)
             .send(challenge);
     }
 
-    console.error("âŒ Instagram webhook verification failed");
+    console.error("Ã¢ÂÅ’ Instagram webhook verification failed");
 
     return res.sendStatus(403);
 });
@@ -3989,7 +3890,7 @@ app.get("/instagram/webhook", (req, res) => {
 //     try {
 
 //         console.log("\n================================");
-//         console.log("ðŸ“© NEW INSTAGRAM WEBHOOK");
+//         console.log("Ã°Å¸â€œÂ© NEW INSTAGRAM WEBHOOK");
 //         console.log(JSON.stringify(req.body, null, 2));
 //         console.log("================================");
 
@@ -4002,7 +3903,7 @@ app.get("/instagram/webhook", (req, res) => {
 //             for (const event of messaging) {
 
 //     console.log(
-//         "ðŸ”Ž Instagram event keys:",
+//         "Ã°Å¸â€Å½ Instagram event keys:",
 //         Object.keys(event)
 //     );
 
@@ -4018,7 +3919,7 @@ app.get("/instagram/webhook", (req, res) => {
 //         event.message_edit
 //     ) {
 //         console.log(
-//             "â„¹ï¸ Ignoring non-message Instagram event"
+//             "Ã¢â€žÂ¹Ã¯Â¸Â Ignoring non-message Instagram event"
 //         );
 
 //         continue;
@@ -4041,7 +3942,7 @@ app.get("/instagram/webhook", (req, res) => {
 //     if (!senderId || !message) {
 
 //         console.log(
-//             "âš ï¸ Instagram message missing sender/text:"
+//             "Ã¢Å¡Â Ã¯Â¸Â Instagram message missing sender/text:"
 //         );
 
 //         console.log(
@@ -4056,12 +3957,12 @@ app.get("/instagram/webhook", (req, res) => {
 //     }
 
 //     console.log(
-//         "ðŸ“¨ Instagram sender:",
+//         "Ã°Å¸â€œÂ¨ Instagram sender:",
 //         senderId
 //     );
 
 //     console.log(
-//         "ðŸ’¬ Instagram message:",
+//         "Ã°Å¸â€™Â¬ Instagram message:",
 //         message
 //     );
 
@@ -4090,7 +3991,7 @@ app.get("/instagram/webhook", (req, res) => {
 //                     );
 
 //                 console.log(
-//                     "ðŸ¤– INSTAGRAM AI UNDERSTANDING:"
+//                     "Ã°Å¸Â¤â€“ INSTAGRAM AI UNDERSTANDING:"
 //                 );
 
 //                 console.log(
@@ -4149,7 +4050,7 @@ app.get("/instagram/webhook", (req, res) => {
 //                     });
 
 //                 console.log(
-//                     "ðŸ¤– Instagram AI reply:",
+//                     "Ã°Å¸Â¤â€“ Instagram AI reply:",
 //                     reply
 //                 );
 
@@ -4173,7 +4074,7 @@ app.get("/instagram/webhook", (req, res) => {
 //                 );
 
 //                 console.log(
-//                     "âœ… Instagram reply completed"
+//                     "Ã¢Å“â€¦ Instagram reply completed"
 //                 );
 //             }
 //         }
@@ -4182,7 +4083,7 @@ app.get("/instagram/webhook", (req, res) => {
 //     catch (error) {
 
 //         console.error(
-//             "\nâŒ INSTAGRAM WEBHOOK ERROR:"
+//             "\nÃ¢ÂÅ’ INSTAGRAM WEBHOOK ERROR:"
 //         );
 
 //         console.error(error);
@@ -4261,7 +4162,7 @@ app.get("/api/instagram/callback", async (req, res) => {
 
         if (error) {
             console.error(
-                "âŒ Instagram OAuth error:",
+                "Ã¢ÂÅ’ Instagram OAuth error:",
                 error,
                 error_reason
             );
@@ -4322,7 +4223,7 @@ app.get("/api/instagram/callback", async (req, res) => {
             await tokenResponse.json();
 
         console.log(
-            "ðŸ“¸ Instagram token response:",
+            "Ã°Å¸â€œÂ¸ Instagram token response:",
             tokenData
         );
 
@@ -4331,7 +4232,7 @@ app.get("/api/instagram/callback", async (req, res) => {
             !tokenData.access_token
         ) {
             console.error(
-                "âŒ Instagram token exchange failed:",
+                "Ã¢ÂÅ’ Instagram token exchange failed:",
                 tokenData
             );
 
@@ -4360,7 +4261,7 @@ const longLivedData =
     await longLivedResponse.json();
 
 console.log(
-    "ðŸ“¸ Instagram long-lived token response:",
+    "Ã°Å¸â€œÂ¸ Instagram long-lived token response:",
     {
         ok: longLivedResponse.ok,
         expires_in: longLivedData.expires_in,
@@ -4373,7 +4274,7 @@ if (
     !longLivedData.access_token
 ) {
     console.error(
-        "âŒ Instagram long-lived token exchange failed:",
+        "Ã¢ÂÅ’ Instagram long-lived token exchange failed:",
         longLivedData
     );
 
@@ -4395,11 +4296,11 @@ const tokenExpiresAt =
     ).toISOString();
 
 console.log(
-    "âœ… Instagram long-lived token obtained"
+    "Ã¢Å“â€¦ Instagram long-lived token obtained"
 );
 
 console.log(
-    "â³ Instagram token expires:",
+    "Ã¢ÂÂ³ Instagram token expires:",
     tokenExpiresAt
 );
 
@@ -4418,7 +4319,7 @@ const meResponse = await fetch(
 const meData = await meResponse.json();
 
 console.log(
-    "ðŸ“¸ Instagram /me:",
+    "Ã°Å¸â€œÂ¸ Instagram /me:",
     meData
 );
 
@@ -4427,7 +4328,7 @@ if (
     !meData.user_id
 ) {
     console.error(
-        "âŒ Could not get Instagram account ID:",
+        "Ã¢ÂÅ’ Could not get Instagram account ID:",
         meData
     );
 
@@ -4469,7 +4370,7 @@ const instagramUserId =
         if (saveError) {
 
             console.error(
-                "âŒ Instagram connection save failed:",
+                "Ã¢ÂÅ’ Instagram connection save failed:",
                 saveError
             );
 
@@ -4484,7 +4385,7 @@ const instagramUserId =
         );
 
         console.log(
-            "âœ… INSTAGRAM CONNECTED"
+            "Ã¢Å“â€¦ INSTAGRAM CONNECTED"
         );
 
         console.log(
@@ -4529,7 +4430,7 @@ const instagramUserId =
 
             <body>
 
-                <h2>âœ… Instagram connected successfully</h2>
+                <h2>Ã¢Å“â€¦ Instagram connected successfully</h2>
 
                 <p>
                     Your Instagram account is now connected
@@ -4547,7 +4448,7 @@ const instagramUserId =
     } catch (error) {
 
         console.error(
-            "âŒ Instagram callback error:",
+            "Ã¢ÂÅ’ Instagram callback error:",
             error
         );
 
@@ -4567,7 +4468,7 @@ app.post("/instagram/webhook", async (req, res) => {
     try {
 
         console.log("\n================================");
-        console.log("ðŸ“© NEW INSTAGRAM WEBHOOK");
+        console.log("Ã°Å¸â€œÂ© NEW INSTAGRAM WEBHOOK");
         console.log(JSON.stringify(req.body, null, 2));
         console.log("================================");
 
@@ -4578,16 +4479,21 @@ app.post("/instagram/webhook", async (req, res) => {
     entry?.id;
 
 const {
-    data: instagramProfile,
+    data: matchingProfiles,
     error: instagramProfileError
 } = await supabase
     .from("profiles")
-    .select("id, instagram_user_id, instagram_connected")
+    .select("id, instagram_user_id, instagram_connected, business_name")
     .eq(
         "instagram_user_id",
         String(instagramBusinessId)
     )
-    .maybeSingle();
+    .eq(
+        "instagram_connected",
+        true
+    )
+    .order("created_at", { ascending: false })
+    .limit(1);
 
 if (instagramProfileError) {
     console.error(
@@ -4598,9 +4504,10 @@ if (instagramProfileError) {
     continue;
 }
 
+const instagramProfile = matchingProfiles && matchingProfiles.length > 0 ? matchingProfiles[0] : null;
 if (!instagramProfile) {
     console.error(
-        "âŒ No Kangro profile found for Instagram account:",
+        "Ã¢ÂÅ’ No Kangro profile found for Instagram account:",
         instagramBusinessId
     );
 
@@ -4608,7 +4515,7 @@ if (!instagramProfile) {
 }
 
 console.log(
-    "âœ… Kangro Instagram profile matched:",
+    "Ã¢Å“â€¦ Kangro Instagram profile matched:",
     instagramProfile
 );
 
@@ -4623,7 +4530,7 @@ const activeInstagramProfileId =
             for (const event of messaging) {
 
                 console.log(
-                    "ðŸ”Ž Instagram event keys:",
+                    "Ã°Å¸â€Å½ Instagram event keys:",
                     Object.keys(event)
                 );
 
@@ -4641,7 +4548,7 @@ const activeInstagramProfileId =
                 ) {
 
                     console.log(
-                        "â„¹ï¸ Ignoring non-customer Instagram event"
+                        "Ã¢â€žÂ¹Ã¯Â¸Â Ignoring non-customer Instagram event"
                     );
 
                     continue;
@@ -4656,7 +4563,7 @@ const activeInstagramProfileId =
 
                 if (!senderId) {
                     console.log(
-                        "âš ï¸ Instagram event missing sender id"
+                        "Ã¢Å¡Â Ã¯Â¸Â Instagram event missing sender id"
                     );
                     continue;
                 }
@@ -4683,7 +4590,7 @@ const activeInstagramProfileId =
                 if (proofImageUrl) {
 
                     console.log(
-                        "ðŸ“¸ Detected payment screenshot / image from Instagram customer:",
+                        "Ã°Å¸â€œÂ¸ Detected payment screenshot / image from Instagram customer:",
                         proofImageUrl
                     );
 
@@ -4740,22 +4647,22 @@ const activeInstagramProfileId =
                         if (!updateError) {
 
                             console.log(
-                                "âœ… Booking confirmed via screenshot proof:",
+                                "Ã¢Å“â€¦ Booking confirmed via screenshot proof:",
                                 pendingBooking.id
                             );
 
-                            const confirmationMessage = `Perfect! Payment proof received. Your appointment is confirmed. ðŸ˜Š
+                            const confirmationMessage = `Perfect! Payment proof received. Your appointment is confirmed. Ã°Å¸ËœÅ 
 
-âœ¨ ${BUSINESS.name}
+Ã¢Å“Â¨ ${BUSINESS.name}
 
 Service: ${pendingBooking.service}
 Date: ${formatDateForCustomer(pendingBooking.booking_date)}
 Time: ${formatTimeForCustomer(pendingBooking.booking_time)}
-ðŸ’³ Advance received: â‚¹${advAmount}
-ðŸ’° Balance remaining: â‚¹${balance}
-ðŸ“ ${BUSINESS.address}
+Ã°Å¸â€™Â³ Advance received: Ã¢â€šÂ¹${advAmount}
+Ã°Å¸â€™Â° Balance remaining: Ã¢â€šÂ¹${balance}
+Ã°Å¸â€œÂ ${BUSINESS.address}
 
-We look forward to seeing you! ðŸ˜Š`;
+We look forward to seeing you! Ã°Å¸ËœÅ `;
 
                             await sendInstagramMessage(
                                 senderId,
@@ -4784,19 +4691,19 @@ We look forward to seeing you! ðŸ˜Š`;
                 if (!message) {
 
                     console.log(
-                        "âš ï¸ Instagram message missing text"
+                        "Ã¢Å¡Â Ã¯Â¸Â Instagram message missing text"
                     );
 
                     continue;
                 }
 
                 console.log(
-                    "ðŸ“¨ Instagram sender:",
+                    "Ã°Å¸â€œÂ¨ Instagram sender:",
                     senderId
                 );
 
                 console.log(
-                    "ðŸ’¬ Instagram message:",
+                    "Ã°Å¸â€™Â¬ Instagram message:",
                     message
                 );
 
@@ -4822,7 +4729,7 @@ We look forward to seeing you! ðŸ˜Š`;
                     );
 
                 console.log(
-                    "ðŸ¤– INSTAGRAM AI UNDERSTANDING:"
+                    "Ã°Å¸Â¤â€“ INSTAGRAM AI UNDERSTANDING:"
                 );
 
                 console.log(booking);
@@ -4919,7 +4826,7 @@ Do not invent availability.
                     else {
 
                         console.log(
-                            "ðŸ“… Complete Instagram booking details received"
+                            "Ã°Å¸â€œâ€¦ Complete Instagram booking details received"
                         );
 
                         const service =
@@ -4980,7 +4887,7 @@ const servicePrice =
                         ) {
 
                             console.log(
-                                "âš ï¸ Existing pending Instagram booking found:",
+                                "Ã¢Å¡Â Ã¯Â¸Â Existing pending Instagram booking found:",
                                 existingPending.id
                             );
 
@@ -5010,10 +4917,10 @@ Appointment status:
 Pending payment
 
 Advance required:
-â‚¹${salonAdvance}
+Ã¢â€šÂ¹${salonAdvance}
 
 Tell the customer:
-"The advance payment for your appointment is â‚¹${salonAdvance}.
+"The advance payment for your appointment is Ã¢â€šÂ¹${salonAdvance}.
 Please scan the QR code below to make the payment.
 Once you've paid, please send me a screenshot of the payment confirmation."
 
@@ -5029,7 +4936,7 @@ Do NOT say the appointment is confirmed yet.
                         else {
 
                             console.log(
-                                "ðŸ“ Creating Instagram pending booking..."
+                                "Ã°Å¸â€œÂ Creating Instagram pending booking..."
                             );
 
                             const {
@@ -5110,7 +5017,7 @@ source:
                             if (error) {
 
                                 console.error(
-                                    "âŒ INSTAGRAM BOOKING INSERT ERROR:",
+                                    "Ã¢ÂÅ’ INSTAGRAM BOOKING INSERT ERROR:",
                                     error
                                 );
 
@@ -5131,7 +5038,7 @@ Apologize naturally and ask the customer to try again.
                             else {
 
                                 console.log(
-                                    "âœ… INSTAGRAM PENDING BOOKING CREATED:",
+                                    "Ã¢Å“â€¦ INSTAGRAM PENDING BOOKING CREATED:",
                                     createdBooking.id
                                 );
 
@@ -5170,19 +5077,19 @@ ${formatTimeForCustomer(
 )}
 
 Service price:
-â‚¹${servicePrice}
+Ã¢â€šÂ¹${servicePrice}
 
 Advance:
-â‚¹${salonAdvance}
+Ã¢â€šÂ¹${salonAdvance}
 
 Remaining balance after advance:
-â‚¹${Math.max(
+Ã¢â€šÂ¹${Math.max(
     servicePrice - salonAdvance,
     0
 )}
 
 Tell the customer:
-"The advance payment for your appointment is â‚¹${salonAdvance}.
+"The advance payment for your appointment is Ã¢â€šÂ¹${salonAdvance}.
 Please scan the QR code below to make the payment.
 Once you've paid, please send me a screenshot of the payment confirmation."
 
@@ -5235,7 +5142,7 @@ The customer asked about the product: "${dbProduct.name}".
 Product Details from Inventory Database:
 - Name: ${dbProduct.name}
 - Category: ${dbProduct.category || "General"}
-- Price: â‚¹${dbProduct.price}
+- Price: Ã¢â€šÂ¹${dbProduct.price}
 - Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
 
 Respond naturally to the customer with the exact price and stock availability.
@@ -5243,7 +5150,7 @@ Respond naturally to the customer with the exact price and stock availability.
                     } else if (allProducts && allProducts.length > 0) {
                         const productListText = allProducts
                             .slice(0, 10)
-                            .map(p => `- ${p.name} (â‚¹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
+                            .map(p => `- ${p.name} (Ã¢â€šÂ¹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
                             .join("\n");
 
                         systemResult = `
@@ -5314,11 +5221,14 @@ Do not invent:
                             systemResult,
 
                         phone:
-                            instagramPhone
+                            instagramPhone,
+
+                        profileId:
+                            activeInstagramProfileId
                     });
 
                 console.log(
-                    "ðŸ¤– Instagram AI reply:",
+                    "Ã°Å¸Â¤â€“ Instagram AI reply:",
                     reply
                 );
 
@@ -5343,7 +5253,7 @@ Do not invent:
                 );
 
                 console.log(
-                    "âœ… Instagram reply completed"
+                    "Ã¢Å“â€¦ Instagram reply completed"
                 );
 
                 // -----------------------------------------
@@ -5353,7 +5263,7 @@ Do not invent:
                 if (shouldSendQrCode && activeSalonQrUrl) {
                     try {
                         console.log(
-                            "ðŸ“¸ Sending UPI QR image to Instagram customer:",
+                            "Ã°Å¸â€œÂ¸ Sending UPI QR image to Instagram customer:",
                             activeSalonQrUrl
                         );
                         await sendInstagramImage(
@@ -5362,11 +5272,11 @@ Do not invent:
                             activeInstagramProfileId
                         );
                         console.log(
-                            "âœ… Instagram UPI QR image sent successfully"
+                            "Ã¢Å“â€¦ Instagram UPI QR image sent successfully"
                         );
                     } catch (imgErr) {
                         console.error(
-                            "âš ï¸ Failed to send Instagram UPI QR image:",
+                            "Ã¢Å¡Â Ã¯Â¸Â Failed to send Instagram UPI QR image:",
                             imgErr
                         );
                     }
@@ -5379,7 +5289,7 @@ Do not invent:
     catch (error) {
 
         console.error(
-            "\nâŒ INSTAGRAM WEBHOOK ERROR:"
+            "\nÃ¢ÂÅ’ INSTAGRAM WEBHOOK ERROR:"
         );
 
         console.error(error);
@@ -5426,7 +5336,7 @@ async function generateBillPDF(bill, items, profileData) {
 
             const INR = v => `\u20B9${Number(v || 0).toLocaleString("en-IN", { minimumFractionDigits: 1, maximumFractionDigits: 2 })}`;
 
-            // â”€â”€ HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Ã¢â€â‚¬Ã¢â€â‚¬ HEADER Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             const headerY = doc.y;
 
             // Left: logo box + business info
@@ -5456,11 +5366,11 @@ async function generateBillPDF(bill, items, profileData) {
 
             doc.text(invoiceDate, L + 360, doc.y, { width: W - 360, align: "right" });
 
-            // â”€â”€ DIVIDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Ã¢â€â‚¬Ã¢â€â‚¬ DIVIDER Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             const divY = Math.max(doc.y, headerY + 70) + 8;
             doc.moveTo(L, divY).lineTo(R, divY).strokeColor("#cccccc").lineWidth(1).stroke();
 
-            // â”€â”€ BILL TO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Ã¢â€â‚¬Ã¢â€â‚¬ BILL TO Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             let curY = divY + 10;
             doc.fontSize(9).font("Helvetica-Bold").fillColor("#666666")
                .text("Bill To", L, curY);
@@ -5473,7 +5383,7 @@ async function generateBillPDF(bill, items, profileData) {
             doc.fontSize(10).font("Helvetica").fillColor("#333333")
                .text(`Phone  ${bill.phone || "-"}`, L, curY);
 
-            // â”€â”€ ITEMS TABLE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Ã¢â€â‚¬Ã¢â€â‚¬ ITEMS TABLE HEADER Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             curY = doc.y + 12;
             const col = { sl: L, desc: L + 30, gross: L + 240, qty: L + 330, disc: L + 385, net: L + 455 };
 
@@ -5490,7 +5400,7 @@ async function generateBillPDF(bill, items, profileData) {
 
             curY += 18;
 
-            // â”€â”€ ITEMS TABLE ROWS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Ã¢â€â‚¬Ã¢â€â‚¬ ITEMS TABLE ROWS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             let totalGross = 0;
             let totalDiscount = 0;
             let totalNet = 0;
@@ -5516,7 +5426,7 @@ async function generateBillPDF(bill, items, profileData) {
                 doc.moveTo(L, curY).lineTo(R, curY).strokeColor("#e5e5e5").lineWidth(0.5).stroke();
             });
 
-            // â”€â”€ ITEMS TOTAL ROW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Ã¢â€â‚¬Ã¢â€â‚¬ ITEMS TOTAL ROW Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             curY += 2;
             doc.rect(L, curY, W, 18).fillColor("#f7f7f7").fill();
             const totY = curY + 4;
@@ -5527,7 +5437,7 @@ async function generateBillPDF(bill, items, profileData) {
             doc.text(INR(totalNet), col.net, totY, { width: 95, align: "right" });
             curY += 20;
 
-            // â”€â”€ BOTTOM TWO PANELS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Ã¢â€â‚¬Ã¢â€â‚¬ BOTTOM TWO PANELS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             curY += 10;
             const panelW = (W / 2) - 8;
             const panelR = L + panelW + 16; // right panel x start
@@ -5542,14 +5452,14 @@ async function generateBillPDF(bill, items, profileData) {
 
             curY += 16;
 
-            // Payment Details panel â€” sub-header row
+            // Payment Details panel Ã¢â‚¬â€ sub-header row
             doc.rect(L, curY, panelW, 14).fillColor("#f5f5f5").fill();
             doc.fontSize(8).font("Helvetica-Bold").fillColor("#555555");
             doc.text("Mode", L + 4, curY + 3, { width: panelW / 2 - 4 });
             doc.text("Amount", L + panelW / 2, curY + 3, { width: panelW / 2 - 4, align: "right" });
             curY += 14;
 
-            // Payment Details panel â€” payment row
+            // Payment Details panel Ã¢â‚¬â€ payment row
             const payMethod = bill.payment_method || "Cash";
             const grandTotal = Number(bill.total || totalNet);
             const advPaid = Number(bill.advance_paid || 0);
@@ -5606,7 +5516,7 @@ async function generateBillPDF(bill, items, profileData) {
             doc.rect(L, curY - 14 - 16, panelW, panelEndY - (curY - 14 - 16)).strokeColor("#cccccc").lineWidth(0.7).stroke();
             doc.rect(panelR, curY - 14 - 16, panelW, panelEndY - (curY - 14 - 16)).strokeColor("#cccccc").lineWidth(0.7).stroke();
 
-            // â”€â”€ FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Ã¢â€â‚¬Ã¢â€â‚¬ FOOTER Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             const footerY = panelEndY + 24;
             doc.moveTo(L, footerY).lineTo(R, footerY).strokeColor("#cccccc").lineWidth(1).stroke();
             doc.fontSize(9).font("Helvetica").fillColor("#777777")
@@ -5966,6 +5876,20 @@ app.post(
 
 
             // ==========================================
+            // GET PROFILE (for business name/address/phone)
+            // ==========================================
+
+            let profileData = null;
+            if (bill.profile_id) {
+                const { data: prof } = await supabase
+                    .from("profiles")
+                    .select("business_name, business_address, business_phone")
+                    .eq("id", bill.profile_id)
+                    .maybeSingle();
+                profileData = prof || null;
+            }
+
+            // ==========================================
             // GENERATE PDF
             // ==========================================
 
@@ -5973,11 +5897,11 @@ app.post(
                 "Generating bill PDF..."
             );
 
-
             const pdfBuffer =
                 await generateBillPDF(
                     bill,
-                    items
+                    items,
+                    profileData
                 );
 
 
@@ -6082,7 +6006,7 @@ if (phone.startsWith("+91")) {
 
 const whatsappTo = `whatsapp:${phone}`;
 
-console.log("ðŸ“± Sending bill to:", whatsappTo);
+console.log("Ã°Å¸â€œÂ± Sending bill to:", whatsappTo);
 
 
             // ==========================================
@@ -6122,27 +6046,27 @@ const twilioMessage =
                 `Hi ${
                     bill.customer_name ||
                     "there"
-                }! ðŸ‘‹
+                }! 👋
 
-Thank you for visiting Bella Salon.
+Thank you for choosing ${profileData?.business_name || "us"}.
 
-ðŸ§¾ Your Bill
+🧾 Your Bill
 
 Total Service Amount:
-â‚¹${grossTotal.toLocaleString("en-IN")}
+₹${grossTotal.toLocaleString("en-IN")}
 
 Advance Paid:
--â‚¹${advancePaid.toLocaleString("en-IN")}
+-₹${advancePaid.toLocaleString("en-IN")}
 
 Balance Due:
-â‚¹${balanceDue.toLocaleString("en-IN")}
+₹${balanceDue.toLocaleString("en-IN")}
 
 Payment Method:
 ${bill.payment_method || "UPI"}
 
 Your e-bill is attached.
 
-Thank you for choosing Bella Salon! ðŸ˜Š`,
+Thank you for choosing ${profileData?.business_name || "us"}! 😊`,
 
             mediaUrl: [
                 pdfUrl
@@ -6403,7 +6327,7 @@ async function generateMenuPDF() {
                     .font("Helvetica")
                     .fillColor("#777777")
                     .text(
-                        "SALON & SPA â€¢ SERVICE MENU",
+                        "SALON & SPA Ã¢â‚¬Â¢ SERVICE MENU",
                         {
                             align: "center"
                         }
@@ -6420,7 +6344,7 @@ async function generateMenuPDF() {
                     );
 
                 doc.text(
-                    `${BUSINESS.phone} â€¢ ${BUSINESS.hours}`,
+                    `${BUSINESS.phone} Ã¢â‚¬Â¢ ${BUSINESS.hours}`,
                     {
                         align: "center"
                     }
@@ -6487,7 +6411,7 @@ async function generateMenuPDF() {
                             doc
                                 .font("Helvetica")
                                 .fillColor("#0f172a")
-                                .text(`₹${price.toLocaleString("en-IN")}`, 430, itemY, { width: 120, align: "right" });
+                                .text(`â‚¹${price.toLocaleString("en-IN")}`, 430, itemY, { width: 120, align: "right" });
 
                             doc.moveDown(0.3);
                         });
@@ -6574,23 +6498,23 @@ app.listen(
         );
 
         console.log(
-            "ðŸš€ Bella Salon Server"
+            "Ã°Å¸Å¡â‚¬ Bella Salon Server"
         );
 
         console.log(
-            `ðŸš€ Running on port ${PORT}`
+            `Ã°Å¸Å¡â‚¬ Running on port ${PORT}`
         );
 
         console.log(
-            `ðŸ’³ UPI: ${UPI_ID}`
+            `Ã°Å¸â€™Â³ UPI: ${UPI_ID}`
         );
 
         console.log(
-            `ðŸ’° Advance: â‚¹${ADVANCE_AMOUNT}`
+            `Ã°Å¸â€™Â° Advance: Ã¢â€šÂ¹${ADVANCE_AMOUNT}`
         );
 
         console.log(
-            `ðŸ¤– AI Model: ${AI_MODEL}`
+            `Ã°Å¸Â¤â€“ AI Model: ${AI_MODEL}`
         );
 
         console.log(
@@ -6609,7 +6533,7 @@ app.listen(
 
 
             console.log(
-                "âœ… Twilio Connected"
+                "Ã¢Å“â€¦ Twilio Connected"
             );
 
         }
@@ -6617,7 +6541,7 @@ app.listen(
         catch (error) {
 
             console.log(
-                "âŒ Twilio Connection Failed"
+                "Ã¢ÂÅ’ Twilio Connection Failed"
             );
 
             console.log(

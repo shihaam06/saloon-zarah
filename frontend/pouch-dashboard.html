@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POUCH Dashboard | Kangro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#101828;
+  --muted:#667085;
+  --muted2:#98A2B3;
+  --line:#E4E7EC;
+  --surface:#F8FAFC;
+  --surface2:#F2F4F7;
+  --white:#fff;
+  --pouch:#7C3AED;
+  --pouch-light:#F5F3FF;
+  --green:#12B76A;
+  --shadow:0 12px 35px rgba(16,24,40,.08);
+}
+body.dark{
+  --ink:#F8FAFC;--muted:#A7B0C0;--muted2:#7F8A9D;--line:#263244;
+  --surface:#0F172A;--surface2:#182234;--white:#111827;
+  --pouch-light:#23153C;background:#0B1220;color:var(--ink);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(--surface);min-height:100vh;display:flex}
+
+/* SIDEBAR */
+.sidebar{width:260px;background:#111827;color:#98A2B3;padding:24px 16px;display:flex;flex-direction:column;flex-shrink:0;min-height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 10px;margin-bottom:32px}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;display:grid;place-items:center;font-family:Manrope;font-weight:800;font-size:16px}
+.brand-name{font-family:Manrope;font-size:17px;font-weight:800;color:#fff}
+.brand-sub{font-size:10px;color:#A78BFA;letter-spacing:1px}
+.nav{display:flex;flex-direction:column;gap:5px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;color:#94A3B8;cursor:pointer;transition:.2s;text-decoration:none}
+.nav-item:hover{background:#1F2937;color:#fff}
+.nav-item.active{background:#7C3AED;color:#fff}
+.nav-item span.icon{font-size:16px;width:20px;text-align:center}
+.user-box{background:#1F2937;border-radius:12px;padding:12px;margin-top:auto}
+.user-name{font-size:12px;font-weight:700;color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:#A78BFA}
+.logout-btn{width:100%;margin-top:10px;padding:8px;border-radius:8px;border:1px solid #374151;background:#111827;color:#E5E7EB;font-size:11px;font-weight:700;cursor:pointer;transition:.2s}
+.logout-btn:hover{background:#dc2626;border-color:#dc2626;color:#fff}
+
+/* MAIN */
+.main{flex:1;padding:32px 36px;overflow-y:auto;max-height:100vh}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+.top-title h1{font-family:Manrope;font-size:24px;font-weight:800}
+.top-title p{font-size:13px;color:var(--muted);margin-top:2px}
+.top-actions{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:.2s}
+.btn-pouch{background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff}
+.btn-pouch:hover{box-shadow:0 8px 20px rgba(124,58,237,.3);transform:translateY(-1px)}
+.btn-outline{background:var(--white);border-color:var(--line);color:var(--ink)}
+.btn-green{background:linear-gradient(135deg,#059669,#10B981);color:#fff}
+.btn-green:hover{box-shadow:0 8px 20px rgba(5,150,105,.3);transform:translateY(-1px)}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 2px 5px rgba(0,0,0,.03)}
+.stat-card label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat-card strong{display:block;font-family:Manrope;font-size:22px;font-weight:800;margin-top:6px}
+.stat-card small{font-size:11px;color:var(--green);font-weight:700;display:inline-block;margin-top:4px}
+
+/* PIPELINE */
+.board-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.board-head h2{font-family:Manrope;font-size:18px;font-weight:800}
+.pipeline-board{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.column{background:var(--surface2);border-radius:14px;padding:14px;min-height:420px;display:flex;flex-direction:column}
+.col-header{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em}
+.col-count{background:rgba(0,0,0,.08);padding:2px 8px;border-radius:12px;font-size:10px}
+.cards-container{display:flex;flex-direction:column;gap:10px;flex:1}
+.order-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:.15s}
+.order-card:hover{border-color:#A78BFA;transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.12)}
+.order-top{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:var(--pouch);margin-bottom:4px}
+.order-card h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.order-desc{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:8px}
+.order-meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+.order-price{font-weight:800;font-family:Manrope;font-size:14px}
+.tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px}
+.tag-paid{background:#ECFDF3;color:#027A48}
+.tag-pending{background:#FEF3C7;color:#B45309}
+.tag-prod{background:#EEF2FF;color:#4338CA}
+
+/* MODAL BASE */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;place-items:center;z-index:999;padding:20px;overflow-y:auto}
+.modal.show{display:grid}
+.modal-box{background:var(--white);width:min(520px,100%);border-radius:22px;padding:30px;box-shadow:var(--shadow);border:1px solid var(--line);max-height:90vh;overflow-y:auto;margin:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.modal-head h3{font-family:Manrope;font-size:19px;font-weight:800}
+.close-btn{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:13px;outline:none;font-family:inherit;transition:.2s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--pouch);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+
+/* BILL PREVIEW inside modal */
+.bill-preview{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0;font-family:"DM Sans",sans-serif}
+.bill-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.bill-biz{font-family:Manrope;font-size:15px;font-weight:800}
+.bill-id{font-size:11px;color:var(--muted)}
+.bill-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.bill-row:last-child{border-bottom:none;font-weight:700;font-size:13px;margin-top:6px;color:var(--pouch)}
+.bill-note{font-size:11px;color:var(--muted);margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+
+/* ORDER DETAIL DRAWER */
+.drawer{position:fixed;top:0;right:-560px;width:min(520px,100vw);height:100vh;background:var(--white);border-left:1px solid var(--line);box-shadow:-20px 0 60px rgba(0,0,0,.12);z-index:1000;transition:right .3s ease;overflow-y:auto;padding:28px}
+.drawer.open{right:0}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:none}
+.drawer-overlay.open{display:block}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.drawer-head h2{font-family:Manrope;font-size:20px;font-weight:800}
+.detail-block{background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:12px}
+.detail-block label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:4px}
+.detail-block p{font-size:14px;font-weight:600}
+.status-select{width:100%;padding:10px;border:1.5px solid var(--pouch);border-radius:10px;background:var(--pouch-light);color:var(--pouch);font-weight:700;font-size:13px;outline:none;cursor:pointer}
+.drawer-actions{display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+
+@media(max-width:1100px){.pipeline-board{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;min-height:auto}.stat-grid{grid-template-columns:1fr 1fr}.pipeline-board{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">P</div>
+    <div>
+      <div class="brand-name">POUCH</div>
+      <div class="brand-sub">BY KANGRO</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="pouch-dashboard.html" class="nav-item active"><span class="icon">📦</span> Order Pipeline</a>
+    <a href="pouch-catalog.html" class="nav-item"><span class="icon">🛍️</span> Product Catalog</a>
+    <a href="pouch-customers.html" class="nav-item"><span class="icon">👥</span> Customer Book</a>
+    <a href="pouch-analytics.html" class="nav-item"><span class="icon">📈</span> Analytics</a>
+    <a href="pouch-settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
+    <a href="index.html" class="nav-item"><span class="icon">🌐</span> Kangro Home</a>
+  </nav>
+  <div class="user-box">
+    <span class="user-name" id="bizName">Loading...</span>
+    <span class="user-role">POUCH Seller Account</span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="top-title">
+      <h1 id="welcomeTitle">Order Pipeline</h1>
+      <p>Track every order from Instagram DM to doorstep delivery.</p>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-outline" onclick="openPaymentLinkModal()">💳 Payment Link</button>
+      <button class="btn btn-pouch" onclick="openNewOrderModal()">➕ New Order</button>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <label>Active Orders</label>
+      <strong id="activeCount">0</strong>
+      <small>Live in pipeline</small>
+    </div>
+    <div class="stat-card">
+      <label>Revenue</label>
+      <strong id="revTotal">₹0</strong>
+      <small>Total confirmed sales</small>
+    </div>
+    <div class="stat-card">
+      <label>Ready to Ship</label>
+      <strong id="readyCount">0</strong>
+      <small>Awaiting dispatch</small>
+    </div>
+    <div class="stat-card">
+      <label>Inquiries</label>
+      <strong id="inqCount">0</strong>
+      <small>Captured via AI</small>
+    </div>
+  </div>
+
+  <div class="board-head">
+    <h2>Orders Pipeline</h2>
+    <span style="font-size:12px;color:var(--muted)">Click any order card for full details</span>
+  </div>
+
+  <div class="pipeline-board">
+    <div class="column">
+      <div class="col-header"><span>💬 DM Inquiries</span><span class="col-count" id="c1Count">0</span></div>
+      <div class="cards-container" id="colInquiry">
+        <div style="text-align:center;padding:24px 8px;color:var(--muted);font-size:12px;">Loading orders...</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="col-header"><span>💳 Payment Confirmed</span><span class="col-count" id="c2Count">0</span></div>
+      <div class="cards-container" id="colPaid">
+        <div style="text-align:center;padding:24px 8px;color:var(--muted);font-size:12px;">Loading orders...</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="col-header"><span>🔨 In Production</span><span class="col-count" id="c3Count">0</span></div>
+      <div class="cards-container" id="colProd">
+        <div style="text-align:center;padding:24px 8px;color:var(--muted);font-size:12px;">Loading orders...</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="col-header"><span>📦 Ready & Dispatched</span><span class="col-count" id="c4Count">0</span></div>
+      <div class="cards-container" id="colDone">
+        <div style="text-align:center;padding:24px 8px;color:var(--muted);font-size:12px;">Loading orders...</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ORDER DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="orderDrawer">
+  <div class="drawer-head">
+    <div>
+      <h2 id="dOrderId">—</h2>
+      <span id="dSource" style="font-size:12px;color:var(--muted)">—</span>
+    </div>
+    <button class="close-btn" onclick="closeDrawer()" style="font-size:26px">×</button>
+  </div>
+
+  <div class="detail-block">
+    <label>👤 Customer Name</label>
+    <p id="dName">—</p>
+  </div>
+  <div class="detail-block">
+    <label>📱 WhatsApp / Phone</label>
+    <p id="dPhone">—</p>
+  </div>
+  <div class="detail-block">
+    <label>🛍️ Order Details</label>
+    <p id="dDetails">—</p>
+  </div>
+  <div class="detail-block">
+    <label>💰 Amount</label>
+    <p id="dPrice" style="font-family:Manrope;font-size:20px;font-weight:800;color:var(--pouch)">₹0</p>
+  </div>
+  <div class="detail-block">
+    <label>📅 Date Received</label>
+    <p id="dDate">—</p>
+  </div>
+  <div class="detail-block">
+    <label>🔄 Update Status</label>
+    <select class="status-select" id="dStatus">
+      <option value="inquiry">💬 DM Inquiry</option>
+      <option value="paid">💳 Payment Confirmed</option>
+      <option value="prod">🔨 In Production</option>
+      <option value="done">📦 Ready / Dispatched</option>
+    </select>
+  </div>
+
+  <div class="drawer-actions">
+    <button class="btn btn-green" style="justify-content:center" onclick="sendWhatsAppBill()">📲 Send WhatsApp Bill</button>
+    <button class="btn btn-pouch" style="justify-content:center" onclick="sendPaymentLink()">💳 Send Payment Link</button>
+    <button class="btn btn-outline" style="justify-content:center" onclick="closeDrawer()">Close</button>
+  </div>
+</div>
+
+<!-- NEW ORDER MODAL -->
+<div class="modal" id="newOrderModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>➕ Add New Order</h3>
+      <button class="close-btn" onclick="closeModals()">×</button>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Customer Name *</label>
+        <input type="text" id="custName" placeholder="e.g. Priya Nair">
+      </div>
+      <div class="form-group">
+        <label>WhatsApp Number *</label>
+        <input type="tel" id="custPhone" placeholder="+91 98765 43210">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Instagram Handle</label>
+      <input type="text" id="custHandle" placeholder="e.g. @priya_n (optional)">
+    </div>
+    <div class="form-group">
+      <label>Product / Order Details *</label>
+      <textarea id="orderDetails" rows="3" placeholder="e.g. 1kg Belgian Truffle Cake, Eggless, gold leaf decoration, custom message"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Total Amount (₹) *</label>
+        <input type="number" id="orderPrice" placeholder="850">
+      </div>
+      <div class="form-group">
+        <label>Order Stage</label>
+        <select id="orderStage">
+          <option value="inquiry">💬 DM Inquiry</option>
+          <option value="paid" selected>💳 Payment Confirmed</option>
+          <option value="prod">🔨 In Production</option>
+          <option value="done">📦 Ready to Ship</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Live bill preview -->
+    <div class="bill-preview" id="billPreview">
+      <div class="bill-header">
+        <div class="bill-biz" id="previewBiz">Your Store</div>
+        <div class="bill-id">#P-NEW · <span id="previewDate"></span></div>
+      </div>
+      <div class="bill-row"><span>Customer</span><span id="previewName">—</span></div>
+      <div class="bill-row"><span>Item</span><span id="previewItem">—</span></div>
+      <div class="bill-row"><span>Total Amount</span><span id="previewPrice">₹—</span></div>
+      <div class="bill-note">Send this bill via WhatsApp after clicking "Save & Send Bill"</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-outline" onclick="saveNewOrder(false)">Save Only</button>
+      <button class="btn btn-green" onclick="saveNewOrder(true)">📲 Save & Send Bill</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT LINK MODAL -->
+<div class="modal" id="payModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>💳 Payment Link Generator</h3>
+      <button class="close-btn" onclick="closeModals()">×</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Customer Name</label>
+        <input type="text" id="payCust" placeholder="e.g. Maya">
+      </div>
+      <div class="form-group">
+        <label>WhatsApp Number</label>
+        <input type="tel" id="payPhone" placeholder="+91 98765 43210">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Item Description</label>
+      <input type="text" id="payItem" placeholder="e.g. Crochet Cardigan — Deposit">
+    </div>
+    <div class="form-group">
+      <label>Amount (₹)</label>
+      <input type="number" id="payAmt" placeholder="750">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModals()">Close</button>
+      <button class="btn btn-pouch" onclick="sharePaymentLink()">📲 Share on WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/theme.js"></script>
+<script>
+let currentUser = null;
+let currentProfile = null;
+let orders = {};
+let activeOrderId = null;
+
+async function checkSession() {
+  const { data, error } = await client.auth.getSession();
+  if (error || !data.session) { window.location.href='login.html'; return; }
+  currentUser = data.session.user;
+  await loadProfileData();
+  await loadOrders();
+}
+
+async function loadProfileData() {
+  const { data: prof } = await client.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+  if (prof) {
+    currentProfile = prof;
+    document.getElementById('bizName').textContent = prof.business_name || 'POUCH Store';
+    document.getElementById('welcomeTitle').textContent = (prof.business_name || 'POUCH') + ' — Order Pipeline';
+    document.getElementById('previewBiz').textContent = prof.business_name || 'POUCH Store';
+  }
+}
+
+async function loadOrders() {
+  try {
+    const { data, error } = await client
+      .from('bookings')
+      .select('*')
+      .eq('profile_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    orders = {};
+    const colInquiry = document.getElementById('colInquiry');
+    const colPaid    = document.getElementById('colPaid');
+    const colProd    = document.getElementById('colProd');
+    const colDone    = document.getElementById('colDone');
+
+    colInquiry.innerHTML = '';
+    colPaid.innerHTML    = '';
+    colProd.innerHTML    = '';
+    colDone.innerHTML    = '';
+
+    let c1 = 0, c2 = 0, c3 = 0, c4 = 0, totalRev = 0;
+
+    if (data && data.length > 0) {
+      data.forEach(b => {
+        const idStr = String(b.id);
+        const shortId = '#P-' + idStr.substring(0, 6).toUpperCase();
+        const statusRaw = (b.status || 'pending').toLowerCase();
+        let stage = 'inquiry';
+        if (statusRaw === 'confirmed' || statusRaw === 'paid') stage = 'paid';
+        else if (statusRaw === 'in_progress' || statusRaw === 'in_baking') stage = 'prod';
+        else if (statusRaw === 'completed' || statusRaw === 'delivered') stage = 'done';
+
+        const price = Number(b.advance_amount || b.balance_amount || 0) || 500;
+        if (stage === 'paid' || stage === 'done') totalRev += price;
+
+        orders[idStr] = {
+          id: shortId,
+          realId: b.id,
+          name: b.customer_name || 'Customer',
+          phone: b.phone || '',
+          handle: b.source === 'instagram' ? '@' + (b.customer_name || '').toLowerCase().replace(/\s+/g, '_') : 'Direct',
+          details: b.service || b.notes || 'Custom Order',
+          price: price,
+          source: b.source || 'Instagram DM',
+          date: b.booking_date || new Date(b.created_at).toLocaleDateString('en-IN', { month:'short', day:'numeric' }),
+          status: stage
+        };
+
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.onclick = () => openOrderDrawer(idStr);
+        card.innerHTML = `
+          <div class="order-top"><span>${shortId}</span><span>${orders[idStr].source}</span></div>
+          <h4>${orders[idStr].name}</h4>
+          <p class="order-desc">${orders[idStr].details}</p>
+          <div class="order-meta">
+            <span class="order-price">₹${price.toLocaleString('en-IN')}</span>
+            <span class="tag ${stage === 'inquiry' ? 'tag-pending' : (stage === 'prod' ? 'tag-prod' : 'tag-paid')}">
+              ${stage === 'inquiry' ? 'Inquiry' : (stage === 'paid' ? '✓ Paid' : (stage === 'prod' ? 'In Production' : '✓ Dispatched'))}
+            </span>
+          </div>
+        `;
+
+        if (stage === 'inquiry') { colInquiry.appendChild(card); c1++; }
+        else if (stage === 'paid') { colPaid.appendChild(card); c2++; }
+        else if (stage === 'prod') { colProd.appendChild(card); c3++; }
+        else { colDone.appendChild(card); c4++; }
+      });
+    }
+
+    document.getElementById('c1Count').textContent = c1;
+    document.getElementById('c2Count').textContent = c2;
+    document.getElementById('c3Count').textContent = c3;
+    document.getElementById('c4Count').textContent = c4;
+
+    document.getElementById('activeCount').textContent = c1 + c2 + c3;
+    document.getElementById('revTotal').textContent = '₹' + totalRev.toLocaleString('en-IN');
+    document.getElementById('readyCount').textContent = c4;
+    document.getElementById('inqCount').textContent = c1;
+
+    ['colInquiry','colPaid','colProd','colDone'].forEach(colId => {
+      const el = document.getElementById(colId);
+      if (!el.children.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px 8px;color:var(--muted);font-size:12px;">No orders here</div>';
+      }
+    });
+  } catch (err) {
+    console.error('Error loading live orders:', err);
+  }
+}
+
+// --- ORDER DRAWER ---
+function openOrderDrawer(id) {
+  const o = orders[id];
+  if (!o) return;
+  activeOrderId = id;
+  document.getElementById('dOrderId').textContent = o.id;
+  document.getElementById('dSource').textContent = o.source;
+  document.getElementById('dName').textContent = o.name;
+  document.getElementById('dPhone').textContent = o.phone ? o.phone.replace(/(\+91)(\d{5})(\d{5})/, '$1 $2 $3') : '—';
+  document.getElementById('dDetails').textContent = o.details;
+  document.getElementById('dPrice').textContent = '₹' + o.price.toLocaleString('en-IN');
+  document.getElementById('dDate').textContent = o.date;
+  document.getElementById('dStatus').value = o.status;
+  document.getElementById('orderDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('orderDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  activeOrderId = null;
+}
+
+document.getElementById('dStatus')?.addEventListener('change', async (e) => {
+  if (!activeOrderId) return;
+  const o = orders[activeOrderId];
+  if (!o) return;
+  const newStage = e.target.value;
+  let dbStatus = 'pending';
+  if (newStage === 'paid') dbStatus = 'confirmed';
+  else if (newStage === 'prod') dbStatus = 'in_progress';
+  else if (newStage === 'done') dbStatus = 'completed';
+
+  await client.from('bookings').update({ status: dbStatus }).eq('id', o.realId);
+  await loadOrders();
+});
+
+function sendWhatsAppBill() {
+  if (!activeOrderId) return;
+  const o = orders[activeOrderId];
+  const biz = currentProfile?.business_name || 'POUCH Store';
+  const upi = currentProfile?.upi_id || 'upi@bank';
+  const msg =
+    `🧾 *Order Bill from ${biz}*\n\n` +
+    `Hi *${o.name.split(' ')[0]}*! Here's a summary of your order:\n\n` +
+    `📋 *Order:* ${o.id}\n` +
+    `🛍️ *Item:* ${o.details}\n` +
+    `💰 *Total:* ₹${o.price.toLocaleString('en-IN')}\n\n` +
+    `💳 *Pay via UPI:* \`${upi}\`\n\n` +
+    `Please send a payment screenshot to confirm. Thank you! 🙏\n— ${biz}`;
+
+  const phone = (o.phone || '').replace(/[^0-9]/g, '');
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function sendPaymentLink() {
+  if (!activeOrderId) return;
+  const o = orders[activeOrderId];
+  document.getElementById('payCust').value = o.name;
+  document.getElementById('payPhone').value = o.phone;
+  document.getElementById('payItem').value = o.details.substring(0, 50);
+  document.getElementById('payAmt').value = o.price;
+  closeDrawer();
+  document.getElementById('payModal').classList.add('show');
+}
+
+// --- NEW ORDER MODAL ---
+function openNewOrderModal() {
+  document.getElementById('previewDate').textContent = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+  document.getElementById('newOrderModal').classList.add('show');
+}
+
+// Live bill preview update
+['custName','orderDetails','orderPrice'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', updateBillPreview);
+});
+
+function updateBillPreview() {
+  document.getElementById('previewName').textContent = document.getElementById('custName').value || '—';
+  document.getElementById('previewItem').textContent = document.getElementById('orderDetails').value.substring(0, 40) || '—';
+  const p = document.getElementById('orderPrice').value;
+  document.getElementById('previewPrice').textContent = p ? '₹' + Number(p).toLocaleString('en-IN') : '₹—';
+}
+
+async function saveNewOrder(sendBill) {
+  const name    = document.getElementById('custName').value.trim();
+  const phone   = document.getElementById('custPhone').value.trim();
+  const handle  = document.getElementById('custHandle').value.trim();
+  const details = document.getElementById('orderDetails').value.trim();
+  const price   = Number(document.getElementById('orderPrice').value.trim()) || 0;
+  const stage   = document.getElementById('orderStage').value;
+
+  if (!name || !details || !price) {
+    alert('Please fill in customer name, order details, and price.');
+    return;
+  }
+
+  let dbStatus = 'pending';
+  if (stage === 'paid') dbStatus = 'confirmed';
+  else if (stage === 'prod') dbStatus = 'in_progress';
+  else if (stage === 'done') dbStatus = 'completed';
+
+  const { error } = await client.from('bookings').insert({
+    profile_id: currentUser.id,
+    customer_name: name,
+    phone: phone,
+    service: details,
+    advance_amount: price,
+    status: dbStatus,
+    booking_date: new Date().toISOString().split('T')[0],
+    source: handle ? `Instagram (${handle})` : 'Direct Order'
+  });
+
+  if (error) {
+    alert('Error saving order: ' + error.message);
+    return;
+  }
+
+  closeModals();
+  await loadOrders();
+
+  if (sendBill && phone) {
+    const biz = currentProfile?.business_name || 'POUCH Store';
+    const upi = currentProfile?.upi_id || 'upi@bank';
+    const msg =
+      `🧾 *Order Confirmation from ${biz}*\n\n` +
+      `Hi *${name.split(' ')[0]}*! Your order has been received.\n\n` +
+      `🛍️ *Item:* ${details}\n` +
+      `💰 *Total:* ₹${Number(price).toLocaleString('en-IN')}\n\n` +
+      `💳 *Pay via UPI:* \`${upi}\`\n\n` +
+      `Please send a payment screenshot after paying. Thank you! 🙏\n— ${biz}`;
+    const cleanPhone = phone.replace(/[^0-9]/g, '');
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+}
+
+// --- PAYMENT LINK MODAL ---
+function openPaymentLinkModal() {
+  document.getElementById('payModal').classList.add('show');
+}
+
+function closeModals() {
+  document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+}
+
+function sharePaymentLink() {
+  const cust  = document.getElementById('payCust').value.trim() || 'Customer';
+  const phone = document.getElementById('payPhone').value.trim();
+  const amt   = document.getElementById('payAmt').value.trim() || '0';
+  const item  = document.getElementById('payItem').value.trim() || 'Order';
+  const upi   = currentProfile?.upi_id || 'upi@bank';
+  const biz   = currentProfile?.business_name || 'POUCH Store';
+
+  const msg =
+    `✨ *Payment Request from ${biz}* ✨\n\n` +
+    `Hi *${cust.split(' ')[0]}*! Your payment details for *${item}*:\n\n` +
+    `💰 *Amount:* ₹${Number(amt).toLocaleString('en-IN')}\n` +
+    `💳 *UPI ID:* \`${upi}\`\n\n` +
+    `Please share the screenshot after payment to confirm your order! 🙏`;
+
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const waUrl = cleanPhone
+    ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`
+    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+  window.open(waUrl, '_blank');
+  closeModals();
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await client.auth.signOut();
+  window.location.href = 'login.html';
+});
+
+checkSession();
+</script>
+</body>
+</html>

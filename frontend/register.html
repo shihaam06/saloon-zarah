@@ -1,287 +1,132 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Kangro | Create Account</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Inter,sans-serif;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:"DM Sans",system-ui,sans-serif}
 body{
-background:#09090B;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-color:white;
+  background:#09090B;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:30px 20px;
+  color:white;
 }
-
 .container{
-
-width:420px;
-
-background:#111827;
-
-padding:40px;
-
-border-radius:24px;
-
-border:1px solid rgba(255,255,255,.06);
-
-box-shadow:
-0 20px 50px rgba(0,0,0,.45);
-
+  width:440px;
+  background:#111827;
+  padding:40px 36px;
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
 }
-
-.logo{
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
-
-margin-bottom:30px;
-
-}
-
+.logo{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
 .logoBox{
-
-width:70px;
-
-height:70px;
-
-border-radius:20px;
-
-background:linear-gradient(135deg,#7C5CFC,#5B8CFF);
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
-
-font-size:34px;
-
-box-shadow:0 12px 30px rgba(124,92,252,.35);
-
+  width:58px;height:58px;border-radius:18px;
+  background:linear-gradient(135deg,#3157E8,#5146E5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;box-shadow:0 12px 30px rgba(49,87,232,.35);
 }
+h1{text-align:center;font-size:26px;font-family:Manrope;font-weight:800;letter-spacing:-.03em}
+.subtitle{text-align:center;margin-top:6px;color:#94A3B8;font-size:13px;margin-bottom:26px}
 
-h1{
-
-text-align:center;
-
-margin-top:18px;
-
-font-size:30px;
-
-font-weight:800;
-
-letter-spacing:-1px;
-
+.product-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.product-option{
+  border:1px solid #1F2937;background:#182234;border-radius:12px;padding:12px 10px;
+  cursor:pointer;text-align:center;transition:.2s;
 }
+.product-option.selected{border-color:#3157E8;background:#1E293B;box-shadow:0 0 0 2px rgba(49,87,232,.4)}
+.product-option strong{display:block;font-size:14px;font-family:Manrope;color:#fff}
+.product-option small{font-size:10px;color:#94A3B8;display:block;margin-top:2px}
 
-.subtitle{
-
-text-align:center;
-
-margin-top:8px;
-
-color:#94A3B8;
-
-margin-bottom:35px;
-
+label{display:block;margin-bottom:6px;font-size:13px;color:#CBD5E1;font-weight:600}
+input,select{
+  width:100%;padding:13px 15px;border-radius:12px;
+  border:1px solid #1F2937;background:#1F2937;color:white;
+  font-size:14px;margin-bottom:16px;outline:none;transition:.2s;
 }
-
-label{
-
-display:block;
-
-margin-bottom:8px;
-
-font-size:14px;
-
-color:#CBD5E1;
-
-font-weight:500;
-
-}
-
-input{
-
-width:100%;
-
-padding:15px 16px;
-
-border-radius:14px;
-
-border:1px solid #1F2937;
-
-background:#1F2937;
-
-color:white;
-
-font-size:15px;
-
-margin-bottom:20px;
-
-outline:none;
-
-transition:.2s;
-
-}
-
-input:focus{
-
-border-color:#7C5CFC;
-
-box-shadow:0 0 0 4px rgba(124,92,252,.18);
-
-}
+input:focus,select:focus{border-color:#3157E8;box-shadow:0 0 0 3px rgba(49,87,232,.25)}
 
 button{
-
-width:100%;
-
-padding:15px;
-
-border:none;
-
-border-radius:14px;
-
-background:#7C5CFC;
-
-color:white;
-
-font-size:16px;
-
-font-weight:700;
-
-cursor:pointer;
-
-transition:.25s;
-
-margin-top:10px;
-
+  width:100%;padding:14px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#3157E8,#5146E5);color:white;
+  font-size:15px;font-weight:700;cursor:pointer;transition:.2s;margin-top:8px;
 }
+button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(49,87,232,.35)}
 
-button:hover{
-
-background:#6D4DF5;
-
-transform:translateY(-2px);
-
-box-shadow:0 10px 25px rgba(124,92,252,.35);
-
-}
-
-.footer{
-
-margin-top:25px;
-
-text-align:center;
-
-color:#94A3B8;
-
-font-size:14px;
-
-}
-
-.footer a{
-
-color:#7C5CFC;
-
-text-decoration:none;
-
-font-weight:600;
-
-}
-
-.footer a:hover{
-
-text-decoration:underline;
-
-}
-
+.footer{margin-top:22px;text-align:center;color:#94A3B8;font-size:13px}
+.footer a{color:#5B8CFF;text-decoration:none;font-weight:600}
+.footer a:hover{text-decoration:underline}
 </style>
-
 </head>
 
 <body>
-
 <div class="container">
+  <div class="logo">
+    <div class="logoBox">✨</div>
+  </div>
 
-<div class="logo">
+  <h1>Create Kangro Account</h1>
+  <p class="subtitle">Select your specialized product to get started</p>
 
-<div class="logoBox">
-📅
-</div>
+  <label>Select Your Platform Product</label>
+  <div class="product-selector">
+    <div class="product-option selected" id="optSal" onclick="selectProduct('SAL')">
+      <strong>✂️ SAL</strong>
+      <small>For Salons & Spas</small>
+    </div>
+    <div class="product-option" id="optPouch" onclick="selectProduct('POUCH')">
+      <strong>📦 POUCH</strong>
+      <small>For Instagram Sellers</small>
+    </div>
+  </div>
+  <input type="hidden" id="selectedProduct" value="SAL">
 
-</div>
+  <label>Business Name *</label>
+  <input type="text" id="businessName" placeholder="e.g. Bella Salon / Sweet Crumbs Bakehouse">
 
-<h1>Kangro</h1>
+  <label>Email *</label>
+  <input type="email" id="email" placeholder="owner@example.com">
 
-<p class="subtitle">
-Create your AI Booking Platform account
-</p>
+  <label>Account Password *</label>
+  <input type="password" id="password" placeholder="••••••••">
 
-<label>Business Name</label>
+  <label>Owner Security PIN (for Analytics & Settings)</label>
+  <input type="password" id="ownerPin" placeholder="4-digit PIN or password">
 
-<input
-type="text"
-id="businessName"
-placeholder="Bella Salon">
+  <button id="registerBtn">Create Account & Launch</button>
 
-<label>Email</label>
-
-<input
-type="email"
-id="email"
-placeholder="owner@example.com">
-
-<label>Account Password</label>
-
-<input
-type="password"
-id="password"
-placeholder="••••••••">
-
-<label>Owner Password / PIN (for Analytics & Settings)</label>
-
-<input
-type="password"
-id="ownerPin"
-placeholder="Used to lock Analytics & Settings">
-
-<button id="registerBtn">
-Create Account
-</button>
-
-<div class="footer">
-
-Already have an account?
-
-<a href="login.html">
-Login
-</a>
-
-</div>
-
+  <div class="footer">
+    Already have an account? <a href="login.html">Login</a>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
-<script src="js/auth.js"></script>
+<script>
+let currentProduct = "SAL";
 
+function selectProduct(prod) {
+  currentProduct = prod;
+  document.getElementById("selectedProduct").value = prod;
+  document.getElementById("optSal").classList.toggle("selected", prod === "SAL");
+  document.getElementById("optPouch").classList.toggle("selected", prod === "POUCH");
+}
+
+// Check URL query param
+const urlParams = new URLSearchParams(window.location.search);
+const prodParam = (urlParams.get("product") || "").toUpperCase();
+if (prodParam === "POUCH") {
+  selectProduct("POUCH");
+} else {
+  selectProduct("SAL");
+}
+</script>
+<script src="js/auth.js"></script>
 </body>
 </html>

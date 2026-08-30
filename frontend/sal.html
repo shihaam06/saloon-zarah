@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAL by Kangro — Complete Management Software for Salons</title>
+<meta name="description" content="SAL is the complete operating system for modern salons — online bookings, staff scheduling, billing, UPI advance payments, GST invoices, and 24/7 Instagram AI receptionist.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#101828;
+  --muted:#475467;
+  --muted2:#98A2B3;
+  --line:#E4E7EC;
+  --surface:#F8FAFC;
+  --surface2:#F2F4F7;
+  --white:#fff;
+  --primary:#E11D48;
+  --primary2:#F43F5E;
+  --primary-light:#FFF1F2;
+  --grad:linear-gradient(135deg,#E11D48 0%,#BE123C 100%);
+  --blue:#3157E8;
+  --green:#12B76A;
+  --shadow:0 24px 70px rgba(16,24,40,.10);
+  --shadow2:0 12px 35px rgba(16,24,40,.08);
+}
+
+/* DARK MODE */
+body.dark{
+  --ink:#F8FAFC;
+  --muted:#CBD5E1;
+  --muted2:#94A3B8;
+  --line:#334155;
+  --surface:#0F172A;
+  --surface2:#1E293B;
+  --white:#111827;
+  --primary-light:#2A1218;
+  background:#0B1220;
+  color:#F8FAFC;
+}
+body.dark .header{background:rgba(11,18,32,.92);border-color:#334155}
+body.dark .logo{color:#F8FAFC}
+body.dark .nav-center>a,body.dark .product-trigger{color:#CBD5E1}
+body.dark .nav-center>a:hover,body.dark .product-trigger:hover{color:var(--primary2)}
+body.dark .dropdown{background:#111827;border-color:#334155;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+body.dark .dropdown strong{color:#F8FAFC}
+body.dark .dropdown span{color:#94A3B8}
+body.dark .dropdown a:hover{background:#1E293B}
+body.dark .mobile{background:#111827;border-color:#334155}
+body.dark .mobile a{color:#F8FAFC}
+body.dark .mobile .sub{color:#94A3B8}
+body.dark .btn-outline{background:#111827;border-color:#334155;color:#F8FAFC}
+body.dark .btn-outline:hover{background:#1E293B;border-color:#475569}
+body.dark .hero{background:radial-gradient(circle at 80% 18%,rgba(225,29,72,.18),transparent 27%),radial-gradient(circle at 8% 12%,rgba(49,87,232,.10),transparent 25%)}
+body.dark .hero-desc{color:#CBD5E1}
+body.dark .hero-note{color:#94A3B8}
+body.dark .hero-note b{color:#F8FAFC}
+body.dark .section.alt{background:#0F172A}
+body.dark .trust{background:#0F172A;border-color:#334155}
+body.dark .trust-label{color:#94A3B8}
+body.dark .trust-points span{color:#CBD5E1}
+body.dark .feature-card,body.dark .pricing-card{background:#111827;border-color:#334155}
+body.dark .feature-card h3,body.dark .pricing-card h3{color:#F8FAFC}
+body.dark .feature-card p,body.dark .pricing-card .p-desc,body.dark .section-head p{color:#CBD5E1}
+body.dark .p-features li{color:#CBD5E1}
+body.dark .pricing-card .price{color:#F8FAFC}
+body.dark .workflow-grid{background:#111827;border-color:#334155}
+body.dark .wf-step{border-color:#334155}
+body.dark .wf-step h3{color:#F8FAFC}
+body.dark .wf-step p{color:#CBD5E1}
+body.dark .mock-stat{background:#182234;border-color:#334155}
+body.dark .mock-stat strong{color:#F8FAFC}
+body.dark .mock-stat label{color:#94A3B8}
+body.dark .mock-table{background:#182234;border-color:#334155}
+body.dark .mock-table-head{color:#F8FAFC}
+body.dark .mock-row{border-color:#263244;color:#E2E8F0}
+body.dark .footer{border-color:#334155;background:#0B1220}
+body.dark .footer h4{color:#F8FAFC}
+body.dark .footer-copy,body.dark .footer a:not(.logo),body.dark .footer-bottom{color:#94A3B8}
+body.dark .footer a:not(.logo):hover{color:var(--primary2)}
+body.dark .toggle{background:#182234;border-color:#334155;color:#E2E8F0}
+body.dark .toggle .sun{display:none}
+body.dark .toggle .moon{display:block}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font:inherit}
+.container{width:min(1180px,calc(100% - 44px));margin:auto}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--primary);font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase}
+.eyebrow i{display:block;width:7px;height:7px;border-radius:50%;background:var(--primary)}
+h1,h2,h3,h4{font-family:Manrope,Inter,sans-serif}
+h1,h2,h3{letter-spacing:-.045em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:10px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 8px 22px rgba(225,29,72,.22)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(225,29,72,.30)}
+.btn-outline{background:#fff;border-color:var(--line);color:#344054}
+.btn-outline:hover{border-color:#C7D0E0;background:var(--surface)}
+.btn-lg{padding:14px 22px;font-size:14px}
+.badge-sal{display:inline-block;padding:4px 10px;border-radius:20px;background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:800;letter-spacing:.05em}
+
+/* NAV */
+.header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.91);backdrop-filter:blur(18px);border-bottom:1px solid rgba(228,231,236,.78)}
+.nav{height:72px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-family:Manrope,sans-serif;font-size:20px;font-weight:800;letter-spacing:-.04em}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:0 6px 17px rgba(225,29,72,.25);color:#fff;font-weight:800;font-size:13px}
+.nav-center{display:flex;align-items:center;gap:28px;margin-left:50px}
+.nav-center>a,.product-trigger{font-size:13px;font-weight:600;color:#475467}
+.nav-center>a:hover,.product-trigger:hover{color:var(--primary)}
+.product-wrap{position:relative}
+.product-trigger{background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:5px}
+.product-trigger svg{transition:.2s}
+.product-wrap.open .product-trigger svg{transform:rotate(180deg)}
+.dropdown{position:absolute;top:38px;left:-22px;width:310px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);opacity:0;visibility:hidden;transform:translateY(-5px);transition:.18s}
+.product-wrap.open .dropdown{opacity:1;visibility:visible;transform:none}
+.dropdown a{display:flex;gap:12px;padding:13px;border-radius:10px}
+.dropdown a:hover{background:var(--surface)}
+.dropdown-icon{width:36px;height:36px;border-radius:10px;background:var(--primary-light);color:var(--primary);display:grid;place-items:center;flex:none;font-weight:800;font-size:11px}
+.dropdown-icon.pouch{background:#F5F3FF;color:#7C3AED}
+.dropdown strong{font-size:13px;display:block}
+.dropdown span{font-size:11px;color:var(--muted);display:block;margin-top:2px}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-right .login{font-size:13px;font-weight:700;padding:10px 12px}
+.toggle{width:38px;height:38px;border:1px solid var(--line);background:#fff;color:#344054;border-radius:10px;display:grid;place-items:center;cursor:pointer;margin-right:4px;transition:.2s}
+.toggle:hover{background:var(--surface)}
+.toggle svg{width:17px;height:17px}
+.toggle .moon{display:none}
+.menu{display:none;border:0;background:none;font-size:24px;cursor:pointer}
+.mobile{display:none}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;padding:85px 0 100px;background:radial-gradient(circle at 80% 18%,rgba(225,29,72,.10),transparent 27%),radial-gradient(circle at 8% 12%,rgba(49,87,232,.05),transparent 25%)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
+.hero h1{font-size:clamp(40px,4.8vw,64px);line-height:1.05;margin:15px 0 20px}
+.hero h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-desc{font-size:16px;color:var(--muted);max-width:580px;line-height:1.6}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.hero-note{display:flex;align-items:center;gap:18px;margin-top:24px;color:var(--muted);font-size:11px}
+.hero-note b{color:#344054}
+.dot-green{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
+
+/* MOCKUP - STRAIGHT & POLISHED */
+.salon-mockup{background:#0F172A;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:12px;box-shadow:0 28px 75px rgba(0,0,0,.25);transform:none}
+.mockup-bar{height:30px;display:flex;align-items:center;gap:7px;padding:0 8px;margin-bottom:8px}
+.wdot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.wdot.red{background:#FF5F56}
+.wdot.yellow{background:#FFBD2E}
+.wdot.green{background:#27C93F}
+.wtitle{font-size:11px;font-weight:600;color:#94A3B8;margin-left:8px;letter-spacing:.02em}
+
+.mockup-body{background:#F8FAFC;border-radius:14px;overflow:hidden;display:grid;grid-template-columns:116px 1fr;min-height:390px}
+.mock-side{background:#111827;color:#98A2B3;padding:18px 10px}
+.mock-brand{font-family:Manrope;font-size:11px;font-weight:800;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:5px}
+.mock-link{font-size:9px;padding:8px 8px;border-radius:7px;margin:3px 0}
+.mock-link.active{background:#273449;color:#fff}
+.mock-content{padding:18px}
+.mock-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.mock-head h4{font-size:15px}
+.mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mock-stat{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:10px}
+.mock-stat label{font-size:8px;color:#98A2B3;display:block}
+.mock-stat strong{font-family:Manrope;font-size:15px;display:block;margin-top:2px}
+.mock-table{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:12px}
+.mock-table-head{font-size:9px;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between}
+.mock-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F2F4F7;font-size:8px}
+.mock-row:last-child{border:0}
+.badge-paid{background:#ECFDF3;color:#027A48;padding:2px 6px;border-radius:4px;font-weight:700}
+.badge-ai{background:#EFF6FF;color:#2563EB;padding:2px 6px;border-radius:4px;font-weight:700}
+
+/* TRUST */
+.trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;background:#fff}
+.trust-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.trust-label{font-size:10px;color:var(--muted2);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.trust-points{display:flex;gap:24px;flex-wrap:wrap}
+.trust-points span{font-size:11px;color:#475467;font-weight:600}
+.trust-points span:before{content:"✓";color:var(--primary);margin-right:6px;font-weight:800}
+
+/* SECTIONS */
+.section{padding:96px 0}
+.section.alt{background:var(--surface)}
+.section-head{max-width:680px;margin-bottom:48px}
+.section-head.center{text-align:center;margin-left:auto;margin-right:auto}
+.section-head h2{font-size:clamp(30px,3.8vw,44px);line-height:1.1;margin:12px 0 14px}
+.section-head p{font-size:15px;color:var(--muted)}
+
+/* FEATURES GRID */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feature-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;transition:.2s}
+.feature-card:hover{transform:translateY(-3px);box-shadow:var(--shadow2)}
+.feat-icon{width:46px;height:46px;border-radius:14px;background:var(--primary-light);color:var(--primary);display:grid;place-items:center;margin-bottom:18px}
+.feat-icon svg{width:22px;height:22px}
+.feature-card h3{font-size:18px;margin-bottom:8px}
+.feature-card p{font-size:13px;color:var(--muted);line-height:1.55}
+
+/* WORKFLOW GRID */
+.workflow-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:22px;background:#fff;overflow:hidden}
+.wf-step{padding:28px 24px;border-right:1px solid var(--line)}
+.wf-step:last-child{border:0}
+.wf-num{font-family:Manrope;font-size:11px;color:var(--primary);font-weight:800}
+.wf-step h3{font-size:16px;margin:16px 0 6px}
+.wf-step p{font-size:12px;color:var(--muted)}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1050px;margin:auto}
+.pricing-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 28px;position:relative}
+.pricing-card.featured{border-color:var(--primary);box-shadow:var(--shadow)}
+.popular-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:.06em}
+.pricing-card h3{font-size:20px;margin-bottom:6px}
+.pricing-card .price{font-family:Manrope;font-size:38px;font-weight:800;margin:18px 0 6px}
+.pricing-card .price small{font-size:13px;color:var(--muted);font-weight:500}
+.pricing-card .p-desc{font-size:12px;color:var(--muted);margin-bottom:24px}
+.p-features{list-style:none;margin-bottom:28px}
+.p-features li{font-size:12px;padding:6px 0;display:flex;align-items:center;gap:8px;color:#475467}
+.p-features li:before{content:"✓";color:var(--primary);font-weight:800}
+
+/* CTA */
+.cta-wrap{padding:0 0 96px}
+.cta{position:relative;overflow:hidden;background:var(--grad);color:#fff;border-radius:28px;padding:60px 40px;text-align:center;box-shadow:0 28px 70px rgba(225,29,72,.25)}
+.cta h2{font-size:clamp(30px,3.8vw,44px);line-height:1.1}
+.cta p{max-width:620px;margin:12px auto 25px;color:rgba(255,255,255,.85);font-size:14px}
+.cta .btn-primary{background:#fff;color:var(--primary);box-shadow:none}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--line);padding:55px 0 25px}
+.footer-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:40px}
+.footer-copy{font-size:12px;color:var(--muted);max-width:320px;margin-top:13px}
+.footer h4{font-family:"DM Sans";font-size:10px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
+.footer a:not(.logo){display:block;font-size:12px;color:var(--muted);margin:9px 0}
+.footer a:not(.logo):hover{color:var(--primary)}
+.footer-bottom{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:42px;padding-top:20px;font-size:10px;color:var(--muted2)}
+
+/* RESPONSIVE */
+@media(max-width:950px){
+  .nav-center{display:none}.menu{display:block}.nav-right .login,.nav-right .btn{display:none}
+  .mobile.open{display:block;padding:12px 22px 22px;border-bottom:1px solid var(--line);background:#fff}
+  .mobile a{display:block;padding:10px 0;font-size:13px;font-weight:600}.mobile .sub{padding-left:14px;color:var(--muted)}
+  .hero-grid{grid-template-columns:1fr;gap:50px}.features-grid,.pricing-grid{grid-template-columns:1fr}
+  .workflow-grid{grid-template-columns:1fr 1fr}
+  .wf-step:nth-child(2){border-right:0}.wf-step:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:650px){
+  .container{width:calc(100% - 30px)}.hero h1{font-size:38px}
+  .workflow-grid{grid-template-columns:1fr}
+  .wf-step{border-right:0!important;border-bottom:1px solid var(--line)!important}
+  .mockup-body{grid-template-columns:75px 1fr}
+}
+</style>
+</head>
+
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo" href="index.html">
+      <span class="logo-mark">SAL</span>
+      SAL <span style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px">by Kangro</span>
+    </a>
+
+    <nav class="nav-center">
+      <div class="product-wrap" id="productWrap">
+        <button class="product-trigger" id="productTrigger">Products <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="dropdown">
+          <a href="sal.html">
+            <div class="dropdown-icon">SAL</div>
+            <div><strong>SAL</strong><span>End-to-end software for salons</span></div>
+          </a>
+          <a href="pouch.html">
+            <div class="dropdown-icon pouch">P</div>
+            <div><strong>POUCH</strong><span>Operations software for Instagram-first sellers</span></div>
+          </a>
+        </div>
+      </div>
+      <a href="#features">Features</a>
+      <a href="#workflow">How It Works</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+
+    <div class="nav-right">
+      <button class="toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
+        <span class="sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
+        <span class="moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"/></svg></span>
+      </button>
+      <a class="login" href="login.html">Log in</a>
+      <a class="btn btn-primary" href="register.html?product=sal">Get started with SAL</a>
+      <button class="menu" id="menuBtn" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile" id="mobile">
+  <div class="container">
+    <a href="index.html">Kangro Home</a>
+    <a class="sub" href="sal.html">→ SAL for Salons</a>
+    <a class="sub" href="pouch.html">→ POUCH for Sellers</a>
+    <a href="#features">Features</a>
+    <a href="#workflow">How It Works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="login.html">Log in</a>
+    <a class="btn btn-primary" href="register.html?product=sal" style="margin-top:8px">Get started with SAL</a>
+  </div>
+</div>
+
+<main>
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="badge-sal">SALON MANAGEMENT PLATFORM</span>
+      <h1>Complete operating software for <span>modern salons.</span></h1>
+      <p class="hero-desc">SAL gives you total control over appointments, walk-ins, staff scheduling, categorized services, automated GST billing, UPI advance payments, WhatsApp invoicing, and a 24/7 Instagram AI receptionist.</p>
+      <div class="hero-actions">
+        <a href="register.html?product=sal" class="btn btn-primary btn-lg">Start Free Trial <span>→</span></a>
+        <a href="dashboard.html" class="btn btn-outline btn-lg">View Live Dashboard</a>
+      </div>
+      <div class="hero-note">
+        <span><span class="dot-green"></span><b>Live in Production</b></span>
+        <span>•</span>
+        <span>No credit card required to start</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="salon-mockup">
+        <div class="mockup-bar">
+          <span class="wdot red"></span>
+          <span class="wdot yellow"></span>
+          <span class="wdot green"></span>
+          <span class="wtitle">SAL Salon OS — Live Console</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mock-side">
+            <div class="mock-brand">✂️ SAL</div>
+            <div class="mock-link active">Dashboard</div>
+            <div class="mock-link">Appointments</div>
+            <div class="mock-link">Calendar</div>
+            <div class="mock-link">Services</div>
+            <div class="mock-link">Staff</div>
+            <div class="mock-link">Billing</div>
+            <div class="mock-link">Analytics</div>
+          </div>
+          <div class="mock-content">
+            <div class="mock-head"><h4>Today's Appointments</h4><span class="badge-ai">🤖 AI Active</span></div>
+            <div class="mock-grid">
+              <div class="mock-stat"><label>Today's Bookings</label><strong>18</strong></div>
+              <div class="mock-stat"><label>Revenue</label><strong>₹14,850</strong></div>
+              <div class="mock-stat"><label>Advance Verified</label><strong>₹4,500</strong></div>
+            </div>
+            <div class="mock-table">
+              <div class="mock-table-head"><span>Client & Service</span><span>Status</span></div>
+              <div class="mock-row"><span>Pooja S. — Hair Spa & Cut</span><span class="badge-paid">Paid (UPI)</span></div>
+              <div class="mock-row"><span>Rahul K. — Beard Trim & Facial</span><span class="badge-paid">Advance Paid</span></div>
+              <div class="mock-row"><span>Ananya M. — O3+ Facial</span><span class="badge-paid">Confirmed</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trust">
+  <div class="container trust-row">
+    <span class="trust-label">End-to-End Salon Infrastructure</span>
+    <div class="trust-points">
+      <span>Online Booking</span><span>Calendar Scheduling</span><span>GST Billing</span><span>UPI Advance Payments</span><span>Instagram AI</span><span>WhatsApp Receipts</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow"><i></i> Complete Salon Features</div>
+      <h2>Everything required to run a 5-star salon.</h2>
+      <p>Built specifically around how salon owners, stylists, and clients interact every day.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <h3>Smart Appointment Calendar</h3>
+        <p>Real-time booking calendar with multi-staff view, walk-in support, duration blocks, turnaround times, and automated conflict prevention.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 5 8 12 8 12s8-7 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h3>Instagram AI Receptionist</h3>
+        <p>Never miss an inquiry. The AI bot answers customer questions, checks live availability, sends the service menu, and confirms appointments 24/7.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Staff & Stylist Management</h3>
+        <p>Track stylist working hours, assign appointments, manage commission rates, calculate performance, and prevent overbooking.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <h3>Point of Sale & GST Invoicing</h3>
+        <p>Instant digital bills with custom GST/SAC codes, discount rules, itemized addons, and automatic balance calculation after advance deduction.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+        <h3>UPI & Razorpay Advance Payments</h3>
+        <p>Lock in bookings with automated advance payments. Support QR code screenshot verification and automated Razorpay payment links.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <h3>1-Click WhatsApp Invoicing</h3>
+        <p>Send direct PDF invoice download links straight to your customer's WhatsApp chat with clean branding and receipt details.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="workflow">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow"><i></i> Salon Workflow</div>
+      <h2>Automated from first DM to final bill.</h2>
+      <p>How SAL handles client flow automatically without manual front-desk chaos.</p>
+    </div>
+
+    <div class="workflow-grid">
+      <div class="wf-step">
+        <span class="wf-num">01 / DISCOVERY</span>
+        <h3>Client Inquires on Instagram</h3>
+        <p>Customer DMs asking about prices or availability. AI responds instantly with categorized menu and available slots.</p>
+      </div>
+      <div class="wf-step">
+        <span class="wf-num">02 / ADVANCE</span>
+        <h3>Slot Booked & Advance Paid</h3>
+        <p>Client picks time, pays advance via UPI/Razorpay, and receives instant appointment confirmation.</p>
+      </div>
+      <div class="wf-step">
+        <span class="wf-num">03 / SERVICE</span>
+        <h3>Stylist Delivers Service</h3>
+        <p>Stylist marks service complete, adds any retail products or extra treatments to the live booking.</p>
+      </div>
+      <div class="wf-step">
+        <span class="wf-num">04 / CHECKOUT</span>
+        <h3>WhatsApp Invoice Generated</h3>
+        <p>1-click bill generation with advance deducted, balance settled, and clean PDF sent to client WhatsApp.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow"><i></i> Transparent Pricing</div>
+      <h2>Simple plans for growing salons.</h2>
+      <p>All plans include full POS, calendar, customer records, and WhatsApp invoice sharing.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Solo Stylist / Studio</h3>
+        <div class="price">₹999 <small>/ month</small></div>
+        <p class="p-desc">For independent stylists, barbers, and private studios.</p>
+        <ul class="p-features">
+          <li>1 Staff Account</li>
+          <li>Unlimited Appointments</li>
+          <li>Full POS & WhatsApp Invoices</li>
+          <li>UPI Advance Payments</li>
+          <li>Customer Visit History</li>
+        </ul>
+        <a href="register.html?product=sal" class="btn btn-outline" style="width:100%">Get Started</a>
+      </div>
+
+      <div class="pricing-card featured">
+        <span class="popular-tag">MOST POPULAR</span>
+        <h3>Professional Salon</h3>
+        <div class="price">₹2,499 <small>/ month</small></div>
+        <p class="p-desc">For full-service unisex salons and multi-stylist teams.</p>
+        <ul class="p-features">
+          <li>Up to 10 Stylists & Staff</li>
+          <li>24/7 Instagram AI Receptionist</li>
+          <li>GST Invoicing & SAC Codes</li>
+          <li>Inventory & Product Sales</li>
+          <li>Advance Verification & Analytics</li>
+          <li>Priority Support</li>
+        </ul>
+        <a href="register.html?product=sal" class="btn btn-primary" style="width:100%">Start 14-Day Trial</a>
+      </div>
+
+      <div class="pricing-card">
+        <h3>Salon Chains</h3>
+        <div class="price">Custom</div>
+        <p class="p-desc">For multi-branch salons, luxury spas, and franchise groups.</p>
+        <ul class="p-features">
+          <li>Unlimited Branches & Staff</li>
+          <li>Centralized Revenue Dashboard</li>
+          <li>Custom AI Training & Workflows</li>
+          <li>Dedicated Account Manager</li>
+          <li>Custom POS & Hardware Integrations</li>
+        </ul>
+        <a href="mailto:hello@kangro.in?subject=SAL Enterprise Chain Inquiry" class="btn btn-outline" style="width:100%">Contact Enterprise</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-wrap">
+  <div class="container">
+    <div class="cta">
+      <h2>Transform your salon operations today.</h2>
+      <p>Join top salons running online bookings, staff, billing, and Instagram automation with SAL.</p>
+      <a class="btn btn-primary btn-lg" href="register.html?product=sal">Get Started with SAL Free →</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="index.html"><span class="logo-mark">SAL</span>Kangro</a>
+        <p class="footer-copy">SAL is the specialized salon operating platform powered by Kangro Business Infrastructure.</p>
+      </div>
+      <div><h4>Products</h4><a href="sal.html">SAL for Salons</a><a href="pouch.html">POUCH for Sellers</a></div>
+      <div><h4>Salon Features</h4><a href="#features">Online Booking</a><a href="#features">Instagram AI</a><a href="#features">POS & GST</a><a href="#features">Staff Schedules</a></div>
+      <div><h4>Company</h4><a href="index.html">Kangro Home</a><a href="index.html#pricing">Platform Pricing</a><a href="login.html">Sign In</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Kangro Technologies. All rights reserved.</span><span>SAL — Salon Operating System.</span></div>
+  </div>
+</footer>
+
+<script src="js/theme.js"></script>
+<script>
+const productWrap=document.getElementById("productWrap");
+const productTrigger=document.getElementById("productTrigger");
+const mobile=document.getElementById("mobile");
+const menuBtn=document.getElementById("menuBtn");
+
+if(productTrigger){
+  productTrigger.addEventListener("click",e=>{
+    e.stopPropagation();
+    productWrap.classList.toggle("open");
+  });
+  document.addEventListener("click",e=>{
+    if(!productWrap.contains(e.target)) productWrap.classList.remove("open");
+  });
+}
+if(menuBtn){
+  menuBtn.addEventListener("click",()=>mobile.classList.toggle("open"));
+  document.querySelectorAll(".mobile a").forEach(a=>a.addEventListener("click",()=>mobile.classList.remove("open")));
+}
+</script>
+</body>
+</html>

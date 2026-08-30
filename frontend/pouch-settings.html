@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings | POUCH by Kangro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#101828;
+  --muted:#667085;
+  --muted2:#98A2B3;
+  --line:#E4E7EC;
+  --surface:#F8FAFC;
+  --surface2:#F2F4F7;
+  --white:#fff;
+  --pouch:#7C3AED;
+  --pouch-light:#F5F3FF;
+  --green:#12B76A;
+  --shadow:0 12px 35px rgba(16,24,40,.08);
+}
+body.dark{
+  --ink:#F8FAFC;--muted:#A7B0C0;--muted2:#7F8A9D;--line:#263244;
+  --surface:#0F172A;--surface2:#182234;--white:#111827;
+  --pouch-light:#23153C;
+  background:#0B1220;color:var(--ink);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(--surface);min-height:100vh;display:flex}
+
+/* SIDEBAR */
+.sidebar{width:260px;background:#111827;color:#98A2B3;padding:24px 16px;display:flex;flex-direction:column;flex-shrink:0;min-height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 10px;margin-bottom:32px}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;display:grid;place-items:center;font-family:Manrope;font-weight:800;font-size:16px}
+.brand-name{font-family:Manrope;font-size:17px;font-weight:800;color:#fff}
+.brand-sub{font-size:10px;color:#A78BFA;letter-spacing:1px}
+
+.nav{display:flex;flex-direction:column;gap:5px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;color:#94A3B8;cursor:pointer;transition:.2s;text-decoration:none}
+.nav-item:hover{background:#1F2937;color:#fff}
+.nav-item.active{background:#7C3AED;color:#fff}
+.nav-item span.icon{font-size:16px;width:20px;text-align:center}
+
+.user-box{background:#1F2937;border-radius:12px;padding:12px;margin-top:auto}
+.user-name{font-size:12px;font-weight:700;color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:#A78BFA}
+.logout-btn{width:100%;margin-top:10px;padding:8px;border-radius:8px;border:1px solid #374151;background:#111827;color:#E5E7EB;font-size:11px;font-weight:700;cursor:pointer;transition:.2s}
+.logout-btn:hover{background:#dc2626;border-color:#dc2626;color:#fff}
+
+/* MAIN */
+.main{flex:1;padding:32px 36px;overflow-y:auto;max-height:100vh}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+.top-title h1{font-family:Manrope;font-size:24px;font-weight:800}
+.top-title p{font-size:13px;color:var(--muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:.2s}
+.btn-pouch{background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff}
+.btn-pouch:hover{box-shadow:0 8px 20px rgba(124,58,237,.3);transform:translateY(-1px)}
+.btn-outline{background:var(--white);border-color:var(--line);color:var(--ink)}
+
+/* SETTINGS GRID */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.card.full{grid-column:1 / -1}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.card-icon{width:40px;height:40px;border-radius:12px;background:var(--pouch-light);color:var(--pouch);display:grid;place-items:center;font-size:18px}
+.card-header h2{font-family:Manrope;font-size:16px;font-weight:800}
+.card-header p{font-size:12px;color:var(--muted);margin-top:2px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1 / -1}
+.form-group label{font-size:12px;font-weight:700;color:var(--muted)}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:13px;outline:none;transition:.2s}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--pouch);box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+
+.insta-box{display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border-radius:12px;padding:16px;gap:16px;flex-wrap:wrap}
+.insta-info strong{display:block;font-size:14px;margin-bottom:4px}
+.insta-info span{font-size:12px;color:var(--muted)}
+.badge-conn{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#ECFDF3;color:#027A48}
+.badge-disc{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#FEF3C7;color:#B45309}
+
+.status-alert{display:none;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:20px}
+.status-alert.success{display:block;background:#ECFDF3;color:#027A48;border:1px solid #A7F3D0}
+.status-alert.error{display:block;background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
+
+@media(max-width:900px){.settings-grid,.form-grid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">P</div>
+    <div>
+      <div class="brand-name">POUCH</div>
+      <div class="brand-sub">BY KANGRO</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <a href="pouch-dashboard.html" class="nav-item"><span class="icon">📦</span> Order Pipeline</a>
+    <a href="pouch-catalog.html" class="nav-item"><span class="icon">🛍️</span> Product Catalog</a>
+    <a href="pouch-customers.html" class="nav-item"><span class="icon">👥</span> Customer Book</a>
+    <a href="pouch-analytics.html" class="nav-item"><span class="icon">📈</span> Analytics</a>
+    <a href="pouch-settings.html" class="nav-item active"><span class="icon">⚙️</span> Settings</a>
+    <a href="index.html" class="nav-item"><span class="icon">🌐</span> Kangro Home</a>
+  </nav>
+
+  <div class="user-box">
+    <span class="user-name" id="sidebarBizName">POUCH Store</span>
+    <span class="user-role">POUCH Seller Account</span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="top-title">
+      <h1>Store Settings</h1>
+      <p>Configure your Instagram connection, business details, UPI payments, and security.</p>
+    </div>
+    <button class="btn btn-pouch" id="saveSettingsBtn">💾 Save Changes</button>
+  </div>
+
+  <div id="statusAlert" class="status-alert"></div>
+
+  <div class="settings-grid">
+    <!-- INSTAGRAM INTEGRATION -->
+    <div class="card full">
+      <div class="card-header">
+        <div class="card-icon">📸</div>
+        <div>
+          <h2>Instagram Automation</h2>
+          <p>Connect your Instagram account so POUCH can auto-capture inquiries and respond to DMs.</p>
+        </div>
+      </div>
+      <div class="insta-box">
+        <div class="insta-info">
+          <strong id="instagramStatusTitle">Instagram Not Connected</strong>
+          <span id="instagramStatusDesc">Connect your Instagram Creator / Business account to automate replies and capture orders.</span>
+        </div>
+        <button class="btn btn-pouch" id="connectInstagramBtn">Connect Instagram</button>
+      </div>
+    </div>
+
+    <!-- BUSINESS PROFILE -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🏪</div>
+        <div>
+          <h2>Business Profile</h2>
+          <p>Your public brand and contact information.</p>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Brand / Business Name *</label>
+          <input type="text" id="businessName" placeholder="e.g. Sweet Crumbs Bakehouse">
+        </div>
+        <div class="form-group full">
+          <label>WhatsApp / Phone Number</label>
+          <input type="text" id="businessPhone" placeholder="e.g. +91 9876543210">
+        </div>
+        <div class="form-group full">
+          <label>Store / Workshop Address</label>
+          <textarea id="businessAddress" rows="2" placeholder="e.g. Studio 4, Indiranagar, Bangalore"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Business Operating Hours (Read by AI)</label>
+          <input type="text" id="businessHours" placeholder="e.g. Mon–Sat 10:00 AM – 8:00 PM">
+        </div>
+        <div class="form-group full">
+          <label>Brand Description / What You Sell</label>
+          <input type="text" id="businessDescription" placeholder="e.g. Handmade custom crochet bags, bucket hats, and artisanal bakes">
+        </div>
+        <div class="form-group full">
+          <label>🤖 AI Assistant Custom Instructions & Tone</label>
+          <textarea id="aiInstructions" rows="3" placeholder="e.g. Always ask for their customization choice (color/flavor). Mention our 3-day turnaround time for custom orders."></textarea>
+          <small style="color:var(--muted); font-size:11px; margin-top:4px; display:block;">POUCH AI will follow these exact custom instructions when answering DMs and WhatsApp messages.</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPI & PAYMENT SETTINGS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">💳</div>
+        <div>
+          <h2>UPI & GPay QR Code</h2>
+          <p>Configure manual UPI payment details and QR code sent to customers.</p>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>UPI ID (VPA)</label>
+          <input type="text" id="upiId" placeholder="e.g. yourname@okaxis">
+        </div>
+        <div class="form-group full">
+          <label>Default Advance / Deposit Amount (₹)</label>
+          <input type="number" id="advanceAmount" placeholder="e.g. 500">
+        </div>
+        <div class="form-group full">
+          <label>GPay / UPI QR Code (Auto-sent to customers on payment request)</label>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input type="text" id="upiQrImage" placeholder="Image URL or click Upload ->" style="flex:1; min-width:200px;" oninput="updateQrPreview(this.value)">
+            <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="handleQrFileUpload(event)">
+            <button type="button" class="btn btn-outline" style="padding:9px 14px; font-size:13px; cursor:pointer;" onclick="document.getElementById('qrFileInput').click()">
+              📁 Upload GPay QR
+            </button>
+          </div>
+          <div id="qrUploadStatus" style="font-size:12px; color:#059669; margin-top:6px; font-weight:600; display:none;"></div>
+          <div id="qrPreviewContainer" style="margin-top:10px; display:none;">
+            <img id="qrPreviewImg" src="" alt="QR Code Preview" style="max-height:160px; border-radius:8px; border:1px solid var(--line); padding:4px; background:#fff;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY & PIN -->
+    <div class="card full">
+      <div class="card-header">
+        <div class="card-icon">🔒</div>
+        <div>
+          <h2>Security & Analytics Access PIN</h2>
+          <p>Set a 4-digit PIN to restrict sensitive revenue and settings access.</p>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Owner Security PIN</label>
+          <input type="password" id="ownerPin" placeholder="4-digit PIN">
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/theme.js"></script>
+<script>
+let currentUser = null;
+
+function updateQrPreview(url) {
+  const container = document.getElementById("qrPreviewContainer");
+  const img = document.getElementById("qrPreviewImg");
+  if (!container || !img) return;
+  if (url && url.trim().length > 0) {
+    img.src = url.trim();
+    container.style.display = "block";
+  } else {
+    container.style.display = "none";
+  }
+}
+
+async function handleQrFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById("qrUploadStatus");
+  if (statusEl) {
+    statusEl.style.display = "block";
+    statusEl.style.color = "#7C3AED";
+    statusEl.textContent = "Uploading QR image...";
+  }
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64 = e.target.result;
+    updateQrPreview(base64);
+
+    try {
+      const res = await fetch("http://localhost:3000/api/upload-qr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile_id: currentUser ? currentUser.id : null,
+          image_data: base64
+        })
+      });
+      const json = await res.json();
+      if (json.success && json.qr_url) {
+        document.getElementById("upiQrImage").value = json.qr_url;
+        if (statusEl) {
+          statusEl.style.color = "#059669";
+          statusEl.textContent = "✓ QR image uploaded and saved!";
+        }
+      } else {
+        document.getElementById("upiQrImage").value = base64;
+        if (statusEl) {
+          statusEl.style.color = "#059669";
+          statusEl.textContent = "✓ QR image ready to save.";
+        }
+      }
+    } catch (err) {
+      document.getElementById("upiQrImage").value = base64;
+      if (statusEl) {
+        statusEl.style.color = "#059669";
+        statusEl.textContent = "✓ QR image ready to save.";
+      }
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function init() {
+  const { data, error } = await client.auth.getSession();
+  if (error || !data.session) {
+    window.location.href = "login.html";
+    return;
+  }
+  currentUser = data.session.user;
+  loadSettings();
+}
+
+async function loadSettings() {
+  const { data: prof, error } = await client.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
+  if (error) {
+    showAlert("Failed to load profile settings.", "error");
+    return;
+  }
+  if (!prof) return;
+
+  document.getElementById("sidebarBizName").textContent = prof.business_name || "POUCH Store";
+  document.getElementById("businessName").value = prof.business_name || "";
+  document.getElementById("businessPhone").value = prof.business_phone || "";
+  document.getElementById("businessAddress").value = prof.business_address || "";
+  if (document.getElementById("businessHours")) document.getElementById("businessHours").value = prof.business_hours || "";
+  if (document.getElementById("businessDescription")) document.getElementById("businessDescription").value = prof.business_description || "";
+  if (document.getElementById("aiInstructions")) document.getElementById("aiInstructions").value = prof.ai_instructions || "";
+  document.getElementById("upiId").value = prof.upi_id || "";
+  document.getElementById("advanceAmount").value = prof.advance_amount || "";
+  const qrUrl = prof.gpay_qr_url || prof.upi_qr_image || "";
+  document.getElementById("upiQrImage").value = qrUrl;
+  updateQrPreview(qrUrl);
+  document.getElementById("ownerPin").value = prof.owner_pin || "";
+
+  // Instagram status
+  const title = document.getElementById("instagramStatusTitle");
+  const desc = document.getElementById("instagramStatusDesc");
+  const btn = document.getElementById("connectInstagramBtn");
+
+  if (prof.instagram_connected) {
+    title.innerHTML = '<span class="badge-conn">✓ Connected</span> Instagram Connected';
+    desc.textContent = "Your Instagram account is actively synchronized with POUCH AI.";
+    btn.textContent = "Reconnect Instagram";
+  } else {
+    title.innerHTML = '<span class="badge-disc">● Not Connected</span> Instagram Not Connected';
+    desc.textContent = "Connect your Instagram Creator/Business account to automate DM orders.";
+    btn.textContent = "Connect Instagram";
+  }
+}
+
+document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("saveSettingsBtn");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+
+  const qrVal = document.getElementById("upiQrImage").value.trim();
+
+  const payload = {
+    business_name: document.getElementById("businessName").value.trim(),
+    business_phone: document.getElementById("businessPhone").value.trim(),
+    business_address: document.getElementById("businessAddress").value.trim(),
+    business_hours: document.getElementById("businessHours") ? document.getElementById("businessHours").value.trim() : "",
+    business_description: document.getElementById("businessDescription") ? document.getElementById("businessDescription").value.trim() : "",
+    ai_instructions: document.getElementById("aiInstructions") ? document.getElementById("aiInstructions").value.trim() : "",
+    upi_id: document.getElementById("upiId").value.trim(),
+    advance_amount: Number(document.getElementById("advanceAmount").value) || 0,
+    upi_qr_image: qrVal,
+    gpay_qr_url: qrVal,
+    owner_pin: document.getElementById("ownerPin").value.trim()
+  };
+
+  const { error } = await client.from("profiles").update(payload).eq("id", currentUser.id);
+  btn.disabled = false;
+  btn.textContent = "💾 Save Changes";
+
+  if (error) {
+    showAlert(error.message || "Could not save settings.", "error");
+  } else {
+    document.getElementById("sidebarBizName").textContent = payload.business_name || "POUCH Store";
+    showAlert("Store settings saved successfully!", "success");
+  }
+});
+
+
+document.getElementById("connectInstagramBtn").addEventListener("click", async () => {
+  try {
+    const { data: { session } } = await client.auth.getSession();
+    if (!session) {
+      alert("Please log in first.");
+      return;
+    }
+    const response = await fetch("https://saloon-zarah.onrender.com/api/instagram/connect", {
+      headers: { Authorization: `Bearer ${session.access_token}` }
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Instagram connection failed");
+    window.location.href = data.authUrl;
+  } catch (err) {
+    console.error(err);
+    alert("Could not connect Instagram. Please check your backend connection.");
+  }
+});
+
+function showAlert(msg, type) {
+  const el = document.getElementById("statusAlert");
+  el.textContent = msg;
+  el.className = `status-alert ${type}`;
+  setTimeout(() => { el.className = "status-alert"; }, 4000);
+}
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await client.auth.signOut();
+  window.location.href = "login.html";
+});
+
+init();
+</script>
+</body>
+</html>

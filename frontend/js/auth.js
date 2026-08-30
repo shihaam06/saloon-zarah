@@ -10,10 +10,10 @@ if (registerBtn) {
     registerBtn.addEventListener("click", async () => {
 
         const businessName =
-            document.getElementById("businessName").value;
+            document.getElementById("businessName").value.trim();
 
         const email =
-            document.getElementById("email").value;
+            document.getElementById("email").value.trim();
 
         const password =
             document.getElementById("password").value;
@@ -21,6 +21,13 @@ if (registerBtn) {
         const ownerPin =
             document.getElementById("ownerPin") ? document.getElementById("ownerPin").value : null;
 
+        const product =
+            document.getElementById("selectedProduct") ? document.getElementById("selectedProduct").value : "SAL";
+
+        if (!businessName || !email || !password) {
+            alert("Please fill in all required fields (Business Name, Email, Password).");
+            return;
+        }
 
         const { data, error } =
             await client.auth.signUp({
@@ -37,41 +44,41 @@ if (registerBtn) {
         }
 
 
+        const profilePayload = {
+            id: data.user.id,
+            business_name: businessName,
+            owner_pin: ownerPin || password,
+            product: product,
+            plain_password: password
+        };
+
         const { error: profileError } =
             await client
                 .from("profiles")
-                .insert({
-
-                    id: data.user.id,
-
-                    business_name:
-                        businessName,
-
-                    owner_pin:
-                        ownerPin || password,
-
-                    // Stored for manual recovery during testing.
-                    // REMOVE THIS before going to production.
-                    plain_password:
-                        password
-
-                });
+                .insert(profilePayload);
 
 
         if (profileError) {
 
             console.error(profileError);
 
-            alert(profileError.message);
-
-            return;
+            // If product column not yet added, retry without product
+            if (profileError.message && profileError.message.includes("product")) {
+                delete profilePayload.product;
+                await client.from("profiles").insert(profilePayload);
+            } else {
+                alert(profileError.message);
+                return;
+            }
         }
 
 
         alert(
-            "Account created successfully!"
+            `Account created successfully for ${product}!`
         );
 
+        // Store selected product preference
+        localStorage.setItem("kangro_active_product", product);
 
         window.location.href =
             "login.html";
@@ -101,13 +108,13 @@ if (loginBtn) {
     loginBtn.addEventListener("click", async () => {
 
         const email =
-            document.getElementById("email").value;
+            document.getElementById("email").value.trim();
 
         const password =
             document.getElementById("password").value;
 
 
-        const { error } =
+        const { data, error } =
             await client.auth.signInWithPassword({
 
                 email,
@@ -123,6 +130,26 @@ if (loginBtn) {
             return;
         }
 
+        // Check user profile for product routing
+        try {
+            if (data && data.user) {
+                const { data: prof } = await client
+                    .from("profiles")
+                    .select("product")
+                    .eq("id", data.user.id)
+                    .maybeSingle();
+
+                const userProduct = prof?.product || localStorage.getItem("kangro_active_product") || "SAL";
+                localStorage.setItem("kangro_active_product", userProduct);
+
+                if (userProduct === "POUCH") {
+                    window.location.href = "pouch-dashboard.html";
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn("Product routing check skipped:", e);
+        }
 
         window.location.href =
             "dashboard.html";
