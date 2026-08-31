@@ -387,6 +387,142 @@ textarea{
    RESPONSIVE
 ========================= */
 
+/* =========================
+   AI PREVIEW & TEST SANDBOX
+========================= */
+
+.ai-preview-card{
+    background:linear-gradient(135deg,rgba(233,130,114,0.09),rgba(233,130,114,0.03));
+    border:1.5px solid rgba(233,130,114,0.3);
+    border-radius:14px;
+    padding:18px 20px;
+    margin-bottom:24px;
+}
+.ai-preview-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+}
+.ai-preview-title{
+    font-size:13px;
+    font-weight:700;
+    color:#d96f60;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.ai-preview-meta{
+    font-size:13px;
+    color:#0f172a;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:6px;
+    font-weight:600;
+}
+.badge-tone{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:6px;
+    font-size:11px;
+    font-weight:700;
+    background:#fff0ed;
+    color:#d96f60;
+}
+.badge-category{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:6px;
+    font-size:11px;
+    font-weight:700;
+    background:#ecfdf3;
+    color:#027a48;
+}
+
+.test-ai-container{
+    background:#f8fafc;
+    border-radius:12px;
+    padding:18px;
+    border:1px solid #e2e8f0;
+}
+.test-chips{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+}
+.test-chip{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    background:#fff;
+    border:1px solid #d7dee6;
+    color:#0f172a;
+    cursor:pointer;
+    transition:.2s;
+}
+.test-chip:hover{
+    border-color:#e98272;
+    background:#fff0ed;
+    color:#d96f60;
+}
+.test-chat-log{
+    max-height:220px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:14px;
+    padding:4px;
+}
+.chat-bubble{
+    max-width:85%;
+    padding:10px 14px;
+    border-radius:14px;
+    font-size:13px;
+    line-height:1.4;
+}
+.chat-bubble.user{
+    align-self:flex-end;
+    background:#e98272;
+    color:#fff;
+    border-bottom-right-radius:4px;
+}
+.chat-bubble.ai{
+    align-self:flex-start;
+    background:#fff;
+    color:#0f172a;
+    border:1px solid #d7dee6;
+    border-bottom-left-radius:4px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.03);
+}
+.chat-bubble.ai small{
+    display:block;
+    font-size:10px;
+    color:#64748b;
+    margin-top:4px;
+}
+.test-input-row{
+    display:flex;
+    gap:10px;
+}
+.test-input-row input{
+    flex:1;
+    padding:11px 14px;
+    border-radius:8px;
+    border:1px solid #d7dee6;
+    background:#fff;
+    font-size:13px;
+    outline:none;
+}
+.test-input-row input:focus{
+    border-color:#e98272;
+    box-shadow:0 0 0 3px rgba(233,130,114,.10);
+}
+
 @media(max-width:900px){
 
     .sidebar{
@@ -549,27 +685,44 @@ textarea{
     </div>
 
 
+    <!-- AI IDENTITY PREVIEW BANNER -->
+    <div class="ai-preview-card">
+        <div class="ai-preview-header">
+            <div class="ai-preview-title">
+                <span>🤖</span> <span>AI Business Identity Active</span>
+            </div>
+            <div>
+                <span class="badge-category" id="previewCategoryBadge">Salon</span>
+                <span class="badge-tone" id="previewToneBadge">Friendly Tone</span>
+            </div>
+        </div>
+        <div class="ai-preview-meta">
+            <span>Your AI receptionist will respond to customers on WhatsApp & Instagram as:</span>
+            <strong id="previewBizNameDisplay" style="color:#d96f60;">Zarah Elite</strong>
+            <span style="color:#64748b; font-size:12px;">(<span id="previewCategoryDisplay">Salon</span>)</span>
+        </div>
+    </div>
+
     <div class="settings-grid">
 
-
         <!-- =========================
-             BUSINESS
+             AI BUSINESS PROFILE & KNOWLEDGE BASE
         ========================= -->
 
-        <div class="card">
+        <div class="card full">
 
             <div class="card-header">
 
                 <div class="card-icon icon-business">
-                    🏢
+                    🧠
                 </div>
 
                 <div>
 
-                    <h2>Business Profile</h2>
+                    <h2>AI Business Profile & Knowledge Base</h2>
 
                     <p>
-                        Basic information about your salon
+                        Configure how your AI receptionist answers customer inquiries, bookings, and pricing.
                     </p>
 
                 </div>
@@ -579,17 +732,41 @@ textarea{
 
             <div class="form-grid">
 
+                <div class="form-group">
+                    <label>Business Category *</label>
+                    <select id="businessCategory" onchange="updateAiPreview()">
+                        <option value="Salon" selected>💇‍♀️ Salon / Spa / Beauty Studio</option>
+                        <option value="Bakery">🍰 Bakery / Home Baker</option>
+                        <option value="Clothing">👗 Clothing / Fashion Brand</option>
+                        <option value="Crochet / Handmade">🧶 Crochet / Handmade Crafts</option>
+                        <option value="Home Business">🏡 Home Business</option>
+                        <option value="Retail">🛍️ Retail Store</option>
+                        <option value="Service Business">💼 Service Business</option>
+                        <option value="Other">✨ Other</option>
+                    </select>
+                </div>
 
-                <div class="form-group full">
+                <div class="form-group">
+                    <label>AI Response Tone *</label>
+                    <select id="aiTone" onchange="updateAiPreview()">
+                        <option value="Friendly" selected>😊 Friendly & Warm (Conversational with gentle emojis)</option>
+                        <option value="Professional">👔 Professional & Polite (Structured and courteous)</option>
+                        <option value="Casual">✨ Casual & Trendy (Relaxed modern style)</option>
+                        <option value="Premium">💎 Premium & Elegant (Luxury high-touch service)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
 
                     <label>
-                        Business Name
+                        Business / Salon Name *
                     </label>
 
                     <input
                         id="businessName"
                         type="text"
-                        placeholder="e.g. Glamour Studio"
+                        placeholder="e.g. Zarah Elite Studio"
+                        oninput="updateAiPreview()"
                     >
 
                 </div>
@@ -598,7 +775,7 @@ textarea{
                 <div class="form-group">
 
                     <label>
-                        Business Phone
+                        Business Phone / WhatsApp
                     </label>
 
                     <input
@@ -628,7 +805,7 @@ textarea{
                 <div class="form-group">
 
                     <label>
-                        Owner Password / PIN (for Analytics & Settings)
+                        Owner Security PIN (for Analytics & Settings)
                     </label>
 
                     <input
@@ -637,19 +814,21 @@ textarea{
                         placeholder="Used for Analytics & Settings protection"
                     >
 
+                </div>
+
                 <div class="form-group full">
 
                     <label>
-                        Business Address
+                        Business Description / Specialties
                     </label>
 
                     <textarea
-                        id="businessAddress"
-                        placeholder="Full salon address"
+                        id="businessDescription"
+                        rows="2"
+                        placeholder="e.g. Premium salon & beauty studio specializing in hair coloring, keratin treatments, hydra facials, and bridal makeovers."
                     ></textarea>
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -657,45 +836,162 @@ textarea{
                         Opening Hours (Read by AI)
                     </label>
 
-                    <input
+                    <textarea
                         id="businessHours"
-                        type="text"
-                        placeholder="e.g. Every day, 9:00 AM to 10:00 PM"
-                    >
+                        rows="3"
+                        placeholder="e.g. Tuesday–Sunday: 9:00 AM – 9:00 PM. Mondays: Closed for maintenance."
+                    ></textarea>
 
                 </div>
-
 
                 <div class="form-group">
 
                     <label>
-                        Business Description / Specialties
+                        Business Address & Location / Service Area
                     </label>
 
-                    <input
-                        id="businessDescription"
-                        type="text"
-                        placeholder="e.g. Luxury hair styling, skin care, bridal and beauty treatments"
-                    >
+                    <textarea
+                        id="businessAddress"
+                        rows="3"
+                        placeholder="e.g. Nova Arcade, Kadri Toll Gate, Mangalore - 575002."
+                    ></textarea>
 
                 </div>
 
+                <div class="form-group">
+
+                    <label>
+                        Pricing & Package Information
+                    </label>
+
+                    <textarea
+                        id="pricingInfo"
+                        rows="3"
+                        placeholder="e.g. Haircuts from ₹350. Hair color starting ₹1500. Hydra facial ₹2200. Bridal makeover packages start from ₹7500."
+                    ></textarea>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Booking & Appointment Rules
+                    </label>
+
+                    <textarea
+                        id="bookingRules"
+                        rows="3"
+                        placeholder="e.g. Prior appointment recommended on weekends. ₹500 advance deposit required to lock slots. 15-minute grace period before slot cancellation."
+                    ></textarea>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Home Visit / Delivery Info (if applicable)
+                    </label>
+
+                    <textarea
+                        id="deliveryInfo"
+                        rows="3"
+                        placeholder="e.g. Bridal home visit available within 15km radius. Retail beauty products can be shipped across the city."
+                    ></textarea>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Payment Information & Policies
+                    </label>
+
+                    <textarea
+                        id="paymentInfo"
+                        rows="3"
+                        placeholder="e.g. ₹500 advance required via UPI / GPay to confirm appointments. We accept UPI, GPay, Credit/Debit cards, and Cash."
+                    ></textarea>
+
+                </div>
 
                 <div class="form-group full">
 
                     <label>
-                        🤖 AI Custom Instructions & Tone
+                        Frequently Asked Questions (FAQ)
+                    </label>
+
+                    <textarea
+                        id="faqData"
+                        rows="3"
+                        placeholder="Q: Do you take walk-ins?&#10;A: Yes, walk-ins are welcome, but appointments get priority.&#10;&#10;Q: Is parking available?&#10;A: Yes, free parking is available in the building basement."
+                    ></textarea>
+
+                </div>
+
+                <div class="form-group full">
+
+                    <label>
+                        🤖 Owner's Custom AI Instructions (Highest Priority)
                     </label>
 
                     <textarea
                         id="aiInstructions"
                         rows="3"
-                        placeholder="e.g. Always mention our seasonal bridal package discount. Be extra warm and recommend our keratin treatment if asked about frizzy hair."
+                        placeholder="e.g. Always recommend our keratin smoothing treatment when asked about dry hair. Mention that bridal consultations are complimentary."
                     ></textarea>
-                    <small style="color:var(--muted); font-size:11px; margin-top:4px; display:block;">These custom rules will be followed by your AI receptionist on WhatsApp and Instagram.</small>
+                    <small style="color:#64748b; font-size:11px; margin-top:4px; display:block;">These custom rules will be strictly followed by your AI receptionist on WhatsApp and Instagram.</small>
 
                 </div>
 
+
+            </div>
+
+        </div>
+
+        <!-- =========================
+             TEST YOUR AI SANDBOX
+        ========================= -->
+
+        <div class="card full">
+
+            <div class="card-header">
+
+                <div class="card-icon icon-business">
+                    ⚡
+                </div>
+
+                <div>
+
+                    <h2>Interactive AI Sandbox — Test Your AI Live</h2>
+
+                    <p>
+                        Type a customer message or pick a sample question to test how your AI receptionist answers with your active settings.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="test-ai-container">
+
+                <div class="test-chips">
+                    <span class="test-chip" onclick="setTestQuery('How much is a haircut and beard trim?')">💇 Haircut price?</span>
+                    <span class="test-chip" onclick="setTestQuery('Can I book an appointment tomorrow at 4 PM?')">📅 Book appointment</span>
+                    <span class="test-chip" onclick="setTestQuery('What are your opening hours on weekends?')">⏰ Opening hours</span>
+                    <span class="test-chip" onclick="setTestQuery('Where is your salon located?')">📍 Salon location</span>
+                    <span class="test-chip" onclick="setTestQuery('How do I pay the advance deposit?')">💳 Payment deposit</span>
+                </div>
+
+                <div class="test-chat-log" id="testChatLog">
+                    <div class="chat-bubble ai">
+                        👋 Hello! I am your AI receptionist. Ask me any question to test my answers based on your configured profile!
+                    </div>
+                </div>
+
+                <div class="test-input-row">
+                    <input type="text" id="testAiInput" placeholder="Type a customer question (e.g. 'What services do you offer?')" onkeydown="if(event.key==='Enter') runAiTest()">
+                    <button type="button" class="save-btn" id="testAiBtn" onclick="runAiTest()" style="white-space:nowrap;">✨ Test AI</button>
+                </div>
 
             </div>
 
@@ -1063,6 +1359,22 @@ textarea{
 
 <script>
 
+function updateAiPreview() {
+    const name = (document.getElementById("businessName")?.value || "").trim() || "Zarah Elite";
+    const cat = document.getElementById("businessCategory")?.value || "Salon";
+    const tone = document.getElementById("aiTone")?.value || "Friendly";
+
+    const nameEl = document.getElementById("previewBizNameDisplay");
+    const catEl = document.getElementById("previewCategoryDisplay");
+    const catBadge = document.getElementById("previewCategoryBadge");
+    const toneBadge = document.getElementById("previewToneBadge");
+
+    if (nameEl) nameEl.textContent = name;
+    if (catEl) catEl.textContent = cat;
+    if (catBadge) catBadge.textContent = cat;
+    if (toneBadge) toneBadge.textContent = `${tone} Tone`;
+}
+
 function updateQrPreview(url) {
     const container = document.getElementById("qrPreviewContainer");
     const img = document.getElementById("qrPreviewImg");
@@ -1125,6 +1437,94 @@ async function handleQrFileUpload(event) {
     reader.readAsDataURL(file);
 }
 
+function setTestQuery(text) {
+    const input = document.getElementById("testAiInput");
+    if (input) {
+        input.value = text;
+        runAiTest();
+    }
+}
+
+async function runAiTest() {
+    const input = document.getElementById("testAiInput");
+    const query = input?.value.trim();
+    if (!query) return;
+
+    const btn = document.getElementById("testAiBtn");
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Thinking...";
+    }
+
+    const log = document.getElementById("testChatLog");
+
+    // Append user bubble
+    const userBubble = document.createElement("div");
+    userBubble.className = "chat-bubble user";
+    userBubble.textContent = query;
+    log.appendChild(userBubble);
+    input.value = "";
+    log.scrollTop = log.scrollHeight;
+
+    const previewProfile = {
+        business_name: document.getElementById("businessName")?.value.trim() || "",
+        business_category: document.getElementById("businessCategory")?.value || "Salon",
+        ai_tone: document.getElementById("aiTone")?.value || "Friendly",
+        business_description: document.getElementById("businessDescription")?.value.trim() || "",
+        business_phone: document.getElementById("businessPhone")?.value.trim() || "",
+        business_hours: document.getElementById("businessHours")?.value.trim() || "",
+        business_address: document.getElementById("businessAddress")?.value.trim() || "",
+        pricing_info: document.getElementById("pricingInfo")?.value.trim() || "",
+        booking_rules: document.getElementById("bookingRules")?.value.trim() || "",
+        delivery_info: document.getElementById("deliveryInfo")?.value.trim() || "",
+        payment_info: document.getElementById("paymentInfo")?.value.trim() || "",
+        faq_data: document.getElementById("faqData")?.value.trim() || "",
+        ai_instructions: document.getElementById("aiInstructions")?.value.trim() || "",
+        upi_id: document.getElementById("upiId")?.value.trim() || "",
+        advance_amount: Number(document.getElementById("advanceAmount")?.value) || 500
+    };
+
+    try {
+        const { data: { user } } = await window.client.auth.getUser();
+        const res = await fetch("http://localhost:3000/api/test-ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                profile_id: user ? user.id : null,
+                message: query,
+                preview_profile: previewProfile
+            })
+        });
+        const data = await res.json();
+
+        const aiBubble = document.createElement("div");
+        aiBubble.className = "chat-bubble ai";
+        if (data.success && data.reply) {
+            aiBubble.innerHTML = `${escapeHtml(data.reply)}<small>🤖 Responding as <strong>${escapeHtml(data.profile_used?.name || previewProfile.business_name)}</strong> (${escapeHtml(data.profile_used?.category || previewProfile.business_category)} • ${escapeHtml(data.profile_used?.tone || previewProfile.ai_tone)} Tone)</small>`;
+        } else {
+            aiBubble.textContent = data.error || "Could not generate response. Make sure backend is running.";
+        }
+        log.appendChild(aiBubble);
+    } catch (err) {
+        const aiBubble = document.createElement("div");
+        aiBubble.className = "chat-bubble ai";
+        aiBubble.textContent = "Error testing AI. Backend connection failed.";
+        log.appendChild(aiBubble);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "✨ Test AI";
+        }
+        log.scrollTop = log.scrollHeight;
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 document.addEventListener(
     "DOMContentLoaded",
     async function(){
@@ -1132,18 +1532,15 @@ document.addEventListener(
         const client =
             window.client;
 
-
         const saveBtn =
             document.getElementById(
                 "saveBtn"
             );
 
-
         const statusMessage =
             document.getElementById(
                 "statusMessage"
             );
-
 
         async function loadSettings(){
 
@@ -1157,18 +1554,14 @@ document.addEventListener(
                 } =
                     await client.auth.getUser();
 
-
                 if(
                     userError ||
                     !user
                 ){
-
                     throw new Error(
                         "User not logged in."
                     );
-
                 }
-
 
                 const {
                     data,
@@ -1183,183 +1576,86 @@ document.addEventListener(
                         )
                         .single();
 
-
                 if(error){
-
                     throw error;
-
                 }
-
 
                 if(!data){
-
                     return;
-
                 }
+
                 // Instagram connection status
-const instagramStatus =
-    document.getElementById("instagramStatus");
+                const instagramStatus = document.getElementById("instagramStatus");
+                const instagramUsername = document.getElementById("instagramUsername");
+                const connectInstagramBtn = document.getElementById("connectInstagramBtn");
 
-const instagramUsername =
-    document.getElementById("instagramUsername");
-
-const connectInstagramBtn =
-    document.getElementById("connectInstagramBtn");
-
-if (data.instagram_connected) {
-
-    instagramStatus.textContent =
-        "Instagram connected";
-
-    instagramUsername.textContent =
-        "Your salon's Instagram account is connected.";
-
-    connectInstagramBtn.textContent =
-        "Instagram Connected";
-
-    connectInstagramBtn.disabled = true;
-
-} else {
-
-    instagramStatus.textContent =
-        "Instagram not connected";
-
-    instagramUsername.textContent =
-        "Connect your salon's Instagram to receive customer enquiries and bookings.";
-
-    connectInstagramBtn.textContent =
-        "Connect Instagram";
-
-    connectInstagramBtn.disabled = false;
-}
-
-
-                document
-                    .getElementById(
-                        "businessName"
-                    )
-                    .value =
-                    data.business_name || "";
-
-
-                document
-                    .getElementById(
-                        "sidebarBusinessName"
-                    )
-                    .textContent =
-                    data.business_name ||
-                    "abcdef";
-
-
-                document
-                    .getElementById(
-                        "businessPhone"
-                    )
-                    .value =
-                    data.business_phone || "";
-
-
-                if (document.getElementById("ownerPin")) {
-                    document.getElementById("ownerPin").value = data.owner_pin || "";
+                if (data.instagram_connected) {
+                    if (instagramStatus) instagramStatus.textContent = "Instagram connected";
+                    if (instagramUsername) instagramUsername.textContent = "Your salon's Instagram account is connected.";
+                    if (connectInstagramBtn) {
+                        connectInstagramBtn.textContent = "Instagram Connected";
+                        connectInstagramBtn.disabled = true;
+                    }
+                } else {
+                    if (instagramStatus) instagramStatus.textContent = "Instagram not connected";
+                    if (instagramUsername) instagramUsername.textContent = "Connect your salon's Instagram to receive customer enquiries and bookings.";
+                    if (connectInstagramBtn) {
+                        connectInstagramBtn.textContent = "Connect Instagram";
+                        connectInstagramBtn.disabled = false;
+                    }
                 }
 
-
-                document
-                    .getElementById(
-                        "businessAddress"
-                    )
-                    .value =
-                    data.business_address || "";
-
-
-                document
-                    .getElementById(
-                        "gstEnabled"
-                    )
-                    .checked =
-                    data.gst_enabled || false;
-
-
-                document
-                    .getElementById(
-                        "gstin"
-                    )
-                    .value =
-                    data.gstin || "";
-
-
-                document
-                    .getElementById(
-                        "businessState"
-                    )
-                    .value =
-                    data.business_state || "";
-
-
-                document
-                    .getElementById(
-                        "stateCode"
-                    )
-                    .value =
-                    data.state_code || "";
-
-
-                document
-                    .getElementById(
-                        "invoicePrefix"
-                    )
-                    .value =
-                    data.invoice_prefix ||
-                    "INV-";
-
-
-                document
-                    .getElementById(
-                        "nextInvoiceNumber"
-                    )
-                    .value =
-                    data.next_invoice_number ||
-                    1;
-
-                if (document.getElementById("businessHours")) {
-                    document.getElementById("businessHours").value = data.business_hours || "";
+                // Parse any extra JSON
+                let extra = {};
+                if (data.ai_business_profile) {
+                    try { extra = typeof data.ai_business_profile === "string" ? JSON.parse(data.ai_business_profile) : data.ai_business_profile; } catch(e){}
+                } else if (data.ai_instructions && data.ai_instructions.startsWith("{")) {
+                    try { extra = JSON.parse(data.ai_instructions); } catch(e){}
                 }
-                if (document.getElementById("businessDescription")) {
-                    document.getElementById("businessDescription").value = data.business_description || "";
-                }
+
+                if (document.getElementById("businessName")) document.getElementById("businessName").value = data.business_name || extra.business_name || "";
+                if (document.getElementById("sidebarBusinessName")) document.getElementById("sidebarBusinessName").textContent = data.business_name || extra.business_name || "Salon";
+                if (document.getElementById("businessCategory")) document.getElementById("businessCategory").value = data.business_category || extra.business_category || "Salon";
+                if (document.getElementById("aiTone")) document.getElementById("aiTone").value = data.ai_tone || extra.ai_tone || "Friendly";
+                if (document.getElementById("businessPhone")) document.getElementById("businessPhone").value = data.business_phone || extra.business_phone || "";
+                if (document.getElementById("businessEmail")) document.getElementById("businessEmail").value = data.business_email || extra.business_email || "";
+                if (document.getElementById("ownerPin")) document.getElementById("ownerPin").value = data.owner_pin || "";
+                if (document.getElementById("businessAddress")) document.getElementById("businessAddress").value = data.business_address || extra.business_address || "";
+                if (document.getElementById("businessHours")) document.getElementById("businessHours").value = data.business_hours || extra.business_hours || "";
+                if (document.getElementById("businessDescription")) document.getElementById("businessDescription").value = data.business_description || extra.business_description || "";
+                if (document.getElementById("pricingInfo")) document.getElementById("pricingInfo").value = data.pricing_info || extra.pricing_info || "";
+                if (document.getElementById("bookingRules")) document.getElementById("bookingRules").value = data.booking_rules || extra.booking_rules || "";
+                if (document.getElementById("deliveryInfo")) document.getElementById("deliveryInfo").value = data.delivery_info || extra.delivery_info || "";
+                if (document.getElementById("paymentInfo")) document.getElementById("paymentInfo").value = data.payment_info || extra.payment_info || "";
+                if (document.getElementById("faqData")) document.getElementById("faqData").value = data.faq_data || extra.faq_data || "";
                 if (document.getElementById("aiInstructions")) {
-                    document.getElementById("aiInstructions").value = data.ai_instructions || "";
+                    document.getElementById("aiInstructions").value = (typeof extra.ai_instructions === "string" ? extra.ai_instructions : (data.ai_instructions && !data.ai_instructions.startsWith("{") ? data.ai_instructions : "")) || "";
                 }
 
-                // UPI and payment settings
+                if (document.getElementById("gstEnabled")) document.getElementById("gstEnabled").checked = data.gst_enabled || false;
+                if (document.getElementById("gstin")) document.getElementById("gstin").value = data.gstin || "";
+                if (document.getElementById("businessState")) document.getElementById("businessState").value = data.business_state || "";
+                if (document.getElementById("stateCode")) document.getElementById("stateCode").value = data.state_code || "";
+                if (document.getElementById("invoicePrefix")) document.getElementById("invoicePrefix").value = data.invoice_prefix || "INV-";
+                if (document.getElementById("nextInvoiceNumber")) document.getElementById("nextInvoiceNumber").value = data.next_invoice_number || 1;
+
                 const upiIdInput = document.getElementById("upiId");
                 const advanceAmountInput = document.getElementById("advanceAmount");
                 const upiQrImageInput = document.getElementById("upiQrImage");
 
-                if (upiIdInput) {
-                    upiIdInput.value = data.upi_id || "mohammedshihaamfayaz@okaxis";
-                }
-                if (advanceAmountInput) {
-                    advanceAmountInput.value = data.advance_amount !== undefined && data.advance_amount !== null ? data.advance_amount : 500;
-                }
+                if (upiIdInput) upiIdInput.value = data.upi_id || extra.upi_id || "mohammedshihaamfayaz@okaxis";
+                if (advanceAmountInput) advanceAmountInput.value = data.advance_amount !== undefined && data.advance_amount !== null ? data.advance_amount : (extra.advance_amount || 500);
                 if (upiQrImageInput) {
-                    upiQrImageInput.value = data.gpay_qr_url || data.upi_qr_image || "";
+                    upiQrImageInput.value = data.gpay_qr_url || data.upi_qr_image || extra.gpay_qr_url || extra.upi_qr_image || "";
                     updateQrPreview(upiQrImageInput.value);
                 }
 
+                updateAiPreview();
+
             }
             catch(error){
-
-                console.error(
-                    "Settings load error:",
-                    error
-                );
-
-                showStatus(
-                    "Could not load settings.",
-                    "error"
-                );
-
+                console.error("Settings load error:", error);
+                showStatus("Could not load settings.", "error");
             }
 
         }
@@ -1368,10 +1664,7 @@ if (data.instagram_connected) {
         async function saveSettings(){
 
             saveBtn.disabled = true;
-
-            saveBtn.textContent =
-                "Saving...";
-
+            saveBtn.textContent = "Saving...";
 
             try{
 
@@ -1383,173 +1676,86 @@ if (data.instagram_connected) {
                 } =
                     await client.auth.getUser();
 
-
                 if(
                     userError ||
                     !user
                 ){
-
                     throw new Error(
                         "User not logged in."
                     );
-
                 }
 
+                const qrVal = (document.getElementById("upiQrImage")?.value || "").trim();
 
                 const updates = {
-
-                    business_name:
-                        document
-                            .getElementById(
-                                "businessName"
-                            )
-                            .value
-                            .trim(),
-
-                    business_phone:
-                        document
-                            .getElementById(
-                                "businessPhone"
-                            )
-                            .value
-                            .trim(),
-
-                    business_hours:
-                        document.getElementById("businessHours")
-                            ? document.getElementById("businessHours").value.trim()
-                            : "",
-
-                    business_description:
-                        document.getElementById("businessDescription")
-                            ? document.getElementById("businessDescription").value.trim()
-                            : "",
-
-                    ai_instructions:
-                        document.getElementById("aiInstructions")
-                            ? document.getElementById("aiInstructions").value.trim()
-                            : "",
-
-                    owner_pin:
-                        document
-                            .getElementById("ownerPin")
-                            ? document.getElementById("ownerPin").value.trim()
-                            : "",
-
-                    business_address:
-                        document
-                            .getElementById(
-                                "businessAddress"
-                            )
-                            .value
-                            .trim(),
-
-                    gst_enabled:
-                        document
-                            .getElementById(
-                                "gstEnabled"
-                            )
-                            .checked,
-
-                    gstin:
-                        document
-                            .getElementById(
-                                "gstin"
-                            )
-                            .value
-                            .trim()
-                            .toUpperCase(),
-
-                    business_state:
-                        document
-                            .getElementById(
-                                "businessState"
-                            )
-                            .value,
-
-                    state_code:
-                        document
-                            .getElementById(
-                                "stateCode"
-                            )
-                            .value
-                            .trim(),
-
-                    invoice_prefix:
-                        document
-                            .getElementById(
-                                "invoicePrefix"
-                            )
-                            .value
-                            .trim() ||
-                        "INV-",
-
-                    next_invoice_number:
-                        Number(
-                            document
-                                .getElementById(
-                                    "nextInvoiceNumber"
-                                )
-                                .value
-                        ) || 1,
-
-                    upi_id:
-                        document.getElementById("upiId")
-                            ? document.getElementById("upiId").value.trim()
-                            : "mohammedshihaamfayaz@okaxis",
-
-                    advance_amount:
-                        document.getElementById("advanceAmount") && document.getElementById("advanceAmount").value
-                            ? Number(document.getElementById("advanceAmount").value)
-                            : 500,
-
-                    upi_qr_image:
-                        document.getElementById("upiQrImage")
-                            ? document.getElementById("upiQrImage").value.trim()
-                            : "",
-
-                    gpay_qr_url:
-                        document.getElementById("upiQrImage")
-                            ? document.getElementById("upiQrImage").value.trim()
-                            : ""
-
+                    business_name: document.getElementById("businessName")?.value.trim() || "",
+                    business_category: document.getElementById("businessCategory")?.value || "Salon",
+                    ai_tone: document.getElementById("aiTone")?.value || "Friendly",
+                    business_phone: document.getElementById("businessPhone")?.value.trim() || "",
+                    business_hours: document.getElementById("businessHours")?.value.trim() || "",
+                    business_description: document.getElementById("businessDescription")?.value.trim() || "",
+                    pricing_info: document.getElementById("pricingInfo")?.value.trim() || "",
+                    booking_rules: document.getElementById("bookingRules")?.value.trim() || "",
+                    delivery_info: document.getElementById("deliveryInfo")?.value.trim() || "",
+                    payment_info: document.getElementById("paymentInfo")?.value.trim() || "",
+                    faq_data: document.getElementById("faqData")?.value.trim() || "",
+                    ai_instructions: document.getElementById("aiInstructions")?.value.trim() || "",
+                    owner_pin: document.getElementById("ownerPin")?.value.trim() || "",
+                    business_address: document.getElementById("businessAddress")?.value.trim() || "",
+                    gst_enabled: document.getElementById("gstEnabled")?.checked || false,
+                    gstin: (document.getElementById("gstin")?.value || "").trim().toUpperCase(),
+                    business_state: document.getElementById("businessState")?.value || "",
+                    state_code: (document.getElementById("stateCode")?.value || "").trim(),
+                    invoice_prefix: (document.getElementById("invoicePrefix")?.value || "").trim() || "INV-",
+                    next_invoice_number: Number(document.getElementById("nextInvoiceNumber")?.value) || 1,
+                    upi_id: (document.getElementById("upiId")?.value || "").trim(),
+                    advance_amount: Number(document.getElementById("advanceAmount")?.value) || 0,
+                    upi_qr_image: qrVal,
+                    gpay_qr_url: qrVal
                 };
 
-
-                const {
-                    error
-                } =
-                    await client
-                        .from("profiles")
-                        .update(updates)
-                        .eq(
-                            "id",
-                            user.id
-                        );
-
-
-                if(error){
-
-                    throw error;
-
+                // Try saving via backend endpoint (handles columns + JSON fallback seamlessly)
+                try {
+                    const res = await fetch("http://localhost:3000/api/profile/ai-settings", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            profile_id: user.id,
+                            settings: updates
+                        })
+                    });
+                    const json = await res.json();
+                    if (!json.success) throw new Error(json.error);
+                } catch (apiErr) {
+                    const { error } = await client.from("profiles").update(updates).eq("id", user.id);
+                    if (error) throw error;
                 }
 
+                if (document.getElementById("sidebarBusinessName")) {
+                    document.getElementById("sidebarBusinessName").textContent = updates.business_name || "Salon";
+                }
 
-                document
-                    .getElementById(
-                        "sidebarBusinessName"
-                    )
-                    .textContent =
-                    updates.business_name ||
-                    "abcdef";
-
+                updateAiPreview();
 
                 showStatus(
-                    "Settings saved successfully.",
+                    "Settings and AI Business Profile saved successfully.",
                     "success"
                 );
 
             }
             catch(error){
+                console.error(error);
+                showStatus(
+                    error.message || "Failed to save settings.",
+                    "error"
+                );
+            }
+            finally{
+                saveBtn.disabled = false;
+                saveBtn.textContent = "Save Changes";
+            }
+
+        }
 
                 console.error(
                     "Settings save error:",

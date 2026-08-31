@@ -696,6 +696,147 @@ app.post("/api/upload-qr", async (req, res) => {
     }
 });
 
+// =====================================================
+// TEST AI ENDPOINT (FOR DASHBOARD INTERACTIVE TESTING)
+// =====================================================
+
+app.post("/api/test-ai", async (req, res) => {
+    try {
+        const { profile_id, message, preview_profile } = req.body;
+        if (!message || !message.trim()) {
+            return res.status(400).json({ error: "Message is required" });
+        }
+
+        // 1. Load base profile from DB (or default)
+        let biz = await getBusinessProfile(profile_id);
+
+        // 2. If preview_profile provided from frontend form, override fields
+        if (preview_profile && typeof preview_profile === "object") {
+            if (preview_profile.business_name) biz.name = preview_profile.business_name.trim();
+            if (preview_profile.business_category) biz.category = preview_profile.business_category.trim();
+            if (preview_profile.ai_tone) biz.tone = preview_profile.ai_tone.trim();
+            if (preview_profile.business_description !== undefined) biz.description = preview_profile.business_description.trim();
+            if (preview_profile.business_hours !== undefined) biz.hours = preview_profile.business_hours.trim();
+            if (preview_profile.business_address !== undefined) biz.address = preview_profile.business_address.trim();
+            if (preview_profile.business_phone !== undefined) biz.phone = preview_profile.business_phone.trim();
+            if (preview_profile.pricing_info !== undefined) biz.pricingInfo = preview_profile.pricing_info.trim();
+            if (preview_profile.booking_rules !== undefined) biz.bookingRules = preview_profile.booking_rules.trim();
+            if (preview_profile.delivery_info !== undefined) biz.deliveryInfo = preview_profile.delivery_info.trim();
+            if (preview_profile.payment_info !== undefined) biz.paymentInfo = preview_profile.payment_info.trim();
+            if (preview_profile.ai_instructions !== undefined) biz.aiInstructions = preview_profile.ai_instructions.trim();
+            if (preview_profile.faq_data !== undefined) biz.faqData = preview_profile.faq_data.trim();
+            if (preview_profile.upi_id !== undefined) biz.upiId = preview_profile.upi_id.trim();
+            if (preview_profile.advance_amount !== undefined) biz.advance = Number(preview_profile.advance_amount) || 0;
+            biz.isSalon = biz.category.toLowerCase() === "salon";
+        }
+
+        const systemPrompt = buildAISystemPrompt(biz);
+
+        const completion = await client.chat.completions.create({
+            model: AI_MODEL,
+            temperature: 0.7,
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: message.trim() }
+            ]
+        });
+
+        const reply = completion.choices[0]?.message?.content?.trim() || "No response generated.";
+
+        return res.status(200).json({
+            success: true,
+            reply,
+            profile_used: {
+                name: biz.name,
+                category: biz.category,
+                tone: biz.tone
+            }
+        });
+    } catch (err) {
+        console.error("Test AI error:", err);
+        return res.status(500).json({ error: err.message || "Failed to test AI response" });
+    }
+});
+
+// =====================================================
+// AI SETTINGS SAVE / UPDATE ENDPOINT
+// =====================================================
+
+app.post("/api/profile/ai-settings", async (req, res) => {
+    try {
+        const { profile_id, settings } = req.body;
+        if (!profile_id || !settings) {
+            return res.status(400).json({ error: "profile_id and settings are required" });
+        }
+
+        const updateData = {
+            business_name: settings.business_name,
+            business_address: settings.business_address,
+            business_phone: settings.business_phone,
+            business_hours: settings.business_hours,
+            business_description: settings.business_description,
+            business_category: settings.business_category,
+            ai_tone: settings.ai_tone || "Friendly",
+            pricing_info: settings.pricing_info,
+            booking_rules: settings.booking_rules,
+            delivery_info: settings.delivery_info,
+            payment_info: settings.payment_info,
+            faq_data: settings.faq_data,
+            ai_instructions: settings.ai_instructions,
+            upi_id: settings.upi_id,
+            advance_amount: settings.advance_amount ? Number(settings.advance_amount) : 0,
+            ai_business_profile: settings
+        };
+
+        // Filter out undefined keys
+        Object.keys(updateData).forEach(k => {
+            if (updateData[k] === undefined) delete updateData[k];
+        });
+
+        // 1. Try full update (with dedicated columns)
+        let { data, error } = await supabase
+            .from("profiles")
+            .update(updateData)
+            .eq("id", profile_id);
+
+        // 2. If dedicated columns not yet migrated in DB, gracefully fallback
+        if (error && (error.message.includes("column") || error.code === "42703")) {
+            console.warn("Falling back to core profile update:", error.message);
+            const coreUpdate = {
+                business_name: settings.business_name,
+                business_address: settings.business_address,
+                business_phone: settings.business_phone,
+                business_hours: settings.business_hours,
+                business_description: settings.business_description,
+                ai_instructions: JSON.stringify(settings),
+                upi_id: settings.upi_id,
+                advance_amount: settings.advance_amount ? Number(settings.advance_amount) : 0
+            };
+            Object.keys(coreUpdate).forEach(k => {
+                if (coreUpdate[k] === undefined) delete coreUpdate[k];
+            });
+            const fallbackRes = await supabase
+                .from("profiles")
+                .update(coreUpdate)
+                .eq("id", profile_id);
+            error = fallbackRes.error;
+        }
+
+        if (error) {
+            console.error("Save AI settings error:", error);
+            return res.status(500).json({ error: error.message });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "AI Business Profile saved successfully"
+        });
+    } catch (err) {
+        console.error("AI settings endpoint error:", err);
+        return res.status(500).json({ error: err.message || "Internal server error" });
+    }
+});
+
 
 // =====================================================
 // BUSINESS INFORMATION
@@ -913,8 +1054,8 @@ async function findServiceInDatabase(serviceName, profileId) {
 
 
 // Get ALL active services
-async function getServicesFromDatabase() {
-
+async function getServicesFromDatabase(profileId) {
+    const resolvedProfileId = profileId || PROFILE_ID;
     const {
         data,
         error
@@ -933,7 +1074,7 @@ async function getServicesFromDatabase() {
         `)
         .eq(
             "profile_id",
-            PROFILE_ID
+            resolvedProfileId
         )
         .eq(
             "active",
@@ -984,19 +1125,16 @@ async function getServicePrice(serviceName, profileId) {
 // =====================================================
 
 /**
- * Load full business profile from Supabase profiles table.
- * Replaces static BUSINESS constant so every AI prompt is
- * personalised per account, not hardcoded to Zarah Elite.
+ * Load full AI Business Profile from Supabase profiles table.
+ * Supports all business categories: Salon, Bakery, Clothing, Crochet / Handmade,
+ * Home Business, Retail, Service Business, Other.
+ * Pulls live database products (inventory table) and services (services table).
  */
 async function getBusinessProfile(profileId) {
     const id = profileId || PROFILE_ID;
     const { data, error } = await supabase
         .from("profiles")
-        .select(
-            "business_name, business_address, business_phone, " +
-            "business_hours, business_description, ai_instructions, " +
-            "product, upi_id, upi_qr_image, gpay_qr_url, advance_amount"
-        )
+        .select("*")
         .eq("id", id)
         .maybeSingle();
 
@@ -1006,66 +1144,183 @@ async function getBusinessProfile(profileId) {
 
     const p = data || {};
 
-    // Determine persona based on product type
-    const productType = p.product || "sal"; // "sal" | "pouch"
-    const isSalon     = productType !== "pouch";
+    // Parse backup JSON if present or extract individual fields
+    let extra = {};
+    if (p.ai_business_profile) {
+        try {
+            extra = typeof p.ai_business_profile === "string" ? JSON.parse(p.ai_business_profile) : p.ai_business_profile;
+        } catch (e) {
+            console.warn("Error parsing ai_business_profile JSON:", e.message);
+        }
+    }
+
+    // Category and product type resolution
+    const productType = (p.product || extra.product || "sal").toLowerCase();
+    const category = p.business_category || extra.business_category || (productType === "pouch" ? "Home Business / Retail" : "Salon");
+    const isSalon = category.toLowerCase() === "salon" || (productType === "sal" && !p.business_category && !extra.business_category);
+
+    const tone = p.ai_tone || extra.ai_tone || "Friendly";
+    const name = p.business_name || extra.business_name || BUSINESS.name;
+    const address = p.business_address || extra.business_address || BUSINESS.address;
+    const phone = p.business_phone || extra.business_phone || BUSINESS.phone;
+    const hours = p.business_hours || extra.business_hours || BUSINESS.hours;
+    const description = p.business_description || extra.business_description || "";
+    const pricingInfo = p.pricing_info || extra.pricing_info || "";
+    const bookingRules = p.booking_rules || extra.booking_rules || "";
+    const deliveryInfo = p.delivery_info || extra.delivery_info || "";
+    const paymentInfo = p.payment_info || extra.payment_info || (p.upi_id ? `UPI ID: ${p.upi_id}` : "");
+    const aiInstructions = p.ai_instructions || extra.ai_instructions || "";
+    const faqData = p.faq_data || extra.faq_data || "";
+    const upiId = p.upi_id || extra.upi_id || "";
+    const qrUrl = p.gpay_qr_url || p.upi_qr_image || extra.gpay_qr_url || extra.upi_qr_image || "";
+    const advance = Number(p.advance_amount || extra.advance_amount) || 0;
+
+    // Load active inventory & services
+    const [products, services] = await Promise.all([
+        getInventoryFromDatabase(id),
+        getServicesFromDatabase(id)
+    ]);
+
+    let catalogSummary = "";
+    if (products && products.length > 0) {
+        catalogSummary += "PRODUCTS IN INVENTORY:\n" + products.map(prod => `- ${prod.name} (₹${prod.price}) [Stock: ${Number(prod.stock) > 0 ? `${prod.stock} units available` : 'Made to order / Out of stock'}]${prod.category ? ` (Category: ${prod.category})` : ''}`).join("\n");
+    }
+    if (services && services.length > 0) {
+        if (catalogSummary) catalogSummary += "\n\n";
+        catalogSummary += "SERVICES MENU:\n" + services.map(s => `- ${s.name} (₹${s.price})${s.duration ? ` [Duration: ${s.duration} mins]` : ''}${s.category ? ` (Category: ${s.category})` : ''}`).join("\n");
+    }
 
     return {
-        name:        p.business_name    || BUSINESS.name,
-        address:     p.business_address || BUSINESS.address,
-        phone:       p.business_phone   || BUSINESS.phone,
-        hours:       p.business_hours   || BUSINESS.hours,
-        description: p.business_description || "",
-        aiInstructions: p.ai_instructions || "",
-        product:     productType,
+        id,
+        name,
+        category,
+        tone,
+        product: productType,
         isSalon,
-        upiId:       p.upi_id           || "",
-        qrUrl:       p.gpay_qr_url      || p.upi_qr_image || "",
-        advance:     Number(p.advance_amount) || 0,
+        address,
+        phone,
+        hours,
+        description,
+        pricingInfo,
+        bookingRules,
+        deliveryInfo,
+        paymentInfo,
+        aiInstructions,
+        faqData,
+        upiId,
+        qrUrl,
+        advance,
+        products,
+        services,
+        catalogSummary
     };
 }
 
 /**
  * Build the AI system persona string dynamically from the profile.
- * Used by both WhatsApp and Instagram AI handlers.
+ * Single universal dynamic AI engine for all categories and products.
  */
 function buildAISystemPrompt(biz) {
-    const roleDesc = biz.isSalon
-        ? `You are the AI assistant / receptionist for ${biz.name}, a professional salon and beauty studio.
-Your job is to help customers with bookings, prices, service information, and general queries — exactly like a warm, professional human receptionist would on WhatsApp.`
-        : `You are the AI assistant for ${biz.name}, an Instagram-first small business.
-Your job is to help customers with product inquiries, pricing, customisation options, order placement, and payment — the way a friendly, responsive seller would reply on Instagram DM or WhatsApp.`;
+    const toneGuides = {
+        "Professional": "Polite, structured, polished, efficient, and courteous.",
+        "Friendly": "Warm, welcoming, conversational, helpful, with friendly emojis 😊✨.",
+        "Casual": "Relaxed, modern, concise, approachable, like chatting with a friend on Instagram.",
+        "Premium": "Sophisticated, elegant, attentive, refined, high-touch luxury service."
+    };
+    const toneGuide = toneGuides[biz.tone] || "Warm, attentive, and helpful.";
 
-    const businessBlock = `
-BUSINESS DETAILS:
-Name: ${biz.name}
-${biz.address   ? `Address: ${biz.address}`           : ""}
-${biz.phone     ? `Phone: ${biz.phone}`                : ""}
-${biz.hours     ? `Hours: ${biz.hours}`                : ""}
-${biz.description ? `About: ${biz.description}`        : ""}
-`.trim();
+    const categoryDescriptions = {
+        "Salon": "a professional salon and beauty studio. You assist clients with appointment bookings, service menus, prices, and salon timings.",
+        "Bakery": "an artisanal home bakery and confectionery. You assist customers with cake orders, flavor options, prices, advance notice, and pickup/delivery.",
+        "Crochet / Handmade": "a handmade crochet & crafts studio. You assist customers with custom handmade creations, yarn colors, pricing, turnaround times, and orders.",
+        "Clothing": "a fashion & apparel brand. You help customers with sizing, product availability, prices, style recommendations, and shipping.",
+        "Home Business": "a dedicated home-grown small business. You help customers with inquiries, product details, custom requests, and placing orders.",
+        "Retail": "a boutique retail store. You help customers with product availability, prices, features, and ordering.",
+        "Service Business": "a professional client service provider. You help clients with service inquiries, quotes, scheduling, and consultation.",
+        "Other": "a customer-first business. You help customers with inquiries, product/service details, pricing, and placing orders."
+    };
+    const categoryDesc = categoryDescriptions[biz.category] || `a business in the "${biz.category}" category. You help customers with product/service details, pricing, and inquiries.`;
 
-    const customRules = biz.aiInstructions
-        ? `\n\nOWNER CUSTOM INSTRUCTIONS:\n${biz.aiInstructions}`
-        : "";
+    const sections = [];
 
-    return `${roleDesc}
+    sections.push(`==================================================
+BUSINESS PROFILE & IDENTITY
+==================================================
+- Business Name: ${biz.name}
+- Category: ${biz.category}
+${biz.description ? `- About / Specialty: ${biz.description}` : ""}
+${biz.address ? `- Location / Studio / Service Area: ${biz.address}` : ""}
+${biz.hours ? `- Operating / Store Hours: ${biz.hours}` : ""}
+${biz.phone ? `- Contact / WhatsApp: ${biz.phone}` : ""}`);
 
-You are NOT a chatbot. You are NOT a customer-support form. Never sound robotic.
+    if (biz.pricingInfo) {
+        sections.push(`==================================================
+PRICING & CUSTOMIZATION GUIDELINES
+==================================================
+${biz.pricingInfo}`);
+    }
 
-CONVERSATION STYLE:
-- Be natural, warm, attentive and professional.
-- Keep messages short — usually 1–4 sentences.
-- Do not over-explain or dump information.
-- Do not ask "How can I help you?" repeatedly — vary your greetings.
-- Use emojis sparingly, the way a friendly person would.
-- Never invent prices or service names. If you don't know, say you'll check.
+    if (biz.bookingRules) {
+        sections.push(`==================================================
+BOOKING & ORDERING RULES
+==================================================
+${biz.bookingRules}`);
+    }
 
-CONVERSATION MEMORY:
-- Pay close attention to previous messages.
-- Never make the customer repeat information they already gave.
+    if (biz.deliveryInfo) {
+        sections.push(`==================================================
+DELIVERY & SHIPPING INFORMATION
+==================================================
+${biz.deliveryInfo}`);
+    }
 
-${businessBlock}${customRules}`;
+    if (biz.paymentInfo || biz.upiId || biz.advance > 0) {
+        let payBlock = biz.paymentInfo ? `${biz.paymentInfo}\n` : "";
+        if (biz.upiId) payBlock += `UPI ID: ${biz.upiId}\n`;
+        if (biz.advance > 0) payBlock += `Default Advance / Deposit Amount: ₹${biz.advance}\n`;
+        sections.push(`==================================================
+PAYMENT INFORMATION
+==================================================
+${payBlock.trim()}`);
+    }
+
+    if (biz.faqData) {
+        sections.push(`==================================================
+FREQUENTLY ASKED QUESTIONS (FAQ)
+==================================================
+${biz.faqData}`);
+    }
+
+    if (biz.aiInstructions) {
+        sections.push(`==================================================
+OWNER'S CUSTOM INSTRUCTIONS (HIGHEST PRIORITY)
+==================================================
+${biz.aiInstructions}`);
+    }
+
+    if (biz.catalogSummary) {
+        sections.push(`==================================================
+LIVE CATALOG & DATABASE ITEMS
+==================================================
+${biz.catalogSummary}`);
+    }
+
+    return `You are the official AI assistant representing "${biz.name}", ${categoryDesc}
+Your communication tone is: ${biz.tone} (${toneGuide}).
+
+${sections.join("\n\n")}
+
+==================================================
+COMMUNICATION & CONVERSATION RULES
+==================================================
+1. You represent ONLY ${biz.name} (${biz.category}). NEVER assume you are a salon or receptionist unless the category is explicitly "Salon". If you are a bakery, speak as a bakery assistant; if crochet/crafts, speak as a handmade artist; if retail/clothing, speak as a boutique seller.
+2. Reply naturally and concisely (usually 1 to 4 sentences) — perfectly formatted for Instagram DMs and WhatsApp messages.
+3. Be truthful to the catalog and business details provided. If an item or price is known, provide it directly. If an item or price is not in the catalog, politely give general pricing guidance or state you can take a custom inquiry for the owner.
+4. If a customer is ready to order or book:
+   - For orders (cakes, crochet, retail, clothing): ask for their item specifications (size/flavor/color/quantity), date needed, and delivery address.
+   - For salon/appointments: ask for service, preferred date, time, customer name, and phone number.
+5. If the customer asks about payments or deposits, explain the payment method (${biz.paymentInfo || (biz.upiId ? `UPI to ${biz.upiId}` : 'online/UPI/cash')}) accurately.
+6. Never sound like a generic robotic bot. Never output JSON or technical debug tags in the final response.`;
 }
 
 // =====================================================
@@ -1365,8 +1620,11 @@ function escapeHtml(value) {
 async function understandCustomer(
     message,
     phone,
-    profileName
+    profileName,
+    profileId
 ) {
+
+    const biz = await getBusinessProfile(profileId);
 
     const history =
         getConversation(phone);
@@ -1399,15 +1657,11 @@ async function understandCustomer(
                     role: "system",
 
                     content: `
-
-You are the booking-intelligence layer
-for ${BUSINESS.name}.
+You are the conversation-understanding intelligence layer for "${biz.name}" (Category: ${biz.category}).
 
 You are NOT speaking to the customer.
 
-Your job is to understand the customer's
-message using the current message AND
-the previous conversation.
+Your job is to understand the customer's message using the current message AND the previous conversation.
 
 Return ONLY valid JSON.
 
@@ -1429,15 +1683,18 @@ Possible intents:
 
 greeting
 booking
-cancel
-reschedule
+order
 pricing
-services
 products
+services
+custom_order
+delivery
 hours
 location
 faq
 payment_confirmation
+cancel
+reschedule
 unknown
 
 IMPORTANT CONVERSATION RULES:
@@ -1795,7 +2052,7 @@ Never say: "According to our system." / "Your request has been processed."
 FINAL RESPONSE
 ==================================================
 
-Return ONLY the WhatsApp message.
+Return ONLY the response message for the customer.
 No analysis. No JSON. No explanation. No quotation marks.
 `
                 },
@@ -2265,7 +2522,8 @@ app.post(
                 await understandCustomer(
                     message,
                     phone,
-                    profileName
+                    profileName,
+                    activeProfileId
                 );
 
 
@@ -4725,7 +4983,8 @@ We look forward to seeing you! Ã°Å¸ËœÅ `;
                     await understandCustomer(
                         message,
                         instagramPhone,
-                        ""
+                        "",
+                        activeInstagramProfileId
                     );
 
                 console.log(
@@ -5043,7 +5302,7 @@ Apologize naturally and ask the customer to try again.
                                 );
 
                                 await findOrCreateCustomer({
-    profileId: PROFILE_ID,
+    profileId: activeInstagramProfileId,
     name:
         booking.customer_name ||
         "Instagram Customer",

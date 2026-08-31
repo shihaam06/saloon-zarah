@@ -84,6 +84,28 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 .status-alert.success{display:block;background:#ECFDF3;color:#027A48;border:1px solid #A7F3D0}
 .status-alert.error{display:block;background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
 
+/* AI PREVIEW BANNER */
+.ai-preview-card{background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(109,40,217,0.03));border:1.5px solid rgba(124,58,237,0.25);border-radius:16px;padding:18px 20px;margin-bottom:20px}
+.ai-preview-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ai-preview-title{font-size:13px;font-weight:700;color:var(--pouch);display:flex;align-items:center;gap:8px}
+.ai-preview-meta{font-size:13px;color:var(--ink);display:flex;align-items:center;gap:8px;margin-top:6px;font-weight:600}
+.badge-tone{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:var(--pouch-light);color:var(--pouch)}
+.badge-category{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#ECFDF3;color:#027A48}
+
+/* TEST AI SANDBOX */
+.test-ai-container{background:var(--surface2);border-radius:14px;padding:18px;border:1px solid var(--line)}
+.test-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.test-chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;background:var(--white);border:1px solid var(--line);color:var(--ink);cursor:pointer;transition:.2s}
+.test-chip:hover{border-color:var(--pouch);background:var(--pouch-light);color:var(--pouch)}
+.test-chat-log{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;padding:4px}
+.chat-bubble{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.4}
+.chat-bubble.user{align-self:flex-end;background:var(--pouch);color:#fff;border-bottom-right-radius:4px}
+.chat-bubble.ai{align-self:flex-start;background:var(--white);color:var(--ink);border:1px solid var(--line);border-bottom-left-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,0.03)}
+.chat-bubble.ai small{display:block;font-size:10px;color:var(--muted);margin-top:4px}
+.test-input-row{display:flex;gap:10px}
+.test-input-row input{flex:1;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--white);font-size:13px;outline:none}
+.test-input-row input:focus{border-color:var(--pouch);box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+
 @media(max-width:900px){.settings-grid,.form-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -117,22 +139,164 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 <main class="main">
   <div class="topbar">
     <div class="top-title">
-      <h1>Store Settings</h1>
-      <p>Configure your Instagram connection, business details, UPI payments, and security.</p>
+      <h1>Store & AI Settings</h1>
+      <p>Configure your dynamic AI personality, business knowledge, Instagram automation, and payment details.</p>
     </div>
     <button class="btn btn-pouch" id="saveSettingsBtn">💾 Save Changes</button>
   </div>
 
   <div id="statusAlert" class="status-alert"></div>
 
+  <!-- AI IDENTITY PREVIEW BANNER -->
+  <div class="ai-preview-card">
+    <div class="ai-preview-header">
+      <div class="ai-preview-title">
+        <span>🤖</span> <span>AI Business Identity Active</span>
+      </div>
+      <div>
+        <span class="badge-category" id="previewCategoryBadge">Bakery</span>
+        <span class="badge-tone" id="previewToneBadge">Friendly Tone</span>
+      </div>
+    </div>
+    <div class="ai-preview-meta">
+      <span>Your AI assistant will respond to Instagram DMs as:</span>
+      <strong id="previewBizNameDisplay" style="color:var(--pouch);">My Store</strong>
+      <span style="color:var(--muted); font-size:12px;">(<span id="previewCategoryDisplay">Bakery</span>)</span>
+    </div>
+  </div>
+
   <div class="settings-grid">
+    <!-- AI BUSINESS PROFILE CONFIGURATION -->
+    <div class="card full">
+      <div class="card-header">
+        <div class="card-icon">🧠</div>
+        <div>
+          <h2>AI Business Profile & Knowledge Base</h2>
+          <p>Configure what your AI knows about your brand, services, pricing rules, and ordering policies.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>1. Business Category *</label>
+          <select id="businessCategory" onchange="updateAiPreview()">
+            <option value="Bakery">🍰 Bakery / Home Baker</option>
+            <option value="Crochet / Handmade">🧶 Crochet / Handmade Crafts</option>
+            <option value="Clothing">👗 Clothing / Fashion Brand</option>
+            <option value="Salon">💇‍♀️ Salon / Spa / Beauty Studio</option>
+            <option value="Home Business">🏡 Home Business</option>
+            <option value="Retail">🛍️ Retail Store</option>
+            <option value="Service Business">💼 Service Business</option>
+            <option value="Other">✨ Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>2. AI Response Tone *</label>
+          <select id="aiTone" onchange="updateAiPreview()">
+            <option value="Friendly">😊 Friendly & Warm (Conversational with emojis)</option>
+            <option value="Professional">👔 Professional & Polite (Structured, businesslike)</option>
+            <option value="Casual">✨ Casual & Trendy (Relaxed, modern Instagram style)</option>
+            <option value="Premium">💎 Premium & Elegant (High-touch luxury feel)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>3. Brand / Business Name *</label>
+          <input type="text" id="businessName" placeholder="e.g. Sweet Crumbs Bakehouse" oninput="updateAiPreview()">
+        </div>
+
+        <div class="form-group">
+          <label>4. WhatsApp / Phone Number</label>
+          <input type="text" id="businessPhone" placeholder="e.g. +91 9876543210">
+        </div>
+
+        <div class="form-group full">
+          <label>5. Business Description & Specialty</label>
+          <textarea id="businessDescription" rows="2" placeholder="e.g. Artisanal custom birthday cakes, bento cakes, cookies, and gourmet brownies made with organic ingredients."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>6. Pricing & Customization Information</label>
+          <textarea id="pricingInfo" rows="3" placeholder="e.g. 0.5kg bento cakes start at ₹450. 1kg custom cakes from ₹850. Custom fondant figures +₹150. Cupcake boxes of 6 for ₹350."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>7. Operating Hours / Working Days</label>
+          <textarea id="businessHours" rows="3" placeholder="e.g. Mon–Sat: 10:00 AM – 8:00 PM. Sundays: Advance pre-orders pickup only."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>8. Location / Studio Address & Service Area</label>
+          <textarea id="businessAddress" rows="3" placeholder="e.g. Studio 12, Indiranagar 100ft Road, Bangalore. We deliver across Bangalore city."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>9. Booking or Ordering Rules</label>
+          <textarea id="bookingRules" rows="3" placeholder="e.g. Please place custom cake orders at least 24–48 hours in advance. For same-day orders, only available ready stock can be delivered."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>10. Delivery & Shipping Information</label>
+          <textarea id="deliveryInfo" rows="3" placeholder="e.g. Free delivery in Indiranagar above ₹500. Porter/Dunzo delivery for other Bangalore locations. Self pickup available at our studio."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>11. Payment Information & Advance Rules</label>
+          <textarea id="paymentInfo" rows="3" placeholder="e.g. 50% advance deposit via GPay/UPI is required to confirm custom orders. Balance paid on delivery. We accept GPay, PhonePe, Paytm, and COD."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>12. Frequently Asked Questions (FAQs)</label>
+          <textarea id="faqData" rows="3" placeholder="Q: Are your cakes eggless?&#10;A: Yes, 100% pure vegetarian and eggless options are available for all flavors.&#10;&#10;Q: Do you make gluten-free?&#10;A: Yes, we offer gluten-free brownies and almond flour cakes on request."></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>13. Owner's Custom AI Instructions (Priority Rules)</label>
+          <textarea id="aiInstructions" rows="3" placeholder="e.g. Always ask for flavor, eggless/regular preference, and delivery date. Never promise 2-hour rush orders on weekends."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST YOUR AI SANDBOX -->
+    <div class="card full">
+      <div class="card-header">
+        <div class="card-icon">⚡</div>
+        <div>
+          <h2>Interactive AI Sandbox — Test Your AI Live</h2>
+          <p>Type a customer question or click a chip to see exactly how your AI will answer on Instagram DMs with current settings.</p>
+        </div>
+      </div>
+
+      <div class="test-ai-container">
+        <div class="test-chips">
+          <span class="test-chip" onclick="setTestQuery('How much is your chocolate cake?')">🍰 Chocolate cake price?</span>
+          <span class="test-chip" onclick="setTestQuery('Can I order a custom bag for next Friday?')">🧶 Custom order inquiry</span>
+          <span class="test-chip" onclick="setTestQuery('Do you deliver to my area?')">🚚 Delivery options</span>
+          <span class="test-chip" onclick="setTestQuery('What are your opening hours?')">⏰ Operating hours</span>
+          <span class="test-chip" onclick="setTestQuery('How do I make payment?')">💳 Payment method</span>
+        </div>
+
+        <div class="test-chat-log" id="testChatLog">
+          <div class="chat-bubble ai">
+            👋 Hello! I am your AI assistant. Ask me anything to test my responses with your current business profile!
+          </div>
+        </div>
+
+        <div class="test-input-row">
+          <input type="text" id="testAiInput" placeholder="Type a message (e.g. 'Can I order a cake for tomorrow?')" onkeydown="if(event.key==='Enter') runAiTest()">
+          <button type="button" class="btn btn-pouch" id="testAiBtn" onclick="runAiTest()">✨ Test AI</button>
+        </div>
+      </div>
+    </div>
+
     <!-- INSTAGRAM INTEGRATION -->
     <div class="card full">
       <div class="card-header">
         <div class="card-icon">📸</div>
         <div>
-          <h2>Instagram Automation</h2>
-          <p>Connect your Instagram account so POUCH can auto-capture inquiries and respond to DMs.</p>
+          <h2>Instagram Automation Connection</h2>
+          <p>Connect your Instagram Creator / Business account so Kangro AI can auto-reply to your DMs.</p>
         </div>
       </div>
       <div class="insta-box">
@@ -144,51 +308,13 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
       </div>
     </div>
 
-    <!-- BUSINESS PROFILE -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon">🏪</div>
-        <div>
-          <h2>Business Profile</h2>
-          <p>Your public brand and contact information.</p>
-        </div>
-      </div>
-      <div class="form-grid">
-        <div class="form-group full">
-          <label>Brand / Business Name *</label>
-          <input type="text" id="businessName" placeholder="e.g. Sweet Crumbs Bakehouse">
-        </div>
-        <div class="form-group full">
-          <label>WhatsApp / Phone Number</label>
-          <input type="text" id="businessPhone" placeholder="e.g. +91 9876543210">
-        </div>
-        <div class="form-group full">
-          <label>Store / Workshop Address</label>
-          <textarea id="businessAddress" rows="2" placeholder="e.g. Studio 4, Indiranagar, Bangalore"></textarea>
-        </div>
-        <div class="form-group full">
-          <label>Business Operating Hours (Read by AI)</label>
-          <input type="text" id="businessHours" placeholder="e.g. Mon–Sat 10:00 AM – 8:00 PM">
-        </div>
-        <div class="form-group full">
-          <label>Brand Description / What You Sell</label>
-          <input type="text" id="businessDescription" placeholder="e.g. Handmade custom crochet bags, bucket hats, and artisanal bakes">
-        </div>
-        <div class="form-group full">
-          <label>🤖 AI Assistant Custom Instructions & Tone</label>
-          <textarea id="aiInstructions" rows="3" placeholder="e.g. Always ask for their customization choice (color/flavor). Mention our 3-day turnaround time for custom orders."></textarea>
-          <small style="color:var(--muted); font-size:11px; margin-top:4px; display:block;">POUCH AI will follow these exact custom instructions when answering DMs and WhatsApp messages.</small>
-        </div>
-      </div>
-    </div>
-
     <!-- UPI & PAYMENT SETTINGS -->
     <div class="card">
       <div class="card-header">
         <div class="card-icon">💳</div>
         <div>
           <h2>UPI & GPay QR Code</h2>
-          <p>Configure manual UPI payment details and QR code sent to customers.</p>
+          <p>Configure manual UPI payment details and QR code sent to customers on Instagram.</p>
         </div>
       </div>
       <div class="form-grid">
@@ -201,7 +327,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
           <input type="number" id="advanceAmount" placeholder="e.g. 500">
         </div>
         <div class="form-group full">
-          <label>GPay / UPI QR Code (Auto-sent to customers on payment request)</label>
+          <label>GPay / UPI QR Code (Auto-sent on payment request)</label>
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <input type="text" id="upiQrImage" placeholder="Image URL or click Upload ->" style="flex:1; min-width:200px;" oninput="updateQrPreview(this.value)">
             <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="handleQrFileUpload(event)">
@@ -218,7 +344,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
     </div>
 
     <!-- SECURITY & PIN -->
-    <div class="card full">
+    <div class="card">
       <div class="card-header">
         <div class="card-icon">🔒</div>
         <div>
@@ -227,7 +353,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
         </div>
       </div>
       <div class="form-grid">
-        <div class="form-group">
+        <div class="form-group full">
           <label>Owner Security PIN</label>
           <input type="password" id="ownerPin" placeholder="4-digit PIN">
         </div>
@@ -241,6 +367,17 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 <script src="js/theme.js"></script>
 <script>
 let currentUser = null;
+
+function updateAiPreview() {
+  const name = document.getElementById("businessName").value.trim() || "My Business";
+  const cat = document.getElementById("businessCategory").value;
+  const tone = document.getElementById("aiTone").value;
+
+  document.getElementById("previewBizNameDisplay").textContent = name;
+  document.getElementById("previewCategoryDisplay").textContent = cat;
+  document.getElementById("previewCategoryBadge").textContent = cat;
+  document.getElementById("previewToneBadge").textContent = `${tone} Tone`;
+}
 
 function updateQrPreview(url) {
   const container = document.getElementById("qrPreviewContainer");
@@ -303,6 +440,87 @@ async function handleQrFileUpload(event) {
   reader.readAsDataURL(file);
 }
 
+function setTestQuery(text) {
+  document.getElementById("testAiInput").value = text;
+  runAiTest();
+}
+
+async function runAiTest() {
+  const input = document.getElementById("testAiInput");
+  const query = input.value.trim();
+  if (!query) return;
+
+  const btn = document.getElementById("testAiBtn");
+  btn.disabled = true;
+  btn.textContent = "Thinking...";
+
+  const log = document.getElementById("testChatLog");
+
+  // Append user bubble
+  const userBubble = document.createElement("div");
+  userBubble.className = "chat-bubble user";
+  userBubble.textContent = query;
+  log.appendChild(userBubble);
+  input.value = "";
+  log.scrollTop = log.scrollHeight;
+
+  // Build current live preview payload from form
+  const previewProfile = {
+    business_name: document.getElementById("businessName").value.trim(),
+    business_category: document.getElementById("businessCategory").value,
+    ai_tone: document.getElementById("aiTone").value,
+    business_description: document.getElementById("businessDescription").value.trim(),
+    business_phone: document.getElementById("businessPhone").value.trim(),
+    business_hours: document.getElementById("businessHours").value.trim(),
+    business_address: document.getElementById("businessAddress").value.trim(),
+    pricing_info: document.getElementById("pricingInfo").value.trim(),
+    booking_rules: document.getElementById("bookingRules").value.trim(),
+    delivery_info: document.getElementById("deliveryInfo").value.trim(),
+    payment_info: document.getElementById("paymentInfo").value.trim(),
+    faq_data: document.getElementById("faqData").value.trim(),
+    ai_instructions: document.getElementById("aiInstructions").value.trim(),
+    upi_id: document.getElementById("upiId").value.trim(),
+    advance_amount: Number(document.getElementById("advanceAmount").value) || 0
+  };
+
+  try {
+    const res = await fetch("http://localhost:3000/api/test-ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        profile_id: currentUser ? currentUser.id : null,
+        message: query,
+        preview_profile: previewProfile
+      })
+    });
+    const data = await res.json();
+
+    const aiBubble = document.createElement("div");
+    aiBubble.className = "chat-bubble ai";
+    if (data.success && data.reply) {
+      aiBubble.innerHTML = `${escapeHtml(data.reply)}<small>🤖 Responding as <strong>${escapeHtml(data.profile_used?.name || previewProfile.business_name)}</strong> (${escapeHtml(data.profile_used?.category || previewProfile.business_category)} • ${escapeHtml(data.profile_used?.tone || previewProfile.ai_tone)} Tone)</small>`;
+    } else {
+      aiBubble.textContent = data.error || "Could not generate response. Make sure backend is running.";
+    }
+    log.appendChild(aiBubble);
+  } catch (err) {
+    const aiBubble = document.createElement("div");
+    aiBubble.className = "chat-bubble ai";
+    aiBubble.textContent = "Error testing AI. Backend connection failed.";
+    log.appendChild(aiBubble);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "✨ Test AI";
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 async function init() {
   const { data, error } = await client.auth.getSession();
   if (error || !data.session) {
@@ -321,19 +539,37 @@ async function loadSettings() {
   }
   if (!prof) return;
 
-  document.getElementById("sidebarBizName").textContent = prof.business_name || "POUCH Store";
-  document.getElementById("businessName").value = prof.business_name || "";
-  document.getElementById("businessPhone").value = prof.business_phone || "";
-  document.getElementById("businessAddress").value = prof.business_address || "";
-  if (document.getElementById("businessHours")) document.getElementById("businessHours").value = prof.business_hours || "";
-  if (document.getElementById("businessDescription")) document.getElementById("businessDescription").value = prof.business_description || "";
-  if (document.getElementById("aiInstructions")) document.getElementById("aiInstructions").value = prof.ai_instructions || "";
-  document.getElementById("upiId").value = prof.upi_id || "";
-  document.getElementById("advanceAmount").value = prof.advance_amount || "";
-  const qrUrl = prof.gpay_qr_url || prof.upi_qr_image || "";
+  // Check if embedded JSON is in ai_business_profile or ai_instructions
+  let extra = {};
+  if (prof.ai_business_profile) {
+    try { extra = typeof prof.ai_business_profile === "string" ? JSON.parse(prof.ai_business_profile) : prof.ai_business_profile; } catch(e){}
+  } else if (prof.ai_instructions && prof.ai_instructions.startsWith("{")) {
+    try { extra = JSON.parse(prof.ai_instructions); } catch(e){}
+  }
+
+  document.getElementById("sidebarBizName").textContent = prof.business_name || extra.business_name || "POUCH Store";
+  document.getElementById("businessName").value = prof.business_name || extra.business_name || "";
+  document.getElementById("businessCategory").value = prof.business_category || extra.business_category || "Bakery";
+  document.getElementById("aiTone").value = prof.ai_tone || extra.ai_tone || "Friendly";
+  document.getElementById("businessPhone").value = prof.business_phone || extra.business_phone || "";
+  document.getElementById("businessAddress").value = prof.business_address || extra.business_address || "";
+  document.getElementById("businessHours").value = prof.business_hours || extra.business_hours || "";
+  document.getElementById("businessDescription").value = prof.business_description || extra.business_description || "";
+  document.getElementById("pricingInfo").value = prof.pricing_info || extra.pricing_info || "";
+  document.getElementById("bookingRules").value = prof.booking_rules || extra.booking_rules || "";
+  document.getElementById("deliveryInfo").value = prof.delivery_info || extra.delivery_info || "";
+  document.getElementById("paymentInfo").value = prof.payment_info || extra.payment_info || "";
+  document.getElementById("faqData").value = prof.faq_data || extra.faq_data || "";
+  document.getElementById("aiInstructions").value = (typeof extra.ai_instructions === "string" ? extra.ai_instructions : (prof.ai_instructions && !prof.ai_instructions.startsWith("{") ? prof.ai_instructions : "")) || "";
+
+  document.getElementById("upiId").value = prof.upi_id || extra.upi_id || "";
+  document.getElementById("advanceAmount").value = prof.advance_amount || extra.advance_amount || "";
+  const qrUrl = prof.gpay_qr_url || prof.upi_qr_image || extra.gpay_qr_url || extra.upi_qr_image || "";
   document.getElementById("upiQrImage").value = qrUrl;
   updateQrPreview(qrUrl);
   document.getElementById("ownerPin").value = prof.owner_pin || "";
+
+  updateAiPreview();
 
   // Instagram status
   const title = document.getElementById("instagramStatusTitle");
@@ -358,13 +594,20 @@ document.getElementById("saveSettingsBtn").addEventListener("click", async () =>
 
   const qrVal = document.getElementById("upiQrImage").value.trim();
 
-  const payload = {
+  const settingsPayload = {
     business_name: document.getElementById("businessName").value.trim(),
+    business_category: document.getElementById("businessCategory").value,
+    ai_tone: document.getElementById("aiTone").value,
     business_phone: document.getElementById("businessPhone").value.trim(),
     business_address: document.getElementById("businessAddress").value.trim(),
-    business_hours: document.getElementById("businessHours") ? document.getElementById("businessHours").value.trim() : "",
-    business_description: document.getElementById("businessDescription") ? document.getElementById("businessDescription").value.trim() : "",
-    ai_instructions: document.getElementById("aiInstructions") ? document.getElementById("aiInstructions").value.trim() : "",
+    business_hours: document.getElementById("businessHours").value.trim(),
+    business_description: document.getElementById("businessDescription").value.trim(),
+    pricing_info: document.getElementById("pricingInfo").value.trim(),
+    booking_rules: document.getElementById("bookingRules").value.trim(),
+    delivery_info: document.getElementById("deliveryInfo").value.trim(),
+    payment_info: document.getElementById("paymentInfo").value.trim(),
+    faq_data: document.getElementById("faqData").value.trim(),
+    ai_instructions: document.getElementById("aiInstructions").value.trim(),
     upi_id: document.getElementById("upiId").value.trim(),
     advance_amount: Number(document.getElementById("advanceAmount").value) || 0,
     upi_qr_image: qrVal,
@@ -372,18 +615,37 @@ document.getElementById("saveSettingsBtn").addEventListener("click", async () =>
     owner_pin: document.getElementById("ownerPin").value.trim()
   };
 
-  const { error } = await client.from("profiles").update(payload).eq("id", currentUser.id);
-  btn.disabled = false;
-  btn.textContent = "💾 Save Changes";
+  try {
+    // Save via backend API endpoint (handles fallback smoothly)
+    const res = await fetch("http://localhost:3000/api/profile/ai-settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        profile_id: currentUser.id,
+        settings: settingsPayload
+      })
+    });
 
-  if (error) {
-    showAlert(error.message || "Could not save settings.", "error");
-  } else {
-    document.getElementById("sidebarBizName").textContent = payload.business_name || "POUCH Store";
-    showAlert("Store settings saved successfully!", "success");
+    const json = await res.json();
+    if (json.success) {
+      document.getElementById("sidebarBizName").textContent = settingsPayload.business_name || "POUCH Store";
+      updateAiPreview();
+      showAlert("AI Business Profile and store settings saved successfully!", "success");
+    } else {
+      // Direct Supabase fallback
+      const { error } = await client.from("profiles").update(settingsPayload).eq("id", currentUser.id);
+      if (error) throw error;
+      document.getElementById("sidebarBizName").textContent = settingsPayload.business_name || "POUCH Store";
+      updateAiPreview();
+      showAlert("Store settings saved successfully!", "success");
+    }
+  } catch (err) {
+    showAlert(err.message || "Could not save settings.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "💾 Save Changes";
   }
 });
-
 
 document.getElementById("connectInstagramBtn").addEventListener("click", async () => {
   try {
