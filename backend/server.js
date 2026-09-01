@@ -837,6 +837,173 @@ app.post("/api/profile/ai-settings", async (req, res) => {
     }
 });
 
+// =====================================================
+// POUCH ORDER BILLING & PAYMENT QR ENDPOINTS
+// =====================================================
+
+app.post("/api/pouch/send-payment-qr", async (req, res) => {
+    try {
+        const { order_id, profile_id, customer_name, bill_summary, amount, instagram_user_id, custom_requirements } = req.body;
+        if (!order_id || !profile_id) {
+            return res.status(400).json({ error: "Missing order_id or profile_id" });
+        }
+
+        // Fetch seller's business profile
+        const biz = await getBusinessProfile(profile_id);
+        const upiId = biz.upi_id || "Not configured";
+        const qrUrl = biz.gpay_qr_url || biz.upi_qr_image || null;
+
+        // Build bill message
+        const shortId = `#P-${String(order_id).substring(0, 6).toUpperCase()}`;
+        const billMsg = bill_summary || 
+`🧾 *Order Bill from ${biz.name}*
+
+Hi ${customer_name || "there"}! Here are your order & payment details:
+
+📋 *Order ID:* ${shortId}
+🛍️ *Details:* ${custom_requirements || "Custom Order"}
+💰 *Total Amount:* ₹${Number(amount || 0).toLocaleString("en-IN")}
+
+💳 *Pay via UPI:* \`${upiId}\`
+
+Scan the UPI QR code below or use our UPI ID to pay.
+📸 *Please send a screenshot of your payment here once completed so we can confirm your order!*
+
+Thank you! 🙏
+— ${biz.name}`;
+
+        let igMessageSent = false;
+        let igImageSent = false;
+
+        // If instagram_user_id exists, send through Instagram Messages API
+        if (instagram_user_id && biz.instagram_connected) {
+            try {
+                await sendInstagramMessage(instagram_user_id, billMsg, profile_id);
+                igMessageSent = true;
+                if (qrUrl) {
+                    await sendInstagramImage(instagram_user_id, qrUrl, profile_id);
+                    igImageSent = true;
+                }
+                addConversation(`instagram:${instagram_user_id}`, "assistant", billMsg);
+            } catch (igErr) {
+                console.warn("Instagram send in send-payment-qr:", igErr.message);
+            }
+        }
+
+        // Update booking in Supabase
+        const updatePayload = {
+            payment_status: "QR Sent",
+            bill_amount: Number(amount) || 0,
+            bill_details: billMsg
+        };
+        if (custom_requirements) {
+            updatePayload.custom_requirements = custom_requirements;
+        }
+
+        const { data: updatedBooking, error: updateErr } = await supabase
+            .from("bookings")
+            .update(updatePayload)
+            .eq("id", order_id)
+            .select()
+            .maybeSingle();
+
+        if (updateErr) {
+            console.error("Error updating order payment status in DB:", updateErr);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment QR & Bill generated successfully",
+            payment_status: "QR Sent",
+            qr_url: qrUrl,
+            upi_id: upiId,
+            bill_text: billMsg,
+            ig_sent: igMessageSent,
+            order: updatedBooking
+        });
+    } catch (err) {
+        console.error("send-payment-qr error:", err);
+        return res.status(500).json({ error: err.message || "Internal server error" });
+    }
+});
+
+app.post("/api/pouch/update-payment-status", async (req, res) => {
+    try {
+        const { order_id, profile_id, payment_status, stage, notes } = req.body;
+        if (!order_id) {
+            return res.status(400).json({ error: "Missing order_id" });
+        }
+
+        const validStatuses = [
+            "Payment Not Requested",
+            "QR Sent",
+            "Payment Screenshot Received",
+            "Payment Confirmed",
+            "Payment Rejected"
+        ];
+
+        if (!validStatuses.includes(payment_status)) {
+            return res.status(400).json({ error: `Invalid payment status: ${payment_status}` });
+        }
+
+        const updateData = {
+            payment_status: payment_status
+        };
+
+        if (payment_status === "Payment Confirmed") {
+            let dbStatus = "confirmed";
+            if (stage === "prod") dbStatus = "in_progress";
+            else if (stage === "done") dbStatus = "completed";
+            updateData.status = dbStatus;
+        } else if (payment_status === "Payment Rejected") {
+            if (notes) updateData.notes = notes;
+        }
+
+        if (stage && payment_status !== "Payment Confirmed") {
+            let dbStatus = "pending";
+            if (stage === "paid") dbStatus = "confirmed";
+            else if (stage === "prod") dbStatus = "in_progress";
+            else if (stage === "done") dbStatus = "completed";
+            else if (stage === "inquiry") dbStatus = "pending";
+            updateData.status = dbStatus;
+        }
+
+        const { data: updatedOrder, error: updateErr } = await supabase
+            .from("bookings")
+            .update(updateData)
+            .eq("id", order_id)
+            .select()
+            .maybeSingle();
+
+        if (updateErr) {
+            console.error("Update payment status error:", updateErr);
+            return res.status(500).json({ error: updateErr.message });
+        }
+
+        // If connected to Instagram and seller confirmed payment, notify customer
+        if (payment_status === "Payment Confirmed" && updatedOrder?.instagram_user_id) {
+            try {
+                const biz = await getBusinessProfile(profile_id || updatedOrder.profile_id);
+                const confMsg = `🎉 *Payment Confirmed!* Your payment has been verified and your order is now confirmed & in production! 📦✨\n\n— ${biz.name}`;
+                await sendInstagramMessage(updatedOrder.instagram_user_id, confMsg, profile_id || updatedOrder.profile_id);
+                addConversation(`instagram:${updatedOrder.instagram_user_id}`, "assistant", confMsg);
+            } catch(e) {
+                console.warn("Instagram confirmation message notice:", e.message);
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            order: updatedOrder,
+            payment_status: payment_status
+        });
+    } catch (err) {
+        console.error("update-payment-status error:", err);
+        return res.status(500).json({ error: err.message || "Internal server error" });
+    }
+});
+
+
 
 // =====================================================
 // BUSINESS INFORMATION
@@ -4755,7 +4922,7 @@ const {
 
 if (instagramProfileError) {
     console.error(
-        "âŒ Instagram profile lookup error:",
+        "â Œ Instagram profile lookup error:",
         instagramProfileError
     );
 
@@ -4765,7 +4932,7 @@ if (instagramProfileError) {
 const instagramProfile = matchingProfiles && matchingProfiles.length > 0 ? matchingProfiles[0] : null;
 if (!instagramProfile) {
     console.error(
-        "Ã¢ÂÅ’ No Kangro profile found for Instagram account:",
+        "Ã¢Â Å’ No Kangro profile found for Instagram account:",
         instagramBusinessId
     );
 
@@ -4780,15 +4947,12 @@ console.log(
 const activeInstagramProfileId =
     instagramProfile.id;
 
-// const activeInstagramProfileId =
-//     instagramProfile.id;
-
             const messaging = entry?.messaging || [];
 
             for (const event of messaging) {
 
                 console.log(
-                    "Ã°Å¸â€Å½ Instagram event keys:",
+                    "📨 Instagram event keys:",
                     Object.keys(event)
                 );
 
@@ -4806,7 +4970,7 @@ const activeInstagramProfileId =
                 ) {
 
                     console.log(
-                        "Ã¢â€žÂ¹Ã¯Â¸Â Ignoring non-customer Instagram event"
+                        "↩️ Ignoring non-customer Instagram event"
                     );
 
                     continue;
@@ -4821,16 +4985,13 @@ const activeInstagramProfileId =
 
                 if (!senderId) {
                     console.log(
-                        "Ã¢Å¡Â Ã¯Â¸Â Instagram event missing sender id"
+                        "⚠️ Instagram event missing sender id"
                     );
                     continue;
                 }
 
                 const instagramPhone =
                     `instagram:${senderId}`;
-
-                let shouldSendQrCode = false;
-                let activeSalonQrUrl = null;
 
                 // -----------------------------------------
                 // DETECT PAYMENT SCREENSHOT / IMAGE ATTACHMENT
@@ -4848,97 +5009,93 @@ const activeInstagramProfileId =
                 if (proofImageUrl) {
 
                     console.log(
-                        "Ã°Å¸â€œÂ¸ Detected payment screenshot / image from Instagram customer:",
+                        "📸 Detected payment screenshot / image from Instagram customer:",
                         proofImageUrl
                     );
 
-                    const { data: pendingBooking } =
+                    // Find most recent booking for this Instagram user & profile
+                    let { data: matchedBooking } =
                         await supabase
                             .from("bookings")
                             .select("*")
                             .eq("profile_id", activeInstagramProfileId)
-                            .eq("instagram_user_id", senderId)
-                            .eq("status", "Pending")
+                            .or(`instagram_user_id.eq.${senderId},phone.eq.instagram:${senderId}`)
                             .order("created_at", { ascending: false })
                             .limit(1)
                             .maybeSingle();
 
-                    if (pendingBooking) {
+                    if (!matchedBooking) {
+                        // Fallback: most recent booking on this profile
+                        const { data: latestPending } = await supabase
+                            .from("bookings")
+                            .select("*")
+                            .eq("profile_id", activeInstagramProfileId)
+                            .order("created_at", { ascending: false })
+                            .limit(1)
+                            .maybeSingle();
+                        matchedBooking = latestPending;
+                    }
 
-                        const servicePrice =
-                            await getServicePrice(pendingBooking.service);
-
-                        const advAmount =
-                            Number(pendingBooking.advance_amount) ||
-                            ADVANCE_AMOUNT;
-
-                        const balance =
-                            Math.max(servicePrice - advAmount, 0);
-
+                    if (matchedBooking) {
                         const { error: updateError } =
                             await supabase
                                 .from("bookings")
                                 .update({
-                                    status:
-                                        "Confirmed",
-
-                                    advance_paid:
-                                        advAmount,
-
-                                    advance_payment_method:
-                                        "UPI",
-
-                                    advance_payment_status:
-                                        "Proof Received",
-
-                                    payment_proof_image:
-                                        proofImageUrl,
-
-                                    payment_proof_timestamp:
-                                        new Date().toISOString(),
-
-                                    balance_amount:
-                                        balance
+                                    payment_status: "Payment Screenshot Received",
+                                    payment_proof_image: proofImageUrl,
+                                    payment_proof_timestamp: new Date().toISOString(),
+                                    instagram_user_id: senderId
                                 })
-                                .eq("id", pendingBooking.id);
+                                .eq("id", matchedBooking.id);
 
                         if (!updateError) {
-
                             console.log(
-                                "Ã¢Å“â€¦ Booking confirmed via screenshot proof:",
-                                pendingBooking.id
+                                "✅ Payment screenshot attached to booking (awaiting seller manual confirmation):",
+                                matchedBooking.id
                             );
-
-                            const confirmationMessage = `Perfect! Payment proof received. Your appointment is confirmed. Ã°Å¸ËœÅ 
-
-Ã¢Å“Â¨ ${BUSINESS.name}
-
-Service: ${pendingBooking.service}
-Date: ${formatDateForCustomer(pendingBooking.booking_date)}
-Time: ${formatTimeForCustomer(pendingBooking.booking_time)}
-Ã°Å¸â€™Â³ Advance received: Ã¢â€šÂ¹${advAmount}
-Ã°Å¸â€™Â° Balance remaining: Ã¢â€šÂ¹${balance}
-Ã°Å¸â€œÂ ${BUSINESS.address}
-
-We look forward to seeing you! Ã°Å¸ËœÅ `;
-
-                            await sendInstagramMessage(
-                                senderId,
-                                confirmationMessage,
-                                activeInstagramProfileId
-                            );
-
-                            addConversation(
-                                instagramPhone,
-                                "assistant",
-                                confirmationMessage
-                            );
-
-                            continue;
+                        } else {
+                            console.error("❌ Error updating payment screenshot on booking:", updateError);
                         }
+                    } else {
+                        // Create an inquiry booking with the screenshot attached
+                        await supabase
+                            .from("bookings")
+                            .insert({
+                                profile_id: activeInstagramProfileId,
+                                customer_name: "Instagram Customer",
+                                phone: `instagram:${senderId}`,
+                                instagram_user_id: senderId,
+                                service: "Custom Order (Screenshot attached)",
+                                status: "pending",
+                                payment_status: "Payment Screenshot Received",
+                                payment_proof_image: proofImageUrl,
+                                payment_proof_timestamp: new Date().toISOString(),
+                                booking_date: new Date().toISOString().split("T")[0],
+                                source: "Instagram DM"
+                            });
                     }
-                }
 
+                    const igBiz = await getBusinessProfile(activeInstagramProfileId);
+                    const ackMessage = `Thank you! 📸 We've received your payment screenshot.\n\nOur team is reviewing it and will confirm your order shortly! 🙏\n\n— ${igBiz.name}`;
+
+                    try {
+                        await sendInstagramMessage(
+                            senderId,
+                            ackMessage,
+                            activeInstagramProfileId
+                        );
+
+                        addConversation(
+                            instagramPhone,
+                            "assistant",
+                            ackMessage
+                        );
+                    } catch (sendErr) {
+                        console.error("Failed to send screenshot acknowledgement message:", sendErr);
+                    }
+
+                    continue;
+                }
                 // -----------------------------------------
                 // GET TEXT MESSAGE
                 // -----------------------------------------

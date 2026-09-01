@@ -120,6 +120,32 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 .detail-block p{font-size:14px;font-weight:600}
 .status-select{width:100%;padding:10px;border:1.5px solid var(--pouch);border-radius:10px;background:var(--pouch-light);color:var(--pouch);font-weight:700;font-size:13px;outline:none;cursor:pointer}
 .drawer-actions{display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+/* PAYMENT STATUS BADGE */
+.pay-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.02em}
+.pay-badge.not-requested{background:#F2F4F7;color:var(--muted)}
+.pay-badge.qr-sent{background:#EFF6FF;color:#1D4ED8}
+.pay-badge.screenshot-received{background:#FEF3C7;color:#B45309}
+.pay-badge.confirmed{background:#ECFDF3;color:#027A48}
+.pay-badge.rejected{background:#FEF2F2;color:#B91C1C}
+/* BILLING SECTION */
+.billing-section{background:var(--surface2);border:1.5px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.billing-section h4{font-family:Manrope;font-size:13px;font-weight:800;margin-bottom:14px;color:var(--ink);display:flex;align-items:center;gap:7px}
+.bill-preview-inner{background:var(--white);border:1px dashed var(--line);border-radius:10px;padding:14px;margin:12px 0}
+.bill-line{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--line)}
+.bill-line:last-child{border:none;font-weight:800;font-size:14px;color:var(--pouch);margin-top:4px}
+.proof-thumb{width:100%;max-height:180px;object-fit:contain;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;margin-top:8px}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:8px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:.18s;display:inline-flex;align-items:center;gap:6px}
+.btn-confirm{background:linear-gradient(135deg,#059669,#10B981);color:#fff}
+.btn-confirm:hover{box-shadow:0 6px 18px rgba(5,150,105,.3);transform:translateY(-1px)}
+.btn-reject{background:var(--white);border-color:#FCA5A5;color:#B91C1C}
+.btn-reject:hover{background:#FEF2F2}
+.btn-sendqr{background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff}
+.btn-sendqr:hover{box-shadow:0 6px 18px rgba(124,58,237,.3);transform:translateY(-1px)}
+.qr-preview{width:120px;height:120px;object-fit:contain;border-radius:10px;border:1px solid var(--line);display:block;margin:10px 0}
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:none;place-items:center;cursor:zoom-out}
+.lightbox.open{display:grid}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 
 @media(max-width:1100px){.pipeline-board{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;min-height:auto}.stat-grid{grid-template-columns:1fr 1fr}.pipeline-board{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
@@ -229,12 +255,13 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
     <button class="close-btn" onclick="closeDrawer()" style="font-size:26px">×</button>
   </div>
 
+  <!-- Order Info -->
   <div class="detail-block">
     <label>👤 Customer Name</label>
     <p id="dName">—</p>
   </div>
   <div class="detail-block">
-    <label>📱 WhatsApp / Phone</label>
+    <label>📱 WhatsApp / Instagram</label>
     <p id="dPhone">—</p>
   </div>
   <div class="detail-block">
@@ -242,15 +269,11 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
     <p id="dDetails">—</p>
   </div>
   <div class="detail-block">
-    <label>💰 Amount</label>
-    <p id="dPrice" style="font-family:Manrope;font-size:20px;font-weight:800;color:var(--pouch)">₹0</p>
-  </div>
-  <div class="detail-block">
     <label>📅 Date Received</label>
     <p id="dDate">—</p>
   </div>
   <div class="detail-block">
-    <label>🔄 Update Status</label>
+    <label>🔄 Update Pipeline Stage</label>
     <select class="status-select" id="dStatus">
       <option value="inquiry">💬 DM Inquiry</option>
       <option value="paid">💳 Payment Confirmed</option>
@@ -259,12 +282,89 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
     </select>
   </div>
 
+  <div style="height:1px;background:var(--line);margin:18px 0"></div>
+
+  <!-- ====================================================
+       BILLING & PAYMENT SECTION
+  ===================================================== -->
+  <div class="billing-section">
+    <h4>💳 Billing & Payment</h4>
+
+    <!-- Payment Status Badge -->
+    <div style="margin-bottom:14px">
+      <label style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Payment Status</label>
+      <span class="pay-badge not-requested" id="payStatusBadge">⏳ Payment Not Requested</span>
+    </div>
+
+    <!-- Bill Creation -->
+    <div id="billCreateSection">
+      <div class="form-group">
+        <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Final Order Amount (₹)</label>
+        <input type="number" id="billAmountInput" placeholder="e.g. 1500" style="width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;font-weight:700;font-family:Manrope;outline:none;background:var(--white);color:var(--ink)">
+      </div>
+      <div class="form-group">
+        <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Custom Requirements / Notes</label>
+        <textarea id="billCustomReq" rows="2" placeholder="e.g. Lavender colour, size M, gift wrap" style="width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit;resize:none;outline:none;background:var(--white);color:var(--ink)"></textarea>
+      </div>
+      <button class="btn-sm btn-sendqr" onclick="createBill()" style="width:100%;justify-content:center">🧾 Create Bill</button>
+    </div>
+
+    <!-- Bill Preview (shown after creation) -->
+    <div id="billPreviewSection" style="display:none">
+      <div class="bill-preview-inner" id="billPreviewContent"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button class="btn-sm btn-outline" onclick="toggleBillCreate()" style="background:var(--white);border:1px solid var(--line);color:var(--ink)">✏️ Edit Bill</button>
+        <button class="btn-sm btn-sendqr" onclick="sendPaymentQR()">📲 Send Payment QR</button>
+      </div>
+    </div>
+
+    <!-- UPI QR Display -->
+    <div id="upiQrSection" style="display:none;margin-top:12px">
+      <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:4px">Your UPI QR Code</label>
+      <img id="upiQrImg" class="qr-preview" src="" alt="UPI QR Code">
+      <p id="upiIdDisplay" style="font-size:11px;color:var(--muted);margin-top:4px"></p>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       PAYMENT SCREENSHOT SECTION
+  ===================================================== -->
+  <div id="screenshotSection" class="billing-section" style="display:none">
+    <h4>📸 Payment Screenshot</h4>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Customer sent a payment screenshot. Please verify before confirming.</p>
+    <img id="proofThumb" class="proof-thumb" src="" alt="Payment Screenshot" onclick="openLightbox(this.src)">
+    <p id="proofTimestamp" style="font-size:10px;color:var(--muted);margin-top:6px"></p>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn-sm" onclick="openLightbox(document.getElementById('proofThumb').src)" style="background:var(--white);border:1px solid var(--line);color:var(--ink)">🔍 View Full Screenshot</button>
+      <button class="btn-sm btn-confirm" onclick="confirmPayment()">✅ Confirm Payment</button>
+      <button class="btn-sm btn-reject" onclick="rejectPayment()">❌ Reject Payment</button>
+    </div>
+  </div>
+
+  <!-- Payment Confirmed / Rejected Banner -->
+  <div id="payConfirmedBanner" style="display:none;background:#ECFDF3;border:1px solid #A7F3D0;border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">
+    <div style="font-size:20px;margin-bottom:4px">🎉</div>
+    <p style="font-weight:800;color:#027A48;font-size:14px">Payment Confirmed!</p>
+    <p style="font-size:12px;color:#065F46;margin-top:2px">Order moved to In Production</p>
+  </div>
+  <div id="payRejectedBanner" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">
+    <div style="font-size:20px;margin-bottom:4px">❌</div>
+    <p style="font-weight:800;color:#B91C1C;font-size:14px">Payment Rejected</p>
+    <p style="font-size:12px;color:#991B1B;margin-top:2px">Order status not advanced — follow up with customer</p>
+  </div>
+
+  <!-- Drawer Actions -->
   <div class="drawer-actions">
-    <button class="btn btn-green" style="justify-content:center" onclick="sendWhatsAppBill()">📲 Send WhatsApp Bill</button>
-    <button class="btn btn-pouch" style="justify-content:center" onclick="sendPaymentLink()">💳 Send Payment Link</button>
     <button class="btn btn-outline" style="justify-content:center" onclick="closeDrawer()">Close</button>
   </div>
 </div>
+
+<!-- LIGHTBOX for payment screenshot -->
+<div class="lightbox" id="proofLightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="Payment proof">
+</div>
+
+
 
 <!-- NEW ORDER MODAL -->
 <div class="modal" id="newOrderModal">
@@ -426,20 +526,38 @@ async function loadOrders() {
           realId: b.id,
           name: b.customer_name || 'Customer',
           phone: b.phone || '',
+          instagram_user_id: b.instagram_user_id || null,
           handle: b.source === 'instagram' ? '@' + (b.customer_name || '').toLowerCase().replace(/\s+/g, '_') : 'Direct',
           details: b.service || b.notes || 'Custom Order',
           price: price,
           source: b.source || 'Instagram DM',
           date: b.booking_date || new Date(b.created_at).toLocaleDateString('en-IN', { month:'short', day:'numeric' }),
-          status: stage
+          status: stage,
+          payment_status: b.payment_status || 'Payment Not Requested',
+          payment_proof_image: b.payment_proof_image || null,
+          payment_proof_timestamp: b.payment_proof_timestamp || null,
+          bill_amount: Number(b.bill_amount) || 0,
+          custom_requirements: b.custom_requirements || ''
         };
 
         const card = document.createElement('div');
         card.className = 'order-card';
         card.onclick = () => openOrderDrawer(idStr);
+
+        const payStatus = b.payment_status || 'Payment Not Requested';
+        const payTag = payStatus === 'Payment Screenshot Received'
+          ? '<span style="font-size:9px;background:#FEF3C7;color:#B45309;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:4px">📸 Screenshot</span>'
+          : payStatus === 'Payment Confirmed'
+          ? '<span style="font-size:9px;background:#ECFDF3;color:#027A48;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:4px">✅ Paid</span>'
+          : payStatus === 'QR Sent'
+          ? '<span style="font-size:9px;background:#EFF6FF;color:#1D4ED8;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:4px">📲 QR Sent</span>'
+          : payStatus === 'Payment Rejected'
+          ? '<span style="font-size:9px;background:#FEF2F2;color:#B91C1C;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:4px">❌ Rejected</span>'
+          : '';
+
         card.innerHTML = `
           <div class="order-top"><span>${shortId}</span><span>${orders[idStr].source}</span></div>
-          <h4>${orders[idStr].name}</h4>
+          <h4>${orders[idStr].name} ${payTag}</h4>
           <p class="order-desc">${orders[idStr].details}</p>
           <div class="order-meta">
             <span class="order-price">₹${price.toLocaleString('en-IN')}</span>
@@ -448,6 +566,7 @@ async function loadOrders() {
             </span>
           </div>
         `;
+
 
         if (stage === 'inquiry') { colInquiry.appendChild(card); c1++; }
         else if (stage === 'paid') { colPaid.appendChild(card); c2++; }
@@ -482,16 +601,77 @@ function openOrderDrawer(id) {
   const o = orders[id];
   if (!o) return;
   activeOrderId = id;
+
   document.getElementById('dOrderId').textContent = o.id;
   document.getElementById('dSource').textContent = o.source;
   document.getElementById('dName').textContent = o.name;
-  document.getElementById('dPhone').textContent = o.phone ? o.phone.replace(/(\+91)(\d{5})(\d{5})/, '$1 $2 $3') : '—';
+  document.getElementById('dPhone').textContent = o.phone ? o.phone.replace(/instagram:/, 'Instagram DM: ') : '—';
   document.getElementById('dDetails').textContent = o.details;
-  document.getElementById('dPrice').textContent = '₹' + o.price.toLocaleString('en-IN');
   document.getElementById('dDate').textContent = o.date;
   document.getElementById('dStatus').value = o.status;
+
+  // Reset billing UI
+  document.getElementById('billCreateSection').style.display = '';
+  document.getElementById('billPreviewSection').style.display = 'none';
+  document.getElementById('payConfirmedBanner').style.display = 'none';
+  document.getElementById('payRejectedBanner').style.display = 'none';
+  document.getElementById('screenshotSection').style.display = 'none';
+  document.getElementById('billAmountInput').value = o.price > 0 ? o.price : '';
+  document.getElementById('billCustomReq').value = o.custom_requirements || '';
+
+  // Load UPI QR if available
+  const qrUrl = currentProfile?.gpay_qr_url || currentProfile?.upi_qr_image;
+  const upiId = currentProfile?.upi_id;
+  if (qrUrl) {
+    document.getElementById('upiQrSection').style.display = '';
+    document.getElementById('upiQrImg').src = qrUrl;
+    document.getElementById('upiIdDisplay').textContent = upiId ? '💳 UPI: ' + upiId : '';
+  } else {
+    document.getElementById('upiQrSection').style.display = 'none';
+  }
+
+  // Set payment status badge
+  setPaymentBadge(o.payment_status || 'Payment Not Requested');
+
+  // Show screenshot if received
+  if (o.payment_proof_image && (o.payment_status === 'Payment Screenshot Received')) {
+    document.getElementById('screenshotSection').style.display = '';
+    document.getElementById('proofThumb').src = o.payment_proof_image;
+    document.getElementById('proofTimestamp').textContent = o.payment_proof_timestamp
+      ? 'Received: ' + new Date(o.payment_proof_timestamp).toLocaleString('en-IN')
+      : '';
+  }
+
+  // Show confirmed/rejected banners
+  if (o.payment_status === 'Payment Confirmed') {
+    document.getElementById('payConfirmedBanner').style.display = '';
+    document.getElementById('screenshotSection').style.display = 'none';
+  }
+  if (o.payment_status === 'Payment Rejected') {
+    document.getElementById('payRejectedBanner').style.display = '';
+  }
+
+  // Pre-fill bill amount from stored bill
+  if (o.bill_amount > 0) {
+    document.getElementById('billAmountInput').value = o.bill_amount;
+  }
+
   document.getElementById('orderDrawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function setPaymentBadge(status) {
+  const badge = document.getElementById('payStatusBadge');
+  const map = {
+    'Payment Not Requested': { cls: 'not-requested', icon: '⏳' },
+    'QR Sent': { cls: 'qr-sent', icon: '📲' },
+    'Payment Screenshot Received': { cls: 'screenshot-received', icon: '📸' },
+    'Payment Confirmed': { cls: 'confirmed', icon: '✅' },
+    'Payment Rejected': { cls: 'rejected', icon: '❌' }
+  };
+  const m = map[status] || map['Payment Not Requested'];
+  badge.className = 'pay-badge ' + m.cls;
+  badge.textContent = m.icon + ' ' + status;
 }
 
 function closeDrawer() {
@@ -513,6 +693,203 @@ document.getElementById('dStatus')?.addEventListener('change', async (e) => {
   await client.from('bookings').update({ status: dbStatus }).eq('id', o.realId);
   await loadOrders();
 });
+
+// --- BILLING FUNCTIONS ---
+
+function createBill() {
+  const o = orders[activeOrderId];
+  if (!o) return;
+  const amount = parseFloat(document.getElementById('billAmountInput').value) || 0;
+  const customReq = document.getElementById('billCustomReq').value.trim();
+
+  if (!amount) {
+    alert('Please enter the final order amount first.');
+    return;
+  }
+
+  const biz = currentProfile?.business_name || 'POUCH Store';
+  const shortId = o.id;
+  const now = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+
+  const billHTML = `
+    <div style="margin-bottom:10px">
+      <div style="font-family:Manrope;font-weight:800;font-size:15px">${biz}</div>
+      <div style="font-size:11px;color:var(--muted)">${shortId} · ${now}</div>
+    </div>
+    <div class="bill-line"><span>Customer</span><span>${o.name}</span></div>
+    <div class="bill-line"><span>Order Details</span><span style="max-width:160px;text-align:right">${o.details}</span></div>
+    ${customReq ? `<div class="bill-line"><span>Custom Requirements</span><span style="max-width:160px;text-align:right">${customReq}</span></div>` : ''}
+    <div class="bill-line"><span>Total Amount</span><span>₹${amount.toLocaleString('en-IN')}</span></div>
+  `;
+
+  document.getElementById('billPreviewContent').innerHTML = billHTML;
+  document.getElementById('billCreateSection').style.display = 'none';
+  document.getElementById('billPreviewSection').style.display = '';
+
+  // Update local order object with amount
+  o.price = amount;
+  o.bill_amount = amount;
+  o.custom_requirements = customReq;
+
+  // Save bill to DB
+  client.from('bookings').update({
+    advance_amount: amount,
+    bill_amount: amount,
+    custom_requirements: customReq || null
+  }).eq('id', o.realId).then(({error}) => {
+    if (error) console.error('Bill save error:', error);
+  });
+}
+
+function toggleBillCreate() {
+  document.getElementById('billCreateSection').style.display = '';
+  document.getElementById('billPreviewSection').style.display = 'none';
+}
+
+async function sendPaymentQR() {
+  const o = orders[activeOrderId];
+  if (!o) return;
+
+  const amount = document.getElementById('billAmountInput').value || o.price;
+  const customReq = document.getElementById('billCustomReq').value.trim() || o.custom_requirements || '';
+
+  // Check if it's an Instagram order
+  const isInstagram = o.phone && o.phone.startsWith('instagram:');
+  const instagramUserId = isInstagram ? o.phone.replace('instagram:', '') : (o.instagram_user_id || null);
+
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '⏳ Sending...';
+
+  try {
+    const res = await fetch('/api/pouch/send-payment-qr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: o.realId,
+        profile_id: currentUser.id,
+        customer_name: o.name,
+        amount: amount,
+        custom_requirements: customReq,
+        instagram_user_id: instagramUserId
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // Update local state
+      o.payment_status = 'QR Sent';
+      setPaymentBadge('QR Sent');
+
+      if (data.ig_sent) {
+        alert('✅ Bill + UPI QR sent via Instagram DM!');
+      } else if (isInstagram) {
+        alert('⚠️ Could not send via Instagram DM (check Instagram connection in Settings). Bill saved.');
+      } else {
+        // Fallback to WhatsApp for non-Instagram orders
+        const biz = currentProfile?.business_name || 'POUCH Store';
+        const upi = currentProfile?.upi_id || 'upi@bank';
+        const msg = data.bill_text || `🧾 Order Bill from ${biz}\n\n💰 Total: ₹${Number(amount).toLocaleString('en-IN')}\n💳 Pay via UPI: ${upi}\n\nPlease send a screenshot after payment!`;
+        const phone = (o.phone || '').replace(/[^0-9]/g, '');
+        if (phone) {
+          window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        } else {
+          alert('Bill saved. No phone number to send via WhatsApp.');
+        }
+      }
+    } else {
+      alert('Error: ' + (data.error || 'Could not send payment QR'));
+    }
+  } catch (err) {
+    console.error('Send payment QR error:', err);
+    alert('Error sending payment QR. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📲 Send Payment QR';
+  }
+}
+
+async function confirmPayment() {
+  const o = orders[activeOrderId];
+  if (!o) return;
+
+  if (!confirm('Confirm payment for this order? This will move the order to In Production.')) return;
+
+  try {
+    const res = await fetch('/api/pouch/update-payment-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: o.realId,
+        profile_id: currentUser.id,
+        payment_status: 'Payment Confirmed',
+        stage: 'prod'
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      o.payment_status = 'Payment Confirmed';
+      o.status = 'prod';
+      setPaymentBadge('Payment Confirmed');
+      document.getElementById('screenshotSection').style.display = 'none';
+      document.getElementById('payConfirmedBanner').style.display = '';
+      document.getElementById('payRejectedBanner').style.display = 'none';
+      document.getElementById('dStatus').value = 'prod';
+      await loadOrders();
+    } else {
+      alert('Error: ' + (data.error || 'Could not confirm payment'));
+    }
+  } catch (err) {
+    console.error('Confirm payment error:', err);
+    alert('Error confirming payment.');
+  }
+}
+
+async function rejectPayment() {
+  const o = orders[activeOrderId];
+  if (!o) return;
+
+  const reason = prompt('Optional: Add a rejection note for your records:') || '';
+  if (!confirm('Reject this payment? The order will NOT be advanced.')) return;
+
+  try {
+    const res = await fetch('/api/pouch/update-payment-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: o.realId,
+        profile_id: currentUser.id,
+        payment_status: 'Payment Rejected',
+        notes: reason
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      o.payment_status = 'Payment Rejected';
+      setPaymentBadge('Payment Rejected');
+      document.getElementById('screenshotSection').style.display = 'none';
+      document.getElementById('payRejectedBanner').style.display = '';
+    } else {
+      alert('Error: ' + (data.error || 'Could not reject payment'));
+    }
+  } catch (err) {
+    console.error('Reject payment error:', err);
+    alert('Error rejecting payment.');
+  }
+}
+
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('proofLightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('proofLightbox').classList.remove('open');
+}
+
+
 
 function sendWhatsAppBill() {
   if (!activeOrderId) return;
