@@ -4929,13 +4929,23 @@ if (instagramProfileError) {
     continue;
 }
 
-const instagramProfile = matchingProfiles && matchingProfiles.length > 0 ? matchingProfiles[0] : null;
+let instagramProfile = matchingProfiles && matchingProfiles.length > 0 ? matchingProfiles[0] : null;
+if (!instagramProfile && PROFILE_ID) {
+    const { data: fallbackProf } = await supabase
+        .from("profiles")
+        .select("id, instagram_user_id, instagram_connected, business_name")
+        .eq("id", PROFILE_ID)
+        .maybeSingle();
+    if (fallbackProf) {
+        instagramProfile = fallbackProf;
+        console.log("ℹ️ Fallback to default Kangro profile for Instagram:", fallbackProf.business_name || fallbackProf.id);
+    }
+}
 if (!instagramProfile) {
     console.error(
-        "Ã¢Â Å’ No Kangro profile found for Instagram account:",
+        "❌ No Kangro profile found for Instagram account:",
         instagramBusinessId
     );
-
     continue;
 }
 
@@ -5193,25 +5203,17 @@ Do not say the booking is confirmed unless the payment result says so.
 
                     const missing = [];
 
-if (!booking.service) {
-    missing.push("service");
-}
+                    if (!booking.service) {
+                        missing.push("service");
+                    }
 
-if (!booking.booking_date) {
-    missing.push("date");
-}
+                    if (!booking.booking_date) {
+                        missing.push("date");
+                    }
 
-if (!booking.booking_time) {
-    missing.push("time");
-}
-
-if (!booking.customer_name) {
-    missing.push("name");
-}
-
-if (!booking.phone || booking.phone === instagramPhone) {
-    missing.push("phone");
-}
+                    if (!booking.booking_time) {
+                        missing.push("time");
+                    }
 
                     // -----------------------------------------
                     // MISSING INFORMATION
@@ -5236,128 +5238,86 @@ Do not invent availability.
                     }
 
                     // -----------------------------------------
-                    // COMPLETE BOOKING
+                    // COMPLETE BOOKING -> CONFIRMED DIRECTLY
                     // -----------------------------------------
 
                     else {
 
                         console.log(
-                            "Ã°Å¸â€œâ€¦ Complete Instagram booking details received"
+                            "📋 Complete Instagram booking details received"
                         );
 
                         const service =
-    booking.service;
+                            booking.service;
 
-const servicePrice =
-    await getServicePrice(service);
+                        const servicePrice =
+                            await getServicePrice(service, activeInstagramProfileId);
 
-                        const profileName =
+                        const customerName =
                             booking.customer_name ||
+                            profileName ||
                             "Instagram Customer";
 
                         // -----------------------------------------
-                        // FETCH SALON PROFILE PAYMENT SETTINGS
+                        // CHECK EXISTING CONFIRMED BOOKING
                         // -----------------------------------------
 
-                        const { data: salonProf } =
+                        const { data: existingBooking } =
                             await supabase
-                                .from("profiles")
-                                .select("upi_id, upi_qr_image, advance_amount, business_name")
-                                .eq("id", activeInstagramProfileId)
+                                .from("bookings")
+                                .select("*")
+                                .eq("profile_id", activeInstagramProfileId)
+                                .eq("instagram_user_id", senderId)
+                                .eq("booking_date", booking.booking_date)
+                                .eq("booking_time", booking.booking_time)
                                 .maybeSingle();
 
-                        const salonAdvance =
-                            salonProf?.advance_amount
-                                ? Number(salonProf.advance_amount)
-                                : ADVANCE_AMOUNT;
-
-                        let salonQrUrl =
-                            salonProf?.upi_qr_image ||
-                            "/images/zarah-elite-qr.png";
-
-                        if (
-                            !salonQrUrl.startsWith("http://") &&
-                            !salonQrUrl.startsWith("https://")
-                        ) {
-                            salonQrUrl =
-                                `${PUBLIC_BASE_URL}/${salonQrUrl.replace(/^\//, "")}`;
-                        }
-
-                        // -----------------------------------------
-                        // CHECK EXISTING PENDING BOOKING
-                        // -----------------------------------------
-
-                        const existingPending =
-                            await findPendingBooking(
-                                instagramPhone
-                            );
-
-                        if (
-                            existingPending &&
-                            existingPending.booking_date ===
-                                booking.booking_date &&
-                            existingPending.booking_time ===
-                                booking.booking_time &&
-                            existingPending.service ===
-                                booking.service
-                        ) {
+                        if (existingBooking) {
 
                             console.log(
-                                "Ã¢Å¡Â Ã¯Â¸Â Existing pending Instagram booking found:",
-                                existingPending.id
+                                "⚠️ Existing booking found for slot:",
+                                existingBooking.id
                             );
 
-                            shouldSendQrCode = true;
-                            activeSalonQrUrl = salonQrUrl;
-
                             systemResult = `
-A pending booking already exists.
+A booking already exists for this customer.
 
 Booking ID:
-${existingPending.id}
+${existingBooking.id}
 
 Service:
-${existingPending.service}
+${existingBooking.service}
 
 Date:
-${formatDateForCustomer(
-    existingPending.booking_date
-)}
+${formatDateForCustomer(existingBooking.booking_date)}
 
 Time:
-${formatTimeForCustomer(
-    existingPending.booking_time
-)}
+${formatTimeForCustomer(existingBooking.booking_time)}
 
-Appointment status:
-Pending payment
+Status:
+Confirmed ✅
 
-Advance required:
-Ã¢â€šÂ¹${salonAdvance}
-
-Tell the customer:
-"The advance payment for your appointment is Ã¢â€šÂ¹${salonAdvance}.
-Please scan the QR code below to make the payment.
-Once you've paid, please send me a screenshot of the payment confirmation."
-
-Do NOT say the appointment is confirmed yet.
+Tell the customer naturally that their appointment is already booked for this date and time.
+Let them know the total bill (₹${servicePrice}) is to be paid when they visit the salon / at the time of service.
+Do NOT ask for advance payment.
+Do NOT send a payment link or QR code.
 `;
 
                         }
 
                         // -----------------------------------------
-                        // CREATE NEW BOOKING
+                        // CREATE NEW CONFIRMED BOOKING
                         // -----------------------------------------
 
                         else {
 
                             console.log(
-                                "Ã°Å¸â€œÂ Creating Instagram pending booking..."
+                                "📌 Creating confirmed Instagram booking..."
                             );
 
                             const {
                                 data: createdBooking,
-                                error
+                                error: bookingInsertError
                             } = await supabase
 
                                 .from("bookings")
@@ -5366,59 +5326,39 @@ Do NOT say the appointment is confirmed yet.
 
                                     profile_id: activeInstagramProfileId,
 
-                                    customer_name:
-    booking.customer_name || "Instagram Customer",
+                                    customer_name: customerName,
 
-phone:
-    booking.phone || null,
+                                    phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : null,
 
-instagram_user_id:
-    senderId,
+                                    instagram_user_id: senderId,
 
-service:
-    service,
+                                    service: service,
 
-booking_date:
-    booking.booking_date,
+                                    booking_date: booking.booking_date,
 
-booking_time:
-    booking.booking_time,
+                                    booking_time: booking.booking_time,
 
-status:
-    "Pending",
+                                    status: "Confirmed",
 
-source:
-    "Instagram",
+                                    source: "Instagram",
 
-                                    notes:
-                                        null,
+                                    notes: null,
 
-                                    intent:
-                                        "booking",
+                                    intent: "booking",
 
-                                    raw_message:
-                                        message,
+                                    raw_message: message,
 
-                                    advance_required:
-                                        true,
+                                    advance_required: false,
 
-                                    advance_amount:
-                                        salonAdvance,
+                                    advance_amount: 0,
 
-                                    advance_paid:
-                                        0,
+                                    advance_paid: 0,
 
-                                    advance_payment_method:
-                                        "UPI",
+                                    advance_payment_status: "Not Required",
 
-                                    advance_payment_status:
-                                        "Pending",
+                                    payment_status: "Payment Not Requested",
 
-                                    balance_amount:
-    Math.max(
-        servicePrice - salonAdvance,
-        0
-    )
+                                    balance_amount: servicePrice
 
                                 })
 
@@ -5430,15 +5370,15 @@ source:
                             // DATABASE ERROR
                             // -----------------------------------------
 
-                            if (error) {
+                            if (bookingInsertError) {
 
                                 console.error(
-                                    "Ã¢ÂÅ’ INSTAGRAM BOOKING INSERT ERROR:",
-                                    error
+                                    "❌ INSTAGRAM BOOKING INSERT ERROR:",
+                                    bookingInsertError
                                 );
 
                                 systemResult = `
-The booking could not be created because of a temporary error.
+The booking could not be created because of a temporary database error.
 
 Do not say the appointment was booked.
 
@@ -5448,68 +5388,42 @@ Apologize naturally and ask the customer to try again.
                             }
 
                             // -----------------------------------------
-                            // BOOKING CREATED
+                            // BOOKING CONFIRMED
                             // -----------------------------------------
 
                             else {
 
                                 console.log(
-                                    "Ã¢Å“â€¦ INSTAGRAM PENDING BOOKING CREATED:",
+                                    "✅ INSTAGRAM BOOKING CONFIRMED & SAVED:",
                                     createdBooking.id
                                 );
 
                                 await findOrCreateCustomer({
-    profileId: activeInstagramProfileId,
-    name:
-        booking.customer_name ||
-        "Instagram Customer",
-    phone: booking.phone
-});
+                                    profileId: activeInstagramProfileId,
+                                    name: customerName,
+                                    phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : `instagram:${senderId}`
+                                });
 
-                                shouldSendQrCode = true;
-                                activeSalonQrUrl = salonQrUrl;
-
-                                // -----------------------------------------
-                                // SEND PAYMENT INFO TO AI
-                                // -----------------------------------------
+                                const igBizProfile = await getBusinessProfile(activeInstagramProfileId);
 
                                 systemResult = `
-A booking has been successfully created but it is NOT confirmed yet.
+The booking has been successfully confirmed and saved in the database!
 
-Booking ID:
-${createdBooking.id}
+Booking ID: ${createdBooking.id}
+Customer: ${customerName}
+Service: ${service}
+Date: ${formatDateForCustomer(createdBooking.booking_date)}
+Time: ${formatTimeForCustomer(createdBooking.booking_time)}
+Total Bill: ₹${servicePrice}
 
-Service:
-${service}
+Tell the customer warmly and clearly that their appointment is CONFIRMED!
+State the total bill amount (₹${servicePrice}) and that payment is to be made when they visit the ${igBizProfile.category === "Salon" ? "salon" : "store / upon delivery"}.
 
-Date:
-${formatDateForCustomer(
-    createdBooking.booking_date
-)}
-
-Time:
-${formatTimeForCustomer(
-    createdBooking.booking_time
-)}
-
-Service price:
-₹${servicePrice}
-
-Advance:
-₹${salonAdvance}
-
-Remaining balance after advance:
-₹${Math.max(
-    servicePrice - salonAdvance,
-    0
-)}
-
-Tell the customer:
-"The advance payment for your appointment is ₹${salonAdvance}.
-Please scan the QR code below to make the payment.
-Once you've paid, please send me a screenshot of the payment confirmation."
-
-Do NOT say the appointment is confirmed.
+CRITICAL RULES:
+- Do NOT ask for any advance payment.
+- Do NOT ask for a payment screenshot.
+- Do NOT send any QR code or payment link.
+- Simply confirm their slot with warm wishes!
 `;
                             }
                         }
@@ -5657,7 +5571,7 @@ Do not invent:
                     });
 
                 console.log(
-                    "Ã°Å¸Â¤â€“ Instagram AI reply:",
+                    "🤖 Instagram AI reply:",
                     reply
                 );
 
@@ -5682,37 +5596,10 @@ Do not invent:
                 );
 
                 console.log(
-                    "Ã¢Å“â€¦ Instagram reply completed"
+                    "✅ Instagram reply completed"
                 );
-
-                // -----------------------------------------
-                // SEND UPI QR CODE IMAGE IF REQUIRED
-                // -----------------------------------------
-
-                if (shouldSendQrCode && activeSalonQrUrl) {
-                    try {
-                        console.log(
-                            "Ã°Å¸â€œÂ¸ Sending UPI QR image to Instagram customer:",
-                            activeSalonQrUrl
-                        );
-                        await sendInstagramImage(
-                            senderId,
-                            activeSalonQrUrl,
-                            activeInstagramProfileId
-                        );
-                        console.log(
-                            "Ã¢Å“â€¦ Instagram UPI QR image sent successfully"
-                        );
-                    } catch (imgErr) {
-                        console.error(
-                            "Ã¢Å¡Â Ã¯Â¸Â Failed to send Instagram UPI QR image:",
-                            imgErr
-                        );
-                    }
-                }
             }
         }
-
     }
 
     catch (error) {
