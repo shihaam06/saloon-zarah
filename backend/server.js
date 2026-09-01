@@ -1297,6 +1297,28 @@ async function getServicePrice(serviceName, profileId) {
  * Home Business, Retail, Service Business, Other.
  * Pulls live database products (inventory table) and services (services table).
  */
+
+// Get active staff for a salon profile
+async function getStaffFromDatabase(profileId) {
+    const resolvedProfileId = profileId || PROFILE_ID;
+    const { data, error } = await supabase
+        .from("staff")
+        .select("id, name, role, working_days, start_time, end_time")
+        .eq("profile_id", resolvedProfileId)
+        .eq("active", true);
+
+    if (error) {
+        console.warn("STAFF LOAD ERROR:", error.message);
+        return [];
+    }
+    return data || [];
+}
+
+
+// =====================================================
+// DYNAMIC BUSINESS PROFILE LOADER
+// =====================================================
+
 async function getBusinessProfile(profileId) {
     const id = profileId || PROFILE_ID;
     const { data, error } = await supabase
@@ -1311,7 +1333,6 @@ async function getBusinessProfile(profileId) {
 
     const p = data || {};
 
-    // Parse backup JSON if present or extract individual fields
     let extra = {};
     if (p.ai_business_profile) {
         try {
@@ -1321,16 +1342,16 @@ async function getBusinessProfile(profileId) {
         }
     }
 
-    // Category and product type resolution
+    // Product type resolution: 'sal' or 'pouch'
     const productType = (p.product || extra.product || "sal").toLowerCase();
-    const category = p.business_category || extra.business_category || (productType === "pouch" ? "Home Business / Retail" : "Salon");
-    const isSalon = category.toLowerCase() === "salon" || (productType === "sal" && !p.business_category && !extra.business_category);
+    const category = p.business_category || extra.business_category || (productType === "pouch" ? "Home Business" : "Salon");
+    const isSalon = productType === "sal" || category.toLowerCase() === "salon";
 
     const tone = p.ai_tone || extra.ai_tone || "Friendly";
-    const name = p.business_name || extra.business_name || BUSINESS.name;
-    const address = p.business_address || extra.business_address || BUSINESS.address;
-    const phone = p.business_phone || extra.business_phone || BUSINESS.phone;
-    const hours = p.business_hours || extra.business_hours || BUSINESS.hours;
+    const name = p.business_name || extra.business_name || (isSalon ? "Salon Zarah" : "Kangro Store");
+    const address = p.business_address || extra.business_address || "";
+    const phone = p.business_phone || extra.business_phone || "";
+    const hours = p.business_hours || extra.business_hours || "10:00 AM - 8:00 PM";
     const description = p.business_description || extra.business_description || "";
     const pricingInfo = p.pricing_info || extra.pricing_info || "";
     const bookingRules = p.booking_rules || extra.booking_rules || "";
@@ -1342,15 +1363,16 @@ async function getBusinessProfile(profileId) {
     const qrUrl = p.gpay_qr_url || p.upi_qr_image || extra.gpay_qr_url || extra.upi_qr_image || "";
     const advance = Number(p.advance_amount || extra.advance_amount) || 0;
 
-    // Load active inventory & services
-    const [products, services] = await Promise.all([
+    // Load active inventory, services, and staff
+    const [products, services, staff] = await Promise.all([
         getInventoryFromDatabase(id),
-        getServicesFromDatabase(id)
+        getServicesFromDatabase(id),
+        getStaffFromDatabase(id)
     ]);
 
     let catalogSummary = "";
     if (products && products.length > 0) {
-        catalogSummary += "PRODUCTS IN INVENTORY:\n" + products.map(prod => `- ${prod.name} (₹${prod.price}) [Stock: ${Number(prod.stock) > 0 ? `${prod.stock} units available` : 'Made to order / Out of stock'}]${prod.category ? ` (Category: ${prod.category})` : ''}`).join("\n");
+        catalogSummary += "PRODUCTS IN INVENTORY / STORE CATALOG:\n" + products.map(prod => `- ${prod.name} (₹${prod.price}) [Stock: ${Number(prod.stock) > 0 ? `${prod.stock} units in stock` : 'Made to order / custom'}]${prod.category ? ` (Category: ${prod.category})` : ''}`).join("\n");
     }
     if (services && services.length > 0) {
         if (catalogSummary) catalogSummary += "\n\n";
@@ -1379,120 +1401,122 @@ async function getBusinessProfile(profileId) {
         advance,
         products,
         services,
+        staff,
         catalogSummary
     };
 }
 
-/**
- * Build the AI system persona string dynamically from the profile.
- * Single universal dynamic AI engine for all categories and products.
- */
-function buildAISystemPrompt(biz) {
+// =====================================================
+// SAL AI PROMPT GENERATOR (SALON APPOINTMENT MANAGEMENT)
+// =====================================================
+
+function buildSalAISystemPrompt(biz) {
     const toneGuides = {
         "Professional": "Polite, structured, polished, efficient, and courteous.",
         "Friendly": "Warm, welcoming, conversational, helpful, with friendly emojis 😊✨.",
-        "Casual": "Relaxed, modern, concise, approachable, like chatting with a friend on Instagram.",
-        "Premium": "Sophisticated, elegant, attentive, refined, high-touch luxury service."
+        "Casual": "Relaxed, modern, concise, approachable.",
+        "Premium": "Sophisticated, elegant, attentive, refined luxury salon service."
     };
     const toneGuide = toneGuides[biz.tone] || "Warm, attentive, and helpful.";
 
-    const categoryDescriptions = {
-        "Salon": "a professional salon and beauty studio. You assist clients with appointment bookings, service menus, prices, and salon timings.",
-        "Bakery": "an artisanal home bakery and confectionery. You assist customers with cake orders, flavor options, prices, advance notice, and pickup/delivery.",
-        "Crochet / Handmade": "a handmade crochet & crafts studio. You assist customers with custom handmade creations, yarn colors, pricing, turnaround times, and orders.",
-        "Clothing": "a fashion & apparel brand. You help customers with sizing, product availability, prices, style recommendations, and shipping.",
-        "Home Business": "a dedicated home-grown small business. You help customers with inquiries, product details, custom requests, and placing orders.",
-        "Retail": "a boutique retail store. You help customers with product availability, prices, features, and ordering.",
-        "Service Business": "a professional client service provider. You help clients with service inquiries, quotes, scheduling, and consultation.",
-        "Other": "a customer-first business. You help customers with inquiries, product/service details, pricing, and placing orders."
-    };
-    const categoryDesc = categoryDescriptions[biz.category] || `a business in the "${biz.category}" category. You help customers with product/service details, pricing, and inquiries.`;
-
-    const sections = [];
-
-    sections.push(`==================================================
-BUSINESS PROFILE & IDENTITY
-==================================================
-- Business Name: ${biz.name}
-- Category: ${biz.category}
-${biz.description ? `- About / Specialty: ${biz.description}` : ""}
-${biz.address ? `- Location / Studio / Service Area: ${biz.address}` : ""}
-${biz.hours ? `- Operating / Store Hours: ${biz.hours}` : ""}
-${biz.phone ? `- Contact / WhatsApp: ${biz.phone}` : ""}`);
-
-    if (biz.pricingInfo) {
-        sections.push(`==================================================
-PRICING & CUSTOMIZATION GUIDELINES
-==================================================
-${biz.pricingInfo}`);
+    let servicesBlock = "";
+    if (biz.services && biz.services.length > 0) {
+        servicesBlock = "SALON SERVICE MENU & PRICING:\n" + biz.services.map(s =>
+            `- ${s.name}: ₹${s.price}${s.duration ? ` (${s.duration} mins)` : ''}${s.category ? ` [${s.category}]` : ''}`
+        ).join("\n");
+    } else {
+        servicesBlock = "Service menu is available at the salon.";
     }
 
-    if (biz.bookingRules) {
-        sections.push(`==================================================
-BOOKING & ORDERING RULES
-==================================================
-${biz.bookingRules}`);
+    let staffBlock = "";
+    if (biz.staff && biz.staff.length > 0) {
+        staffBlock = "SALON STYLISTS & STAFF:\n" + biz.staff.map(st =>
+            `- ${st.name} (${st.role || 'Stylist'})`
+        ).join("\n");
     }
 
-    if (biz.deliveryInfo) {
-        sections.push(`==================================================
-DELIVERY & SHIPPING INFORMATION
-==================================================
-${biz.deliveryInfo}`);
-    }
-
-    if (biz.paymentInfo || biz.upiId || biz.advance > 0) {
-        let payBlock = biz.paymentInfo ? `${biz.paymentInfo}\n` : "";
-        if (biz.upiId) payBlock += `UPI ID: ${biz.upiId}\n`;
-        if (biz.advance > 0) payBlock += `Default Advance / Deposit Amount: ₹${biz.advance}\n`;
-        sections.push(`==================================================
-PAYMENT INFORMATION
-==================================================
-${payBlock.trim()}`);
-    }
-
-    if (biz.faqData) {
-        sections.push(`==================================================
-FREQUENTLY ASKED QUESTIONS (FAQ)
-==================================================
-${biz.faqData}`);
-    }
-
-    if (biz.aiInstructions) {
-        sections.push(`==================================================
-OWNER'S CUSTOM INSTRUCTIONS (HIGHEST PRIORITY)
-==================================================
-${biz.aiInstructions}`);
-    }
-
-    if (biz.catalogSummary) {
-        sections.push(`==================================================
-LIVE CATALOG & DATABASE ITEMS
-==================================================
-${biz.catalogSummary}`);
-    }
-
-    return `You are the official AI assistant representing "${biz.name}", ${categoryDesc}
-Your communication tone is: ${biz.tone} (${toneGuide}).
-
-${sections.join("\n\n")}
+    return `You are the official salon appointment coordinator and receptionist for "${biz.name}".
+Your tone: ${biz.tone} (${toneGuide}).
 
 ==================================================
-COMMUNICATION & CONVERSATION RULES
+SALON INFORMATION
 ==================================================
-1. You represent ONLY ${biz.name} (${biz.category}). NEVER assume you are a salon or receptionist unless the category is explicitly "Salon". If you are a bakery, speak as a bakery assistant; if crochet/crafts, speak as a handmade artist; if retail/clothing, speak as a boutique seller.
-2. Reply naturally and concisely (usually 1 to 4 sentences) — perfectly formatted for Instagram DMs and WhatsApp messages.
-3. Be truthful to the catalog and business details provided. If an item or price is known, provide it directly. If an item or price is not in the catalog, politely give general pricing guidance or state you can take a custom inquiry for the owner.
-4. If a customer is ready to order or book:
-   - For orders (cakes, crochet, retail, clothing): ask for their item specifications (size/flavor/color/quantity), date needed, and delivery address.
-   - For salon/appointments: ask for service, preferred date, time, customer name, and phone number.
-5. If the customer asks about payments or deposits, explain the payment method (${biz.paymentInfo || (biz.upiId ? `UPI to ${biz.upiId}` : 'online/UPI/cash')}) accurately.
-6. Never sound like a generic robotic bot. Never output JSON or technical debug tags in the final response.`;
+- Salon Name: ${biz.name}
+${biz.description ? `- About / Specialty: ${biz.description}\n` : ''}- Location / Address: ${biz.address || 'Contact salon for exact directions'}
+- Operating Hours: ${biz.hours || '10:00 AM - 8:00 PM'}
+${biz.phone ? `- Phone / Contact: ${biz.phone}\n` : ''}
+==================================================
+${servicesBlock}
+==================================================
+${staffBlock ? staffBlock + '\n==================================================\n' : ''}${biz.bookingRules ? `BOOKING & CANCELLATION POLICIES:\n${biz.bookingRules}\n==================================================\n` : ''}${biz.paymentInfo ? `PAYMENT INFORMATION:\n${biz.paymentInfo}\n==================================================\n` : ''}${biz.faqData ? `SALON FAQS:\n${biz.faqData}\n==================================================\n` : ''}${biz.aiInstructions ? `OWNER SPECIAL INSTRUCTIONS:\n${biz.aiInstructions}\n==================================================\n` : ''}
+COMMUNICATION RULES FOR SALON APPOINTMENTS:
+1. Greet clients warmly, answer questions about salon treatments, prices, durations, and timings.
+2. If the client wants to book an appointment:
+   - Ask for: Service desired, Preferred Date, and Preferred Time.
+   - Once all 3 are provided, confirm the booking warmly with the total bill amount.
+   - Payment is paid at the salon after service. Do NOT ask for advance payment or send payment links unless specifically instructed.
+3. Keep replies concise (1-3 sentences), natural, and formatted cleanly for Instagram DMs / WhatsApp.
+4. Never invent services, prices, or policies not in the menu.`;
 }
 
 // =====================================================
-// INVENTORY & PRODUCT HELPERS
+// POUCH AI PROMPT GENERATOR (INSTAGRAM COMMERCE & ORDERS)
 // =====================================================
+
+function buildPouchAISystemPrompt(biz) {
+    const toneGuides = {
+        "Professional": "Polite, structured, polished, efficient, and courteous.",
+        "Friendly": "Warm, welcoming, conversational, helpful, with friendly emojis 😊✨.",
+        "Casual": "Relaxed, modern, concise, approachable, like chatting with an artisan on Instagram.",
+        "Premium": "Sophisticated, boutique, elegant, bespoke craftsmanship."
+    };
+    const toneGuide = toneGuides[biz.tone] || "Warm, attentive, and helpful.";
+
+    let catalogBlock = "";
+    if (biz.products && biz.products.length > 0) {
+        catalogBlock = "STORE PRODUCTS & CATALOG:\n" + biz.products.map(p =>
+            `- ${p.name}: ₹${p.price} [${Number(p.stock) > 0 ? `${p.stock} in stock` : 'Made to order'}]${p.category ? ` (Category: ${p.category})` : ''}`
+        ).join("\n");
+    } else {
+        catalogBlock = "Products are made to order. DM for latest catalog.";
+    }
+
+    return `You are the official Instagram business assistant and shop manager for "${biz.name}" (Category: ${biz.category}).
+Your tone: ${biz.tone} (${toneGuide}).
+
+==================================================
+BUSINESS PROFILE & BRAND IDENTITY
+==================================================
+- Store / Business Name: ${biz.name}
+- Category: ${biz.category}
+${biz.description ? `- About Our Brand: ${biz.description}\n` : ''}- Working Hours: ${biz.hours || 'Standard operating hours'}
+${biz.address ? `- Studio / Location / Pickup Point: ${biz.address}\n` : ''}
+==================================================
+${catalogBlock}
+==================================================
+${biz.pricingInfo ? `PRICING & CUSTOMIZATION GUIDELINES:\n${biz.pricingInfo}\n==================================================\n` : ''}${biz.bookingRules ? `ORDERING & TURNAROUND RULES:\n${biz.bookingRules}\n==================================================\n` : ''}${biz.deliveryInfo ? `DELIVERY & SHIPPING INFORMATION:\n${biz.deliveryInfo}\n==================================================\n` : ''}${biz.paymentInfo ? `PAYMENT INFORMATION (UPI / MANUAL BILLING):\n${biz.paymentInfo}\n==================================================\n` : ''}${biz.faqData ? `FREQUENTLY ASKED QUESTIONS:\n${biz.faqData}\n==================================================\n` : ''}${biz.aiInstructions ? `SELLER'S CUSTOM INSTRUCTIONS (HIGHEST PRIORITY):\n${biz.aiInstructions}\n==================================================\n` : ''}
+COMMUNICATION & ORDER WORKFLOW RULES:
+1. You represent an independent Instagram business (${biz.category}). NEVER assume you are a salon or receptionist.
+2. THREE ORDER TYPES SUPPORTED:
+   - STANDARD ORDER: Customer inquires or orders an existing catalog item. Provide price, confirm availability, and ask for quantity and delivery/pickup preference.
+   - CUSTOM ORDER: Customer wants custom specifications (flavor, size, color, theme, embroidery, text). Collect their requirements politely and inform them that the seller will prepare their custom bill.
+   - REFERENCE ORDER ("I want this"): Customer sends an image/reel/reference or asks if you can make something. Acknowledge enthusiastically, extract what they want (size, color, design details), and explain that the seller will review their reference and provide a custom quote.
+3. NEVER invent a random price for unpriced custom/reference orders. State starting prices or say the seller will confirm the exact price in their bill.
+4. MANUAL UPI BILLING FLOW:
+   - Let customers know that orders are processed directly through Instagram: the seller sends an order bill + UPI QR code, customer pays via UPI and shares screenshot, and seller confirms.
+5. Keep responses concise, friendly, and formatted for Instagram DMs (1-3 sentences).`;
+}
+
+// =====================================================
+// MASTER AI SYSTEM PROMPT DISPATCHER
+// =====================================================
+
+function buildAISystemPrompt(biz) {
+    if (biz.product === "pouch" || (!biz.isSalon && biz.category !== "Salon")) {
+        return buildPouchAISystemPrompt(biz);
+    }
+    return buildSalAISystemPrompt(biz);
+}
 
 async function getInventoryFromDatabase(profileId) {
     const resolvedProfileId = profileId || PROFILE_ID;

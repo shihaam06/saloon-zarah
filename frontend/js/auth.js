@@ -160,34 +160,71 @@ if (loginBtn) {
 
 
 // =====================================================
-// CHECK USER
+// CHECK USER & PRODUCT ROUTE GUARD
 // =====================================================
 
-if (
-    window.location.pathname
-        .includes("dashboard.html")
-) {
+const isSalPage = [
+    "dashboard.html",
+    "appointments.html",
+    "calendar.html",
+    "services.html",
+    "staff.html",
+    "billing.html",
+    "inventory.html",
+    "customers.html",
+    "analytics.html",
+    "settings.html"
+].some(p => window.location.pathname.endsWith(p));
 
+const isPouchPage = [
+    "pouch-dashboard.html",
+    "pouch-catalog.html",
+    "pouch-customers.html",
+    "pouch-analytics.html",
+    "pouch-settings.html"
+].some(p => window.location.pathname.endsWith(p));
+
+if (isSalPage || isPouchPage) {
     checkUser();
-
 }
 
-
 async function checkUser() {
-
     const {
         data,
         error
     } = await client.auth.getSession();
 
-
     if (error || !data.session) {
-
-        window.location.href =
-            "login.html";
-
+        window.location.href = "login.html";
+        return;
     }
 
+    try {
+        const { data: prof } = await client
+            .from("profiles")
+            .select("product")
+            .eq("id", data.session.user.id)
+            .maybeSingle();
+
+        const userProduct = (prof?.product || "SAL").toUpperCase();
+        localStorage.setItem("kangro_active_product", userProduct);
+
+        // Guard: POUCH user trying to access SAL pages
+        if (userProduct === "POUCH" && isSalPage) {
+            console.log("Routing POUCH user to POUCH dashboard");
+            window.location.href = "pouch-dashboard.html";
+            return;
+        }
+
+        // Guard: SAL user trying to access POUCH pages
+        if (userProduct === "SAL" && isPouchPage) {
+            console.log("Routing SAL user to SAL dashboard");
+            window.location.href = "dashboard.html";
+            return;
+        }
+    } catch (e) {
+        console.warn("Product route guard check skipped:", e);
+    }
 }
 
 
