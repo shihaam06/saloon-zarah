@@ -1871,6 +1871,7 @@ Schema:
     "booking_date": "",
     "booking_time": "",
     "question": "",
+    "custom_requirements": "",
     "payment_confirmation": false
 }
 
@@ -5192,252 +5193,232 @@ const activeInstagramProfileId =
                 console.log(booking);
 
                 // -----------------------------------------
-                // BOOKING LOGIC
+                // BOOKING / COMMERCE LOGIC
                 // -----------------------------------------
 
                 let systemResult = "";
 
-                // =================================================
-                // PAYMENT CONFIRMATION
-                // =================================================
+                const igBizProfile = await getBusinessProfile(activeInstagramProfileId);
+                const isPouch = igBizProfile.product === "pouch" || (!igBizProfile.isSalon && igBizProfile.category !== "Salon");
 
-                if (
-                    booking?.intent ===
-                    "payment_confirmation"
-                ) {
+                if (isPouch) {
+                    // =========================================================
+                    // POUCH: INSTAGRAM COMMERCE PIPELINE
+                    // =========================================================
 
-                    const paymentResult =
-                        await confirmAdvancePayment(
-                            instagramPhone
-                        );
+                    if (booking?.intent === "payment_confirmation") {
+                        systemResult = `
+The customer is confirming payment for their order.
+Payment rules for this business: ${igBizProfile.paymentInfo || 'UPI / COD'}
 
-                    systemResult = `
+Acknowledge their payment message warmly!
+Let them know that our team will verify the payment and a soft copy of their bill will be sent to them.
+`;
+                    }
+                    else if (
+                        booking?.intent === "order" ||
+                        booking?.intent === "custom_order" ||
+                        booking?.intent === "reference_order" ||
+                        booking?.intent === "booking" ||
+                        booking?.product_name ||
+                        (booking?.service && booking?.service.length > 2)
+                    ) {
+                        // ALWAYS create a NEW separate order row in the bookings table
+                        // Every DM inquiry/order gets its own card on the dashboard!
+                        const customerName = booking?.customer_name || "Instagram Customer";
+                        const customReq = booking?.custom_requirements || "";
+                        const serviceItem = booking?.product_name || booking?.service || message.substring(0, 120);
+                        const isCustom = booking?.intent === "custom_order" || booking?.intent === "reference_order";
+
+                        const { data: createdInquiry, error: inqErr } = await supabase
+                            .from("bookings")
+                            .insert({
+                                profile_id: activeInstagramProfileId,
+                                customer_name: customerName,
+                                phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : `instagram:${senderId}`,
+                                instagram_user_id: senderId,
+                                service: serviceItem,
+                                booking_date: getIndiaDate(),
+                                booking_time: "12:00",
+                                status: "pending",
+                                source: "Instagram",
+                                notes: isCustom ? "⚠️ Needs Human Response" : "Captured via POUCH AI",
+                                intent: booking.intent || "order",
+                                raw_message: message,
+                                custom_requirements: customReq || null,
+                                payment_status: "Payment Not Requested",
+                                advance_required: false,
+                                advance_amount: 0,
+                                advance_paid: 0
+                            })
+                            .select()
+                            .single();
+
+                        if (createdInquiry) {
+                            console.log("✅ New POUCH order card created:", createdInquiry.id, "| Customer:", customerName, "| Item:", serviceItem);
+                        } else {
+                            console.error("❌ POUCH order insert error:", inqErr);
+                        }
+
+                        await findOrCreateCustomer({
+                            profileId: activeInstagramProfileId,
+                            name: customerName,
+                            phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : `instagram:${senderId}`
+                        });
+
+                        const matchedProd = await findProductInDatabase(serviceItem, activeInstagramProfileId);
+
+                        if (isCustom) {
+                            systemResult = `
+The customer placed a custom / reference order inquiry:
+- Item / Description: ${serviceItem}
+- Customization / Preferences: ${customReq || "Customer provided custom specifications"}
+- Customer: ${customerName}
+- Status: A new order card has been added to your POUCH dashboard (⚠️ Needs Human Response).
+
+Reply to the customer warmly:
+1. Acknowledge their custom request and any preferences they mentioned.
+2. Tell them our team will review the details and confirm the exact pricing and timeline shortly.
+3. Ask if they have any additional preferences (size, flavor, color, custom text, or delivery date).
+`;
+                        } else if (matchedProd) {
+                            const unitText = matchedProd.category ? ` (${matchedProd.category})` : "";
+                            systemResult = `
+The customer is ordering: "${matchedProd.name}"${unitText}.
+- Price: ₹${matchedProd.price}
+- Availability: ${Number(matchedProd.stock) > 0 ? `${matchedProd.stock} in stock` : 'Made to order'}
+- Preferences noted: ${customReq || 'None mentioned yet'}
+- Status: A new order card has been added to your POUCH dashboard.
+
+Reply to the customer warmly:
+1. Confirm the item and total price (₹${matchedProd.price}).
+2. ALWAYS ask if they have any specific preferences or customization (e.g., size/weight, flavor, color, custom message, or required date).
+3. Ask if they would like to pay online via UPI or pay Cash on Delivery (COD).
+`;
+                        } else {
+                            systemResult = `
+The customer is interested in ordering: "${serviceItem}".
+- Customer: ${customerName}
+- Preferences noted: ${customReq || 'None mentioned yet'}
+- Status: A new order card has been added to your POUCH dashboard.
+
+Reply to the customer warmly:
+1. Acknowledge their inquiry for "${serviceItem}".
+2. ALWAYS ask for their preferences (quantity, size, flavor/color, custom design, or delivery date).
+3. Ask if they prefer online payment (UPI) or Cash on Delivery (COD).
+`;
+                        }
+                    }
+                    else if (
+                        booking?.intent === "products" ||
+                        booking?.intent === "services" ||
+                        booking?.intent === "pricing"
+                    ) {
+                        const allProducts = await getInventoryFromDatabase(activeInstagramProfileId);
+                        if (allProducts && allProducts.length > 0) {
+                            const prodText = allProducts.slice(0, 12).map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? 'In Stock' : 'Made to Order'}`).join("\n");
+                            systemResult = `
+The customer is asking about products, prices, or catalogue.
+Available items in store inventory:
+${prodText}
+
+Tell the customer naturally what products are available and their exact prices.
+Ask them which item they would like to order or if they need a custom order!
+`;
+                        } else {
+                            systemResult = `
+The customer is asking about products and pricing.
+Pricing & business info: ${igBizProfile.pricingInfo || 'Custom pricing based on order'}
+Respond helpfully with details about what the business offers and invite them to share their order details!
+`;
+                        }
+                    }
+                    else {
+                        systemResult = `
+The customer contacted ${igBizProfile.name} on Instagram.
+Customer message: ${message}
+Customer name: ${booking?.customer_name || 'Customer'}
+Intent: ${booking?.intent || 'general'}
+Custom preferences: ${booking?.custom_requirements || 'None'}
+
+Respond naturally, warmly, and helpfully.
+Do not invent fake prices or products not in the catalogue.
+`;
+                    }
+                } else {
+                    // =========================================================
+                    // SAL: SALON APPOINTMENT BOOKING PIPELINE
+                    // =========================================================
+
+                    if (booking?.intent === "payment_confirmation") {
+                        const paymentResult = await confirmAdvancePayment(instagramPhone);
+                        systemResult = `
 The customer contacted the salon through Instagram.
-
 Payment confirmation result:
 ${paymentResult.message}
 
 Do not invent payment information.
 Do not say the booking is confirmed unless the payment result says so.
 `;
-
-                }
-
-                // =================================================
-                // BOOKING
-                // =================================================
-
-                else if (
-                    booking?.intent ===
-                    "booking"
-                ) {
-
-                    const missing = [];
-
-                    if (!booking.service) {
-                        missing.push("service");
                     }
+                    else if (booking?.intent === "booking") {
+                        const missing = [];
+                        if (!booking.service) missing.push("service");
+                        if (!booking.booking_date) missing.push("date");
+                        if (!booking.booking_time) missing.push("time");
 
-                    if (!booking.booking_date) {
-                        missing.push("date");
-                    }
-
-                    if (!booking.booking_time) {
-                        missing.push("time");
-                    }
-
-                    // -----------------------------------------
-                    // MISSING INFORMATION
-                    // -----------------------------------------
-
-                    if (missing.length > 0) {
-
-                        systemResult = `
-The customer wants to make a booking.
-
+                        if (missing.length > 0) {
+                            systemResult = `
+The customer wants to make a salon appointment booking.
 The booking has NOT been created yet.
-
-Missing information:
-${missing.join(", ")}
+Missing information: ${missing.join(", ")}
 
 Ask naturally only for the missing information.
-
 Do not say the appointment is confirmed.
 Do not invent availability.
 `;
+                        } else {
+                            const service = booking.service;
+                            const servicePrice = await getServicePrice(service, activeInstagramProfileId);
+                            const customerName = booking.customer_name || "Instagram Customer";
 
-                    }
-
-                    // -----------------------------------------
-                    // COMPLETE BOOKING -> CONFIRMED DIRECTLY
-                    // -----------------------------------------
-
-                    else {
-
-                        console.log(
-                            "📋 Complete Instagram booking details received"
-                        );
-
-                        const service =
-                            booking.service;
-
-                        const servicePrice =
-                            await getServicePrice(service, activeInstagramProfileId);
-
-                        const customerName =
-                            booking.customer_name ||
-                            "Instagram Customer";
-
-                        // -----------------------------------------
-                        // CHECK EXISTING CONFIRMED BOOKING
-                        // -----------------------------------------
-
-                        const { data: existingBooking } =
-                            await supabase
+                            const { data: createdBooking, error: bookingInsertError } = await supabase
                                 .from("bookings")
-                                .select("*")
-                                .eq("profile_id", activeInstagramProfileId)
-                                .eq("instagram_user_id", senderId)
-                                .eq("booking_date", booking.booking_date)
-                                .eq("booking_time", booking.booking_time)
-                                .maybeSingle();
-
-                        if (existingBooking) {
-
-                            console.log(
-                                "⚠️ Existing booking found for slot:",
-                                existingBooking.id
-                            );
-
-                            systemResult = `
-A booking already exists for this customer.
-
-Booking ID:
-${existingBooking.id}
-
-Service:
-${existingBooking.service}
-
-Date:
-${formatDateForCustomer(existingBooking.booking_date)}
-
-Time:
-${formatTimeForCustomer(existingBooking.booking_time)}
-
-Status:
-Confirmed ✅
-
-Tell the customer naturally that their appointment is already booked for this date and time.
-Let them know the total bill (₹${servicePrice}) is to be paid when they visit the salon / at the time of service.
-Do NOT ask for advance payment.
-Do NOT send a payment link or QR code.
-`;
-
-                        }
-
-                        // -----------------------------------------
-                        // CREATE NEW CONFIRMED BOOKING
-                        // -----------------------------------------
-
-                        else {
-
-                            console.log(
-                                "📌 Creating confirmed Instagram booking..."
-                            );
-
-                            const {
-                                data: createdBooking,
-                                error: bookingInsertError
-                            } = await supabase
-
-                                .from("bookings")
-
                                 .insert({
-
                                     profile_id: activeInstagramProfileId,
-
                                     customer_name: customerName,
-
-                                    phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : null,
-
-                                    instagram_user_id: senderId,
-
+                                    phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : `instagram:${senderId}`,
                                     service: service,
-
                                     booking_date: booking.booking_date,
-
                                     booking_time: booking.booking_time,
-
                                     status: "Confirmed",
-
                                     source: "Instagram",
-
-                                    notes: null,
-
-                                    intent: "booking",
-
-                                    raw_message: message,
-
+                                    notes: "Confirmed directly via Instagram AI",
+                                    payment_status: "Payment at Salon",
                                     advance_required: false,
-
                                     advance_amount: 0,
-
                                     advance_paid: 0,
-
-                                    advance_payment_status: "Not Required",
-
-                                    payment_status: "Payment Not Requested",
-
-                                    balance_amount: servicePrice
-
+                                    balance_amount: servicePrice,
+                                    instagram_user_id: senderId,
+                                    intent: "booking",
+                                    raw_message: message,
+                                    custom_requirements: booking.custom_requirements || null
                                 })
-
                                 .select()
                                 .single();
 
-
-                            // -----------------------------------------
-                            // DATABASE ERROR
-                            // -----------------------------------------
-
                             if (bookingInsertError) {
-
-                                console.error(
-                                    "❌ INSTAGRAM BOOKING INSERT ERROR:",
-                                    bookingInsertError
-                                );
-
-                                systemResult = `
-The booking could not be created because of a temporary database error.
-
-Do not say the appointment was booked.
-
-Apologize naturally and ask the customer to try again.
-`;
-
-                            }
-
-                            // -----------------------------------------
-                            // BOOKING CONFIRMED
-                            // -----------------------------------------
-
-                            else {
-
-                                console.log(
-                                    "✅ INSTAGRAM BOOKING CONFIRMED & SAVED:",
-                                    createdBooking.id
-                                );
-
+                                console.error("❌ Instagram salon booking error:", bookingInsertError);
+                                systemResult = "An error occurred while confirming the booking. Please ask the customer to try again.";
+                            } else {
                                 await findOrCreateCustomer({
                                     profileId: activeInstagramProfileId,
                                     name: customerName,
                                     phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : `instagram:${senderId}`
                                 });
 
-                                const igBizProfile = await getBusinessProfile(activeInstagramProfileId);
-
                                 systemResult = `
-The booking has been successfully confirmed and saved in the database!
+The salon appointment has been successfully confirmed and saved in the database!
 
 Booking ID: ${createdBooking.id}
 Customer: ${customerName}
@@ -5447,7 +5428,7 @@ Time: ${formatTimeForCustomer(createdBooking.booking_time)}
 Total Bill: ₹${servicePrice}
 
 Tell the customer warmly and clearly that their appointment is CONFIRMED!
-State the total bill amount (₹${servicePrice}) and that payment is to be made when they visit the ${igBizProfile.category === "Salon" ? "salon" : "store / upon delivery"}.
+State the total bill amount (₹${servicePrice}) and that payment is to be made when they visit the salon.
 
 CRITICAL RULES:
 - Do NOT ask for any advance payment.
@@ -5458,121 +5439,65 @@ CRITICAL RULES:
                             }
                         }
                     }
-                }
-
-                // =================================================
-                // OTHER INSTAGRAM MESSAGE
-                // =================================================
-                // =================================================
-// INSTAGRAM SERVICES
-// =================================================
-
-else if (
-    booking?.intent === "services"
-) {
-    const igBiz = await getBusinessProfile(activeInstagramProfileId);
-    if (igBiz.isSalon) {
-    systemResult = `
-The customer is asking for the business's service menu.
-
+                    else if (booking?.intent === "services") {
+                        systemResult = `
+The customer is asking for the salon's service menu.
 The complete current service menu is available here:
-
 https://saloon-zarah.onrender.com/menu.pdf
 
 Tell the customer naturally that they can view the complete service menu using this link.
-
 Send the URL exactly as provided.
-
 Do NOT list individual services or prices in the message.
 Do NOT invent any services or prices.
 `;
-    } else {
-        const allProds = await getInventoryFromDatabase(activeInstagramProfileId);
-        if (allProds && allProds.length > 0) {
-            const prodText = allProds.slice(0, 10).map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Made to Order"}`).join("\n");
-            systemResult = `
-The customer is asking about available products.
-Available Products:
-${prodText}
+                    }
+                    else if (booking?.intent === "products" || booking?.product_name) {
+                        const searchProduct = booking.product_name || booking.service || message;
+                        const dbProduct = await findProductInDatabase(searchProduct, activeInstagramProfileId);
+                        const allProducts = await getInventoryFromDatabase(activeInstagramProfileId);
 
-Tell the customer about what we sell and their prices in a friendly way.
-`;
-        } else {
-            systemResult = `
-The customer is asking about products or services.
-Tell the customer that the catalog is being updated and to DM for the latest availability and pricing.
-`;
-        }
-    }
-}
-
-                else if (
-                    booking?.intent === "products" ||
-                    booking?.product_name
-                ) {
-                    const searchProduct = booking.product_name || booking.service || message;
-                    const dbProduct = await findProductInDatabase(searchProduct, activeInstagramProfileId);
-                    const allProducts = await getInventoryFromDatabase(activeInstagramProfileId);
-
-                    if (dbProduct) {
-                        const inStock = (Number(dbProduct.stock) || 0) > 0;
-                        systemResult = `
+                        if (dbProduct) {
+                            const inStock = (Number(dbProduct.stock) || 0) > 0;
+                            systemResult = `
 The customer asked about the product: "${dbProduct.name}".
-Product Details from Inventory Database:
+Product Details:
 - Name: ${dbProduct.name}
 - Category: ${dbProduct.category || "General"}
 - Price: ₹${dbProduct.price}
-- Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock / Made to Order"}
+- Stock Status: ${inStock ? `In Stock (${dbProduct.stock} available)` : "Currently Out of Stock"}
 
 Respond naturally to the customer with the exact price and stock availability.
 `;
-                    } else if (allProducts && allProducts.length > 0) {
-                        const productListText = allProducts
-                            .slice(0, 10)
-                            .map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? "In Stock" : "Out of Stock"}`)
-                            .join("\n");
-
-                        systemResult = `
+                        } else if (allProducts && allProducts.length > 0) {
+                            const productListText = allProducts.slice(0, 10).map(p => `- ${p.name} (₹${p.price}) - ${Number(p.stock) > 0 ? 'In Stock' : 'Out of Stock'}`).join("\n");
+                            systemResult = `
 Available Products in Inventory Database:
 ${productListText}
 
 Tell the customer what products we currently carry and their prices.
 `;
-                    } else {
+                        } else {
+                            systemResult = `
+The customer asked about products or services.
+Tell the customer politely that the catalog is being updated and offer to answer any questions.
+`;
+                        }
+                    }
+                    else {
                         systemResult = `
-The customer asked about products or services, but nothing is currently listed in the catalog.
-Tell the customer politely that the catalog is being updated and offer to answer any other questions.
+The customer contacted ${igBizProfile.name} through Instagram.
+Customer message: ${message}
+Intent: ${booking?.intent || ""}
+Service: ${booking?.service || ""}
+Date: ${booking?.booking_date || ""}
+Time: ${booking?.booking_time || ""}
+
+Respond naturally and helpfully.
+Do not invent services, prices, or availability.
 `;
                     }
                 }
 
-                else {
-                    const igBizFallback = await getBusinessProfile(activeInstagramProfileId);
-                    systemResult = `
-The customer contacted ${igBizFallback.name} through Instagram.
-
-Customer message:
-${message}
-
-Intent:
-${booking?.intent || ""}
-
-${igBizFallback.isSalon
-    ? `Service: ${booking?.service || ""}\nDate: ${booking?.booking_date || ""}\nTime: ${booking?.booking_time || ""}`
-    : `Product/Order: ${booking?.service || booking?.product_name || ""}`
-}
-
-Respond naturally and helpfully.
-
-Do not invent:
-- services or products
-- prices
-- availability
-- bookings or payments
-`;
-                }
-
-                // -----------------------------------------
                 // GENERATE HUMAN REPLY
                 // -----------------------------------------
 
