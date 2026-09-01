@@ -1606,7 +1606,7 @@ async function findOrCreateCustomer({
         .from("customers")
         .insert({
 
-            profileId: activeInstagramProfileId,
+            profile_id: profileId,
 
             name:
                 name ||
