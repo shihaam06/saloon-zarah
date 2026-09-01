@@ -275,6 +275,10 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
     <label>🛍️ Order Details</label>
     <p id="dDetails">—</p>
   </div>
+  <div class="detail-block" id="dCustomBox" style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border:1.5px solid #C4B5FD;border-radius:12px;padding:12px;margin:12px 0;">
+    <label style="color:#6D28D9;font-weight:800;display:flex;align-items:center;gap:6px">✨ Customer Preferences & Customization</label>
+    <p id="dCustomReq" style="font-weight:700;color:#4C1D95;margin-top:4px;white-space:pre-wrap;font-size:13px">—</p>
+  </div>
   <div class="detail-block">
     <label>📅 Date Received</label>
     <p id="dDate">—</p>
@@ -570,6 +574,7 @@ async function loadOrders() {
           <h4>${orders[idStr].name} ${humanTag} ${payTag}</h4>
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">📸 ${orders[idStr].handle}</div>
           <p class="order-desc">${orders[idStr].details}</p>
+          ${orders[idStr].custom_requirements ? `<div style="background:#F5F3FF;border:1px solid #DDD6FE;color:#5B21B6;border-radius:8px;padding:5px 8px;font-size:11px;font-weight:600;margin:6px 0">✨ <strong>Pref:</strong> ${orders[idStr].custom_requirements}</div>` : ''}
           <div class="order-meta">
             <span class="order-price">₹${price.toLocaleString('en-IN')}</span>
             <span class="tag ${stage === 'inquiry' ? 'tag-pending' : (stage === 'prod' ? 'tag-prod' : 'tag-paid')}">
@@ -620,6 +625,7 @@ function openOrderDrawer(id) {
   const cleanPhone = (o.phone && !o.phone.startsWith('instagram:')) ? o.phone : '';
   document.getElementById('dPhoneInput').value = cleanPhone;
   document.getElementById('dDetails').textContent = o.details;
+  document.getElementById('dCustomReq').textContent = o.custom_requirements || 'No specific preferences specified.';
   document.getElementById('dDate').textContent = o.date;
   document.getElementById('dStatus').value = o.status;
 

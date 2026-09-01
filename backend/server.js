@@ -1451,7 +1451,8 @@ ${servicesBlock}
 ${staffBlock ? staffBlock + '\n==================================================\n' : ''}${biz.bookingRules ? `BOOKING & CANCELLATION POLICIES:\n${biz.bookingRules}\n==================================================\n` : ''}${biz.paymentInfo ? `PAYMENT INFORMATION:\n${biz.paymentInfo}\n==================================================\n` : ''}${biz.faqData ? `SALON FAQS:\n${biz.faqData}\n==================================================\n` : ''}${biz.aiInstructions ? `OWNER SPECIAL INSTRUCTIONS:\n${biz.aiInstructions}\n==================================================\n` : ''}
 COMMUNICATION RULES FOR SALON APPOINTMENTS:
 1. Greet clients warmly, answer questions about salon treatments, prices, durations, and timings.
-2. If the client wants to book an appointment:
+2. ALWAYS ask the client if they have any specific preferences or customizations (e.g. hair length/style preferences, skin type, or stylist preference).
+3. If the client wants to book an appointment:
    - Ask for: Service desired, Preferred Date, and Preferred Time.
    - Once all 3 are provided, confirm the booking warmly with the total bill amount.
    - Payment is paid at the salon after service. Do NOT ask for advance payment or send payment links unless specifically instructed.
@@ -1497,6 +1498,7 @@ ${catalogBlock}
 ${biz.pricingInfo ? `PRICING, PORTIONS & SIZING RULES:\n${biz.pricingInfo}\n==================================================\n` : ''}${biz.bookingRules ? `ORDERING & TURNAROUND RULES:\n${biz.bookingRules}\n==================================================\n` : ''}${biz.deliveryInfo ? `DELIVERY & SHIPPING INFORMATION:\n${biz.deliveryInfo}\n==================================================\n` : ''}${biz.paymentInfo ? `PAYMENT INFORMATION & POLICIES:\n${biz.paymentInfo}\n==================================================\n` : ''}${biz.faqData ? `FREQUENTLY ASKED QUESTIONS:\n${biz.faqData}\n==================================================\n` : ''}${biz.aiInstructions ? `SELLER'S SPECIAL INSTRUCTIONS (HIGHEST PRIORITY):\n${biz.aiInstructions}\n==================================================\n` : ''}
 COMMUNICATION & COMMERCE ORDER RULES:
 1. Read exact prices and unit amounts (e.g. per kg, per piece, per box) directly from the catalog above. Never misquote or invent arbitrary prices.
+2. ALWAYS ask the customer if they have any specific preferences or customizations (such as flavor, size, portions in kg/grams, color, theme, custom message, or delivery preference). Acknowledge whatever they mention warmly.
 2. PAYMENT METHOD SELECTION (ONLINE vs COD):
    - When the customer is placing an order or ready to pay, ask if they would prefer:
      "Would you like to pay online via UPI, or Cash on Delivery (COD)?"
@@ -1889,6 +1891,9 @@ payment_confirmation
 cancel
 reschedule
 unknown
+
+CUSTOM PREFERENCES & REQUIREMENTS:
+Always extract any customer preferences, customizations, flavors, sizes, kg/grams, colors, designs, custom text, or special instructions into "custom_requirements".
 
 IMPORTANT CONVERSATION RULES:
 
