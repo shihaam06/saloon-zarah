@@ -5255,7 +5255,6 @@ Do not invent availability.
 
                         const customerName =
                             booking.customer_name ||
-                            profileName ||
                             "Instagram Customer";
 
                         // -----------------------------------------
