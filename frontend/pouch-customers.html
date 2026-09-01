@@ -72,7 +72,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 .cust-stat strong{font-size:13px;font-weight:800;font-family:Manrope}
 .cust-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--pouch);font-weight:700}
 
-/* DETAIL MODAL / DRAWER */
+/* DETAIL MODAL */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;place-items:center;z-index:999;padding:20px}
 .modal.show{display:grid}
 .modal-box{background:var(--white);width:min(540px,100%);border-radius:22px;padding:30px;box-shadow:var(--shadow);border:1px solid var(--line);max-height:90vh;overflow-y:auto}
@@ -126,15 +126,14 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
   <div class="topbar">
     <div class="top-title">
       <h1>Customer Book</h1>
-      <p>Click any customer to view full contact numbers, Instagram handles, addresses, and complete order history.</p>
+      <p>Click any customer to expand full contact numbers, Instagram IDs, delivery addresses, and complete order history with instant WhatsApp chat.</p>
     </div>
-    <button class="btn btn-pouch" onclick="openAddCustomerModal()">➕ Add Customer</button>
   </div>
 
-  <input type="text" class="search-box" id="custSearch" placeholder="🔍 Search customers or phone numbers..." oninput="filterCustomers()">
+  <input type="text" class="search-box" id="custSearch" placeholder="🔍 Search by name, phone, or Instagram handle..." oninput="filterCustomers()">
 
   <div class="customer-grid" id="customerGrid">
-    <!-- Populated via JS -->
+    <div style="grid-column:1/-1;text-align:center;padding:48px 16px;color:var(--muted)">Loading customer book...</div>
   </div>
 </main>
 
@@ -153,8 +152,13 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
     </div>
 
     <div class="detail-section">
-      <label>📱 Phone & WhatsApp Number</label>
+      <label>📱 Phone / WhatsApp Number</label>
       <div class="detail-val" id="mPhone">—</div>
+    </div>
+
+    <div class="detail-section">
+      <label>📸 Instagram Identity</label>
+      <div class="detail-val" id="mIgId">—</div>
     </div>
 
     <div class="detail-section">
@@ -168,7 +172,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
     </div>
 
     <div class="detail-section">
-      <label>📦 Order History (<span id="mOrderCount">3</span> orders)</label>
+      <label>📦 Order History (<span id="mOrderCount">0</span> orders)</label>
       <div class="order-history-list" id="mHistoryList">
         <!-- Populated via JS -->
       </div>
@@ -186,7 +190,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 <script src="js/theme.js"></script>
 <script>
 let currentUser = null;
-let currentSelectedPhone = "";
+let currentSelectedCustomer = null;
 let customers = [];
 
 async function init() {
@@ -209,39 +213,58 @@ async function loadProfile() {
 
 async function loadCustomersFromDB() {
   try {
-    const { data: bookings, error } = await client
-      .from("bookings")
-      .select("*")
-      .eq("profile_id", currentUser.id)
-      .order("created_at", { ascending: false });
+    const [custRes, bookRes] = await Promise.all([
+      client.from("customers").select("*").eq("profile_id", currentUser.id).order("created_at", { ascending: false }),
+      client.from("bookings").select("*").eq("profile_id", currentUser.id).order("created_at", { ascending: false })
+    ]);
 
-    if (bookings && bookings.length > 0) {
-      const customerMap = {};
-      bookings.forEach(b => {
-        const key = (b.phone || b.customer_name || "Guest").trim();
-        if (!customerMap[key]) {
-          customerMap[key] = {
-            id: key,
-            name: b.customer_name || "Customer",
-            phone: b.phone || "—",
-            handle: b.source?.includes("Instagram") ? "@" + (b.customer_name || "").toLowerCase().replace(/\s+/g, "_") : "Direct",
-            address: b.notes || "Customer details captured via AI chat",
-            notes: b.service ? `Recent: ${b.service}` : "Captured via POUCH AI",
-            orders: []
-          };
-        }
-        customerMap[key].orders.push({
-          id: "#P-" + String(b.id).substring(0, 6).toUpperCase(),
-          item: b.service || "Order Item",
-          price: Number(b.advance_amount || b.balance_amount || 0) || 500,
-          date: b.booking_date || new Date(b.created_at).toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
-          status: b.status || "Pending"
-        });
+    const bookings = bookRes.data || [];
+    const directCusts = custRes.data || [];
+
+    const customerMap = {};
+
+    // 1. Add direct customers from customers table
+    directCusts.forEach(c => {
+      const key = (c.phone || c.name || String(c.id)).trim();
+      customerMap[key] = {
+        key: key,
+        name: c.name || "Customer",
+        phone: c.phone || "—",
+        handle: c.phone && c.phone.startsWith("instagram:") ? "@" + c.phone.replace("instagram:", "") : "@" + (c.name || "").toLowerCase().replace(/\s+/g, "_"),
+        igId: c.phone && c.phone.startsWith("instagram:") ? c.phone.replace("instagram:", "") : "—",
+        address: c.notes || "Standard Shipping / Pickup",
+        notes: c.notes || "Captured via Kangro",
+        orders: []
+      };
+    });
+
+    // 2. Add and link bookings/orders
+    bookings.forEach(b => {
+      const key = (b.phone || b.customer_name || "Guest").trim();
+      if (!customerMap[key]) {
+        const isIg = b.phone && b.phone.startsWith("instagram:");
+        customerMap[key] = {
+          key: key,
+          name: b.customer_name || "Customer",
+          phone: isIg ? "—" : (b.phone || "—"),
+          handle: isIg ? "@" + b.phone.replace("instagram:", "") : (b.source?.includes("Instagram") ? "@" + (b.customer_name || "").toLowerCase().replace(/\s+/g, "_") : "Direct"),
+          igId: isIg ? b.phone.replace("instagram:", "") : (b.instagram_user_id || "—"),
+          address: b.notes || "Captured via Instagram DM",
+          notes: b.service ? `Recent order: ${b.service}` : "Captured via POUCH AI",
+          orders: []
+        };
+      }
+
+      customerMap[key].orders.push({
+        id: "#P-" + String(b.id).substring(0, 6).toUpperCase(),
+        item: b.service || "Order Item",
+        price: Number(b.bill_amount || b.advance_amount || b.balance_amount || 0) || 500,
+        date: b.booking_date || new Date(b.created_at).toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
+        status: b.payment_status || b.status || "Inquiry"
       });
-      customers = Object.values(customerMap);
-    } else {
-      customers = [];
-    }
+    });
+
+    customers = Object.values(customerMap);
   } catch (err) {
     console.warn("Failed to load customers from DB:", err);
     customers = [];
@@ -256,37 +279,38 @@ function renderCustomers() {
   const filtered = customers.filter(c => 
     c.name.toLowerCase().includes(query) || 
     c.phone.toLowerCase().includes(query) || 
-    c.handle.toLowerCase().includes(query)
+    c.handle.toLowerCase().includes(query) ||
+    c.igId.toLowerCase().includes(query)
   );
 
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 48px 16px; background: var(--white); border: 1px dashed var(--line); border-radius: 16px;">
         <div style="font-size: 36px; margin-bottom: 8px;">👥</div>
-        <h3 style="font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 6px;">No customers found</h3>
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px;">No customers found</h3>
         <p style="font-size: 13px; color: var(--muted);">Customers will automatically appear here as they message you on Instagram DMs or place orders.</p>
       </div>
     `;
     return;
   }
 
-  grid.innerHTML = filtered.map(c => {
+  grid.innerHTML = filtered.map((c, idx) => {
     const totalSpend = c.orders.reduce((sum, o) => sum + o.price, 0);
     return `
-      <div class="customer-card" onclick="openCustomerDetails(${c.id})">
+      <div class="customer-card" onclick="openCustomerDetails(${idx})">
         <div class="cust-head">
-          <div class="cust-avatar">${c.name.charAt(0)}</div>
+          <div class="cust-avatar">${c.name.charAt(0).toUpperCase()}</div>
           <div class="cust-meta">
             <h3>${c.name}</h3>
-            <span>${c.phone} · ${c.handle}</span>
+            <span>${c.phone !== '—' ? c.phone : c.handle} · ${c.orders.length} order(s)</span>
           </div>
         </div>
         <div class="cust-stats">
-          <div class="cust-stat"><label>Orders</label><strong>${c.orders.length} Orders</strong></div>
-          <div class="cust-stat"><label>Lifetime Spend</label><strong>₹${totalSpend}</strong></div>
+          <div class="cust-stat"><label>Total Orders</label><strong>${c.orders.length}</strong></div>
+          <div class="cust-stat"><label>Total Value</label><strong>₹${totalSpend.toLocaleString('en-IN')}</strong></div>
         </div>
         <div class="cust-footer">
-          <span>🔍 Click to expand details</span>
+          <span>🔍 View Details & History</span>
           <span>💬 WhatsApp →</span>
         </div>
       </div>
@@ -298,32 +322,37 @@ function filterCustomers() {
   renderCustomers();
 }
 
-function openCustomerDetails(id) {
-  const c = customers.find(x => x.id === id);
+function openCustomerDetails(idx) {
+  const c = customers[idx];
   if (!c) return;
 
-  currentSelectedPhone = c.phone.replace(/[^0-9]/g, "");
-  document.getElementById("mAvatar").textContent = c.name.charAt(0);
+  currentSelectedCustomer = c;
+  document.getElementById("mAvatar").textContent = c.name.charAt(0).toUpperCase();
   document.getElementById("mName").textContent = c.name;
-  document.getElementById("mHandle").textContent = `${c.handle} · ${c.phone}`;
+  document.getElementById("mHandle").textContent = c.handle;
   document.getElementById("mPhone").textContent = c.phone;
+  document.getElementById("mIgId").textContent = c.igId !== "—" ? c.igId : (c.handle || "—");
   document.getElementById("mAddress").textContent = c.address;
   document.getElementById("mNotes").textContent = c.notes;
   document.getElementById("mOrderCount").textContent = c.orders.length;
 
   const list = document.getElementById("mHistoryList");
-  list.innerHTML = c.orders.map(o => `
-    <div class="history-item">
-      <div>
-        <strong>${o.id} · ${o.item}</strong>
-        <div><span>${o.date}</span></div>
+  if (c.orders.length > 0) {
+    list.innerHTML = c.orders.map(o => `
+      <div class="history-item">
+        <div>
+          <strong>${o.id} · ${o.item}</strong>
+          <div><span style="font-size:11px;color:var(--muted)">${o.date}</span></div>
+        </div>
+        <div style="text-align:right">
+          <strong style="display:block;font-size:13px">₹${o.price.toLocaleString('en-IN')}</strong>
+          <span class="tag-paid">${o.status}</span>
+        </div>
       </div>
-      <div style="text-align:right">
-        <strong style="display:block;font-size:13px">₹${o.price}</strong>
-        <span class="tag-paid">${o.status}</span>
-      </div>
-    </div>
-  `).join("");
+    `).join("");
+  } else {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px">No previous orders recorded yet.</div>';
+  }
 
   document.getElementById("custModal").classList.add("show");
 }
@@ -333,33 +362,21 @@ function closeModal() {
 }
 
 function openWhatsAppChat() {
-  if (!currentSelectedPhone) {
-    alert("No phone number saved for this customer.");
-    return;
+  if (!currentSelectedCustomer) return;
+  const raw = currentSelectedCustomer.phone || "";
+  let digits = raw.replace(/[^0-9]/g, "");
+
+  if (!digits || digits.length < 10) {
+    const manual = prompt("No WhatsApp phone number found for this customer. Please enter their WhatsApp number (+91...):");
+    if (!manual) return;
+    digits = manual.replace(/[^0-9]/g, "");
   }
-  window.open(`https://wa.me/${currentSelectedPhone}`, "_blank");
-}
 
-function openAddCustomerModal() {
-  const name = prompt("Enter Customer Name:");
-  if (!name) return;
-  const phone = prompt("Enter Phone / WhatsApp Number (+91...):");
-  const handle = prompt("Enter Instagram Handle (@...):") || "@instagram";
-  const address = prompt("Enter Delivery Address:") || "Pickup / Direct";
+  if (digits.length === 10) digits = "91" + digits;
 
-  const newCust = {
-    id: Date.now(),
-    name: name,
-    phone: phone || "+91 98000 00000",
-    handle: handle,
-    address: address,
-    notes: "New customer added via dashboard.",
-    orders: []
-  };
-
-  customers.unshift(newCust);
-  renderCustomers();
-  alert(`Customer "${name}" added!`);
+  const bizName = document.getElementById("sidebarBizName").textContent || "POUCH Store";
+  const msg = encodeURIComponent(`Hello ${currentSelectedCustomer.name}, this is ${bizName}! Reaching out regarding your order inquiry.`);
+  window.open(`https://wa.me/${digits}?text=${msg}`, "_blank");
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {

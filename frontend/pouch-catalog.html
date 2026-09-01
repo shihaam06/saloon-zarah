@@ -94,7 +94,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 .form-group{margin-bottom:14px}
 .form-group label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:13px;outline:none}
-.form-group input:focus,.form-group textarea:focus{border-color:var(--pouch)}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--pouch)}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 
 @media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;min-height:auto}.toolbar{flex-direction:column;align-items:stretch}.search-input{width:100%}}
@@ -131,7 +131,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
   <div class="topbar">
     <div class="top-title">
       <h1>Product Catalog</h1>
-      <p>Manage your items, prices, and options. Your Instagram AI automatically reads this catalog to quote prices to customers.</p>
+      <p>Manage your items, prices, unit measurements (kg, pcs, boxes), and stock. Your Instagram AI automatically reads this catalog to quote exact prices to customers.</p>
     </div>
     <button class="btn btn-pouch" onclick="openAddModal()">➕ Add Product</button>
   </div>
@@ -139,24 +139,25 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
   <div class="ai-note">
     <span class="emoji">🤖</span>
     <div class="ai-note-text">
-      <strong>AI Auto-Pricing Active</strong>
-      <p>When customers DM your Instagram or WhatsApp asking about prices, flavor choices, or product details, the AI answers directly from this database.</p>
+      <strong>Live AI Price & Catalog Sync Active</strong>
+      <p>When customers ask about cake flavors, crochet designs, unit prices (per kg or piece), or availability, your AI assistant reads this database in real-time.</p>
     </div>
   </div>
 
   <div class="toolbar">
-    <input type="text" class="search-input" id="searchBox" placeholder="🔍 Search products..." oninput="filterProducts()">
+    <input type="text" class="search-input" id="searchBox" placeholder="🔍 Search products or units..." oninput="filterProducts()">
     <div class="category-pills" id="catPills">
       <button class="pill active" onclick="selectCat('ALL')">All Items</button>
       <button class="pill" onclick="selectCat('Cakes')">Cakes & Bakes</button>
       <button class="pill" onclick="selectCat('Crochet')">Crochet & Yarn</button>
       <button class="pill" onclick="selectCat('Handmade')">Handmade & Crafts</button>
+      <button class="pill" onclick="selectCat('Clothing')">Clothing</button>
       <button class="pill" onclick="selectCat('Gifts')">Gift Hampers</button>
     </div>
   </div>
 
   <div class="product-grid" id="productGrid">
-    <!-- Populated via JS / Supabase -->
+    <div style="grid-column:1/-1;text-align:center;padding:48px 16px;color:var(--muted)">Loading catalog...</div>
   </div>
 </main>
 
@@ -167,35 +168,58 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
       <h3 id="modalTitle">Add Product to Catalog</h3>
       <button class="close-btn" onclick="closeModal()">×</button>
     </div>
+    <input type="hidden" id="editProdId">
+    
     <div class="form-group">
       <label>Product / Creation Name *</label>
-      <input type="text" id="pName" placeholder="e.g. Lavender Crochet Tote Bag">
+      <input type="text" id="pName" placeholder="e.g. Belgian Chocolate Truffle Cake or Crochet Tote Bag">
     </div>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="pCat">
+          <option value="Cakes">Cakes & Bakes</option>
+          <option value="Crochet">Crochet & Yarn</option>
+          <option value="Handmade">Handmade & Crafts</option>
+          <option value="Clothing">Clothing & Apparel</option>
+          <option value="Gifts">Gift Hampers</option>
+          <option value="General">General / Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Unit / Pricing Basis *</label>
+        <select id="pUnit">
+          <option value="per kg">per kg (Cakes/Sweets)</option>
+          <option value="per 500g">per 500g</option>
+          <option value="per piece">per piece / item</option>
+          <option value="per box">per box / pack</option>
+          <option value="per set">per set</option>
+          <option value="per dozen">per dozen</option>
+          <option value="fixed price">fixed price</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label>Price (₹) *</label>
+        <input type="number" id="pPrice" placeholder="e.g. 1200">
+      </div>
+      <div class="form-group">
+        <label>Available Stock (Units) *</label>
+        <input type="number" id="pStock" placeholder="e.g. 10 (or 0 for Made to Order)" value="10">
+      </div>
+    </div>
+
     <div class="form-group">
-      <label>Category *</label>
-      <select id="pCat">
-        <option value="Cakes">Cakes & Bakes</option>
-        <option value="Crochet">Crochet & Yarn</option>
-        <option value="Handmade">Handmade & Crafts</option>
-        <option value="Gifts">Gift Hampers</option>
-        <option value="General">General / Custom</option>
-      </select>
+      <label>Customization Details & Options</label>
+      <input type="text" id="pOptions" placeholder="e.g. Eggless, Dark Chocolate, Custom Message, 1kg or 2kg">
     </div>
-    <div class="form-group">
-      <label>Price (₹) *</label>
-      <input type="number" id="pPrice" placeholder="e.g. 1200">
-    </div>
-    <div class="form-group">
-      <label>Stock / Lead Time *</label>
-      <input type="text" id="pStock" placeholder="e.g. Made to Order (2-3 days) or 10 in stock">
-    </div>
-    <div class="form-group">
-      <label>Description & Customization Options (Flavors, Colors, Sizes)</label>
-      <textarea id="pDesc" rows="3" placeholder="e.g. Handcrafted with 100% cotton yarn. Available in beige, lavender, and matcha green. Custom strap lengths on request."></textarea>
-    </div>
+
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-pouch" onclick="saveProduct()">Save Product</button>
+      <button class="btn btn-pouch" id="saveProdBtn" onclick="saveProduct()">Save Product</button>
     </div>
   </div>
 </div>
@@ -216,7 +240,7 @@ async function init() {
   }
   currentUser = data.session.user;
   loadProfile();
-  loadProductsFromDB();
+  await loadProductsFromDB();
 }
 
 async function loadProfile() {
@@ -228,21 +252,40 @@ async function loadProfile() {
 
 async function loadProductsFromDB() {
   try {
-    const { data, error } = await client.from("inventory").select("*").eq("profile_id", currentUser.id);
+    const { data, error } = await client
+      .from("inventory")
+      .select("*")
+      .eq("profile_id", currentUser.id)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
     if (data && data.length > 0) {
-      products = data.map(p => ({
-        id: p.id,
-        name: p.name,
-        category: p.category || "General",
-        price: p.price || 0,
-        stock: p.stock > 0 ? `${p.stock} in stock` : "Made to Order",
-        desc: p.description || "Handcrafted item"
-      }));
+      products = data.map(p => {
+        let cleanName = p.name || "Product";
+        let unitText = "";
+        const unitMatch = cleanName.match(/\((per [^)]+|fixed price)\)/i);
+        if (unitMatch) {
+          unitText = unitMatch[0];
+          cleanName = cleanName.replace(unitMatch[0], "").trim();
+        }
+
+        return {
+          id: p.id,
+          rawName: p.name,
+          name: cleanName,
+          unit: unitText ? unitText.replace(/[()]/g, "") : "per piece",
+          category: p.category || "General",
+          price: Number(p.price) || 0,
+          stockQty: Number(p.stock) || 0,
+          stockDisplay: Number(p.stock) > 0 ? `${p.stock} units available` : "Made to Order / Custom"
+        };
+      });
     } else {
       products = [];
     }
   } catch (e) {
-    console.warn("Catalog load:", e);
+    console.error("Catalog load error:", e);
     products = [];
   }
   renderProducts();
@@ -254,7 +297,7 @@ function renderProducts() {
 
   const filtered = products.filter(p => {
     const matchCat = activeCategory === "ALL" || p.category.toLowerCase().includes(activeCategory.toLowerCase());
-    const matchQuery = p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
+    const matchQuery = p.name.toLowerCase().includes(query) || p.unit.toLowerCase().includes(query) || p.category.toLowerCase().includes(query);
     return matchCat && matchQuery;
   });
 
@@ -262,8 +305,8 @@ function renderProducts() {
     grid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:48px 16px;background:var(--white);border:1px dashed var(--line);border-radius:16px;">
         <div style="font-size:36px;margin-bottom:8px;">🛍️</div>
-        <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px;">No products in catalog</h3>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Add your baked goods, crochet items, art, or craft products so POUCH AI can sell them automatically.</p>
+        <h3 style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px;">No products in catalog</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Add your baked goods, crochet items, apparel, or craft products so POUCH AI can quote and sell them automatically.</p>
         <button class="btn btn-pouch" onclick="openAddModal()">+ Add First Product</button>
       </div>
     `;
@@ -274,14 +317,14 @@ function renderProducts() {
     <div class="prod-card">
       <div class="prod-top">
         <span class="prod-tag">${p.category}</span>
-        <div class="prod-price">₹${p.price}</div>
+        <div class="prod-price">₹${p.price.toLocaleString("en-IN")} <span style="font-size:11px;color:var(--muted);font-weight:500">/${p.unit.replace(/^per\s+/i, '')}</span></div>
       </div>
       <h3>${p.name}</h3>
-      <p>${p.desc}</p>
-      <div class="prod-stock">📦 ${p.stock}</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Pricing Unit: <strong>${p.unit}</strong></p>
+      <div class="prod-stock">📦 ${p.stockDisplay}</div>
       <div class="prod-actions">
-        <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">✏️ Edit</button>
-        <button class="btn btn-outline btn-sm" style="color:#DC2626" onclick="deleteProduct(${p.id})">🗑️ Delete</button>
+        <button class="btn btn-outline btn-sm" onclick="editProduct('${p.id}')">✏️ Edit</button>
+        <button class="btn btn-outline btn-sm" style="color:#DC2626;border-color:#FCA5A5" onclick="deleteProduct('${p.id}')">🗑️ Delete</button>
       </div>
     </div>
   `).join("");
@@ -299,10 +342,14 @@ function filterProducts() {
 }
 
 function openAddModal() {
+  document.getElementById("editProdId").value = "";
+  document.getElementById("modalTitle").textContent = "Add Product to Catalog";
   document.getElementById("pName").value = "";
+  document.getElementById("pCat").value = "Cakes";
+  document.getElementById("pUnit").value = "per kg";
   document.getElementById("pPrice").value = "";
-  document.getElementById("pStock").value = "";
-  document.getElementById("pDesc").value = "";
+  document.getElementById("pStock").value = "10";
+  document.getElementById("pOptions").value = "";
   document.getElementById("prodModal").classList.add("show");
 }
 
@@ -311,62 +358,94 @@ function closeModal() {
 }
 
 async function saveProduct() {
-  const name = document.getElementById("pName").value.trim();
+  const editId = document.getElementById("editProdId").value;
+  const rawName = document.getElementById("pName").value.trim();
   const cat = document.getElementById("pCat").value;
+  const unit = document.getElementById("pUnit").value;
   const price = Number(document.getElementById("pPrice").value) || 0;
-  const stock = document.getElementById("pStock").value.trim() || "Made to Order";
-  const desc = document.getElementById("pDesc").value.trim();
+  const stock = Number(document.getElementById("pStock").value) || 0;
+  const options = document.getElementById("pOptions").value.trim();
 
-  if (!name || !price) {
-    alert("Please fill in product name and price.");
+  if (!rawName || !price) {
+    alert("Please enter product name and price.");
     return;
   }
 
-  const newProd = {
-    id: Date.now(),
-    name: name,
-    category: cat,
-    price: price,
-    stock: stock,
-    desc: desc
-  };
+  const fullName = `${rawName} (${unit})${options ? ` - ${options}` : ''}`;
+  const saveBtn = document.getElementById("saveProdBtn");
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving...";
 
-  products.unshift(newProd);
-
-  // Sync with Supabase inventory table
   try {
-    await client.from("inventory").insert({
-      profile_id: currentUser.id,
-      name: name,
-      category: cat,
-      price: price,
-      stock: 10,
-      description: desc
-    });
-  } catch (err) {
-    console.warn("Saved locally in catalog:", err);
-  }
+    if (editId) {
+      const { error } = await client
+        .from("inventory")
+        .update({
+          name: fullName,
+          category: cat,
+          price: price,
+          stock: stock
+        })
+        .eq("id", editId)
+        .eq("profile_id", currentUser.id);
 
-  closeModal();
-  renderProducts();
-  alert(`"${name}" added to your catalog! Your Instagram AI can now quote this item to customers.`);
+      if (error) throw error;
+    } else {
+      const { error } = await client
+        .from("inventory")
+        .insert({
+          profile_id: currentUser.id,
+          name: fullName,
+          category: cat,
+          price: price,
+          stock: stock
+        });
+
+      if (error) throw error;
+    }
+
+    closeModal();
+    await loadProductsFromDB();
+    alert(`✅ "${rawName}" (${unit}) saved to catalog! Persisted permanently in database.`);
+  } catch (err) {
+    console.error("Save error:", err);
+    alert("Failed to save product: " + (err.message || "Database error"));
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save Product";
+  }
 }
 
 function editProduct(id) {
-  const prod = products.find(p => p.id === id);
+  const prod = products.find(p => String(p.id) === String(id));
   if (!prod) return;
+  document.getElementById("editProdId").value = prod.id;
+  document.getElementById("modalTitle").textContent = "Edit Product";
   document.getElementById("pName").value = prod.name;
-  document.getElementById("pCat").value = prod.category;
+  document.getElementById("pCat").value = prod.category || "General";
+  document.getElementById("pUnit").value = prod.unit || "per piece";
   document.getElementById("pPrice").value = prod.price;
-  document.getElementById("pStock").value = prod.stock;
-  document.getElementById("pDesc").value = prod.desc;
+  document.getElementById("pStock").value = prod.stockQty;
   document.getElementById("prodModal").classList.add("show");
 }
 
-function deleteProduct(id) {
-  if (confirm("Are you sure you want to remove this item from your catalog?")) {
-    products = products.filter(p => p.id !== id);
-    renderProducts();
+async function deleteProduct(id) {
+  if (!confirm("Are you sure you want to remove this item from your catalog?")) return;
+
+  try {
+    const { error } = await client
+      .from("inventory")
+      .delete()
+      .eq("id", id)
+      .eq("profile_id", currentUser.id);
+
+    if (error) throw error;
+
+    await loadProductsFromDB();
+    alert("Product deleted from catalog.");
+  } catch (err) {
+    console.error("Delete error:", err);
+    alert("Failed to delete product: " + err.message);
   }
 }
 
