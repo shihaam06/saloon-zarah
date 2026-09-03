@@ -6721,6 +6721,616 @@ async function generateMenuPDF() {
         }
     );
 }
+
+
+// Fallback in-memory cache for BYO products if migration not yet executed in Supabase
+const MEMORY_BYO_STORE = new Map();
+
+// Sample Default BYO Product
+const SAMPLE_BYO_PRODUCT = {
+    id: "giftbox-default",
+    name: "Build Your Own Gift Box",
+    slug: "giftbox-abc123",
+    description: "Personalize your very own gift box with beads, charms, and packaging!",
+    base_price: 499,
+    image_url: "🎁",
+    category: "Gift Boxes",
+    rules: { min_total: 0, max_total: 0, allow_notes: true },
+    active: true,
+    categories: [
+        {
+            id: "cat-beads",
+            name: "Beads",
+            description: "Choose beads for your gift box",
+            required: false,
+            components: [
+                { id: "comp-blue-bead", name: "Blue Bead", emoji_icon: "🔵", price: 10, stock: -1 },
+                { id: "comp-pink-bead", name: "Pink Bead", emoji_icon: "🌸", price: 10, stock: -1 },
+                { id: "comp-pearl-bead", name: "Pearl Bead", emoji_icon: "⚪", price: 15, stock: -1 }
+            ]
+        },
+        {
+            id: "cat-charms",
+            name: "Charms",
+            description: "Pick custom charms",
+            required: false,
+            components: [
+                { id: "comp-heart-charm", name: "Heart Charm", emoji_icon: "💗", price: 25, stock: -1 },
+                { id: "comp-star-charm", name: "Star Charm", emoji_icon: "⭐", price: 20, stock: -1 },
+                { id: "comp-flower-charm", name: "Flower Charm", emoji_icon: "🌼", price: 30, stock: -1 }
+            ]
+        },
+        {
+            id: "cat-addons",
+            name: "Add-ons",
+            description: "Special extras",
+            required: false,
+            components: [
+                { id: "comp-ribbon", name: "Pink Ribbon", emoji_icon: "🎀", price: 20, stock: -1 },
+                { id: "comp-teddy", name: "Mini Teddy", emoji_icon: "🧸", price: 80, stock: -1 }
+            ]
+        }
+    ]
+};
+MEMORY_BYO_STORE.set(SAMPLE_BYO_PRODUCT.slug, SAMPLE_BYO_PRODUCT);
+MEMORY_BYO_STORE.set(SAMPLE_BYO_PRODUCT.id, SAMPLE_BYO_PRODUCT);
+
+// =====================================================
+// POUCH: BUILD YOUR OWN (BYO) API ENDPOINTS
+// =====================================================
+
+// 1. PUBLIC: Get Build Your Own Product details by slug or ID
+app.get("/api/public/byo/:slugOrId", async (req, res) => {
+    try {
+        const { slugOrId } = req.params;
+        if (!slugOrId) {
+            return res.status(400).json({ error: "Product slug or ID is required" });
+        }
+
+        // 1. Try fetching from byo_products table
+        let product = null;
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+
+        let query = supabase.from("byo_products").select("*");
+        if (isUuid) {
+            query = query.or(`id.eq.${slugOrId},slug.eq.${slugOrId}`);
+        } else {
+            query = query.eq("slug", slugOrId);
+        }
+
+        const { data: prodData, error: prodErr } = await query.maybeSingle();
+
+        if (prodErr) {
+            console.warn("byo_products query error (might use fallback JSON):", prodErr.message);
+        }
+
+        if (prodData) {
+            product = prodData;
+        }
+
+        if (!product) {
+            // Check memory cache or sample fallback
+            if (MEMORY_BYO_STORE.has(slugOrId)) {
+                const mem = MEMORY_BYO_STORE.get(slugOrId);
+                product = mem;
+                categories = mem.categories || [];
+                components = categories.flatMap(c => (c.components || []).map(comp => ({ ...comp, category_id: c.id })));
+            } else if (slugOrId === 'default' || slugOrId.includes('giftbox')) {
+                product = SAMPLE_BYO_PRODUCT;
+                categories = SAMPLE_BYO_PRODUCT.categories;
+                components = categories.flatMap(c => c.components.map(comp => ({ ...comp, category_id: c.id })));
+            } else {
+                return res.status(404).json({ error: "Custom product not found or inactive" });
+            }
+        }
+
+        // 2. Fetch Categories & Components
+        let categories = [];
+        let components = [];
+
+        const { data: catData } = await supabase
+            .from("byo_categories")
+            .select("*")
+            .eq("product_id", product.id)
+            .order("sort_order", { ascending: true })
+            .order("created_at", { ascending: true });
+
+        if (catData && catData.length > 0) {
+            categories = catData;
+        }
+
+        const { data: compData } = await supabase
+            .from("byo_components")
+            .select("*")
+            .eq("product_id", product.id)
+            .eq("active", true)
+            .order("sort_order", { ascending: true })
+            .order("created_at", { ascending: true });
+
+        if (compData && compData.length > 0) {
+            components = compData;
+        }
+
+        // If categories/components empty but config_data snapshot exists, use snapshot
+        if (categories.length === 0 && product.config_data && product.config_data.categories) {
+            categories = product.config_data.categories;
+            components = product.config_data.components || [];
+        }
+
+        // 3. Fetch Seller Public Profile info
+        let seller = {
+            name: "Kangro Store",
+            address: "",
+            phone: "",
+            upiId: "",
+            qrUrl: "",
+            deliveryInfo: "",
+            paymentInfo: ""
+        };
+
+        if (product.profile_id) {
+            const { data: prof } = await supabase
+                .from("profiles")
+                .select("id, business_name, business_address, business_phone, upi_id, gpay_qr_url, upi_qr_image, delivery_info, payment_info, business_category")
+                .eq("id", product.profile_id)
+                .maybeSingle();
+
+            if (prof) {
+                seller = {
+                    id: prof.id,
+                    name: prof.business_name || "POUCH Store",
+                    address: prof.business_address || "",
+                    phone: prof.business_phone || "",
+                    upiId: prof.upi_id || "",
+                    qrUrl: prof.gpay_qr_url || prof.upi_qr_image || "",
+                    deliveryInfo: prof.delivery_info || "",
+                    paymentInfo: prof.payment_info || "Cash on Delivery or UPI Online"
+                };
+            }
+        }
+
+        return res.json({
+            success: true,
+            product: {
+                id: product.id,
+                profile_id: product.profile_id,
+                name: product.name,
+                slug: product.slug,
+                description: product.description || "",
+                base_price: Number(product.base_price) || 0,
+                image_url: product.image_url || "",
+                category: product.category || "Custom",
+                rules: product.rules || { min_total: 0, max_total: 0, allow_notes: true },
+                active: product.active
+            },
+            categories,
+            components,
+            seller
+        });
+    } catch (err) {
+        console.error("GET /api/public/byo/:slugOrId error:", err);
+        return res.status(500).json({ error: "Internal server error fetching product" });
+    }
+});
+
+
+// 2. PUBLIC: Submit a Build Your Own Custom Order
+app.post("/api/public/byo/order", async (req, res) => {
+    try {
+        const {
+            productId,
+            customerName,
+            phone,
+            address,
+            note,
+            selections // Array of { componentId, qty }
+        } = req.body;
+
+        if (!productId) {
+            return res.status(400).json({ error: "Product ID is required" });
+        }
+        if (!customerName || !customerName.trim()) {
+            return res.status(400).json({ error: "Customer name is required" });
+        }
+        if (!phone || !phone.trim()) {
+            return res.status(400).json({ error: "Phone number (WhatsApp) is required" });
+        }
+        if (!Array.isArray(selections)) {
+            return res.status(400).json({ error: "Invalid selections format" });
+        }
+
+        // 1. Fetch Product Authoritative Data
+        let product = null;
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId);
+        let query = supabase.from("byo_products").select("*");
+        if (isUuid) {
+            query = query.or(`id.eq.${productId},slug.eq.${productId}`);
+        } else {
+            query = query.eq("slug", productId);
+        }
+
+        const { data: prodData, error: prodErr } = await query.maybeSingle();
+        if (prodErr || !prodData) {
+            return res.status(404).json({ error: "Product not found or unavailable" });
+        }
+        product = prodData;
+
+        // 2. Fetch Authoritative Components & Categories
+        const { data: compData } = await supabase
+            .from("byo_components")
+            .select("*")
+            .eq("product_id", product.id)
+            .eq("active", true);
+
+        const compMap = new Map();
+        if (compData) {
+            compData.forEach(c => compMap.set(String(c.id), c));
+        }
+
+        // Fallback to snapshot if table empty
+        if (compMap.size === 0 && product.config_data && product.config_data.components) {
+            product.config_data.components.forEach(c => compMap.set(String(c.id), c));
+        }
+
+        // 3. Server-Side Price Calculation & Validation (NEVER TRUST CLIENT TOTAL)
+        const basePrice = Number(product.base_price) || 0;
+        let calculatedItemTotal = 0;
+        const validItems = [];
+        let totalUnitsCount = 0;
+
+        for (const sel of selections) {
+            const qty = Number(sel.qty);
+            if (!qty || qty <= 0) continue;
+
+            const compId = String(sel.componentId || sel.id);
+            const comp = compMap.get(compId);
+
+            if (!comp) {
+                return res.status(400).json({ error: `Component "${sel.name || compId}" is no longer available` });
+            }
+
+            // Check stock limit if applicable
+            if (comp.stock !== undefined && comp.stock !== null && comp.stock >= 0 && qty > comp.stock) {
+                return res.status(400).json({ error: `Only ${comp.stock} units of "${comp.name}" are in stock` });
+            }
+
+            // Check max_qty per component if applicable
+            if (comp.max_qty && comp.max_qty > 0 && qty > comp.max_qty) {
+                return res.status(400).json({ error: `Maximum ${comp.max_qty} units allowed for "${comp.name}"` });
+            }
+
+            const unitPrice = Number(comp.price) || 0;
+            const lineTotal = unitPrice * qty;
+            calculatedItemTotal += lineTotal;
+            totalUnitsCount += qty;
+
+            validItems.push({
+                id: comp.id,
+                name: comp.name,
+                emoji: comp.emoji_icon || "✨",
+                image_url: comp.image_url || "",
+                unit_price: unitPrice,
+                qty: qty,
+                line_total: lineTotal,
+                category_id: comp.category_id || null
+            });
+        }
+
+        // Validate overall product rules
+        const rules = product.rules || {};
+        if (rules.min_total && rules.min_total > 0 && totalUnitsCount < rules.min_total) {
+            return res.status(400).json({ error: `Please select at least ${rules.min_total} items in total` });
+        }
+        if (rules.max_total && rules.max_total > 0 && totalUnitsCount > rules.max_total) {
+            return res.status(400).json({ error: `Maximum allowed items in total is ${rules.max_total}` });
+        }
+
+        const grandTotal = basePrice + calculatedItemTotal;
+
+        // 4. Format Structured Text & JSON Configuration for POUCH Pipeline
+        const itemLines = validItems.map(item => `- ${item.emoji} ${item.name} × ${item.qty} (₹${item.line_total})`).join("\n");
+        const structuredSummary = `BUILD YOUR OWN: ${product.name}\nBase: ₹${basePrice}\nComponents:\n${itemLines}\nTotal: ₹${grandTotal}`;
+
+        const configObject = {
+            type: "byo",
+            product_id: product.id,
+            product_name: product.name,
+            base_price: basePrice,
+            total_price: grandTotal,
+            total_units: totalUnitsCount,
+            items: validItems,
+            customer: {
+                name: customerName.trim(),
+                phone: phone.trim(),
+                address: (address || "").trim(),
+                note: (note || "").trim()
+            }
+        };
+
+        const notesFormatted = `📍 Address: ${address || "None provided"}${note ? ` | 📝 Note: ${note}` : ""}`;
+
+        // 5. Insert into POUCH Bookings / Order Pipeline
+        const { data: createdBooking, error: bookingErr } = await supabase
+            .from("bookings")
+            .insert({
+                profile_id: product.profile_id,
+                customer_name: customerName.trim(),
+                phone: phone.trim(),
+                service: `Build Your Own: ${product.name}`,
+                booking_date: getIndiaDate(),
+                booking_time: "12:00",
+                status: "pending", // Appears in DM Inquiries / Pending column
+                source: "Build Your Own",
+                intent: "custom_order",
+                notes: notesFormatted,
+                custom_requirements: JSON.stringify(configObject),
+                bill_amount: grandTotal,
+                balance_amount: grandTotal,
+                advance_required: false,
+                advance_amount: 0,
+                advance_paid: 0,
+                payment_status: "Payment Not Requested",
+                raw_message: structuredSummary
+            })
+            .select()
+            .single();
+
+        if (bookingErr) {
+            console.error("❌ BYO order insert error:", bookingErr);
+            return res.status(500).json({ error: "Failed to create order in database" });
+        }
+
+        // 6. Save or update customer record
+        await findOrCreateCustomer({
+            profileId: product.profile_id,
+            name: customerName.trim(),
+            phone: phone.trim()
+        });
+
+        const shortId = "#P-" + String(createdBooking.id).substring(0, 6).toUpperCase();
+
+        console.log(`✅ New BYO Order Created: ${createdBooking.id} (${shortId}) | Customer: ${customerName} | Total: ₹${grandTotal}`);
+
+        return res.json({
+            success: true,
+            orderId: createdBooking.id,
+            shortId,
+            productName: product.name,
+            basePrice,
+            itemTotal: calculatedItemTotal,
+            total: grandTotal,
+            currency: "INR",
+            summary: structuredSummary,
+            message: "Your custom order has been placed successfully!"
+        });
+    } catch (err) {
+        console.error("POST /api/public/byo/order error:", err);
+        return res.status(500).json({ error: "Internal server error while placing order" });
+    }
+});
+
+
+// 3. SELLER: Get all BYO Products for Authenticated Profile
+app.get("/api/byo/products", async (req, res) => {
+    try {
+        const profileId = req.query.profileId || req.headers["x-profile-id"];
+        if (!profileId) {
+            return res.status(400).json({ error: "Profile ID is required" });
+        }
+
+        const { data: prods, error: pErr } = await supabase
+            .from("byo_products")
+            .select("*")
+            .eq("profile_id", profileId)
+            .order("created_at", { ascending: false });
+
+        if (pErr) {
+            console.error("Error fetching byo_products:", pErr);
+            return res.status(500).json({ error: pErr.message });
+        }
+
+        // Enrich with categories count and components count
+        const enriched = await Promise.all((prods || []).map(async (p) => {
+            const { count: catCount } = await supabase
+                .from("byo_categories")
+                .select("id", { count: "exact", head: true })
+                .eq("product_id", p.id);
+
+            const { count: compCount } = await supabase
+                .from("byo_components")
+                .select("id", { count: "exact", head: true })
+                .eq("product_id", p.id);
+
+            return {
+                ...p,
+                category_count: catCount || 0,
+                component_count: compCount || 0
+            };
+        }));
+
+        return res.json({ success: true, products: enriched });
+    } catch (err) {
+        console.error("GET /api/byo/products error:", err);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+
+// 4. SELLER: Save or Update a BYO Product with Categories & Components
+app.post("/api/byo/save", async (req, res) => {
+    try {
+        const {
+            profileId,
+            productId,
+            name,
+            slug,
+            description,
+            basePrice,
+            imageUrl,
+            category,
+            rules,
+            active,
+            categories // Array of category objects with .components array
+        } = req.body;
+
+        if (!profileId) {
+            return res.status(400).json({ error: "Profile ID is required" });
+        }
+        if (!name || !name.trim()) {
+            return res.status(400).json({ error: "Product name is required" });
+        }
+
+        // Generate clean unique slug
+        let finalSlug = slug ? slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-") : "";
+        if (!finalSlug) {
+            const rand = Math.random().toString(36).substring(2, 8);
+            finalSlug = name.trim().toLowerCase().replace(/[^a-z0-9]/g, "-").substring(0, 20) + "-" + rand;
+        }
+
+        // Ensure unique slug
+        const { data: existingSlug } = await supabase
+            .from("byo_products")
+            .select("id")
+            .eq("slug", finalSlug)
+            .neq("id", productId || "00000000-0000-0000-0000-000000000000")
+            .maybeSingle();
+
+        if (existingSlug) {
+            finalSlug += "-" + Math.random().toString(36).substring(2, 6);
+        }
+
+        // Prepare full snapshot
+        const configSnapshot = {
+            categories: categories || [],
+            components: (categories || []).flatMap(c => c.components || [])
+        };
+
+        const prodPayload = {
+            profile_id: profileId,
+            name: name.trim(),
+            slug: finalSlug,
+            description: description || "",
+            base_price: Number(basePrice) || 0,
+            image_url: imageUrl || "",
+            category: category || "Custom",
+            rules: rules || { min_total: 0, max_total: 0, allow_notes: true },
+            config_data: configSnapshot,
+            active: active !== false,
+            updated_at: new Date().toISOString()
+        };
+
+        let savedProduct = null;
+
+        if (productId) {
+            // Update existing
+            const { data: updated, error: uErr } = await supabase
+                .from("byo_products")
+                .update(prodPayload)
+                .eq("id", productId)
+                .eq("profile_id", profileId)
+                .select()
+                .single();
+
+            if (uErr) throw uErr;
+            savedProduct = updated;
+        } else {
+            // Create new
+            const { data: created, error: cErr } = await supabase
+                .from("byo_products")
+                .insert({ ...prodPayload, created_at: new Date().toISOString() })
+                .select()
+                .single();
+
+            if (cErr) throw cErr;
+            savedProduct = created;
+        }
+
+        // Sync Categories and Components to relational tables
+        if (Array.isArray(categories) && savedProduct) {
+            // 1. Delete old categories and components for this product
+            await supabase.from("byo_components").delete().eq("product_id", savedProduct.id);
+            await supabase.from("byo_categories").delete().eq("product_id", savedProduct.id);
+
+            // 2. Insert categories and components
+            for (let i = 0; i < categories.length; i++) {
+                const cat = categories[i];
+                const { data: insertedCat, error: catErr } = await supabase
+                    .from("byo_categories")
+                    .insert({
+                        product_id: savedProduct.id,
+                        name: cat.name || "Category " + (i + 1),
+                        description: cat.description || "",
+                        min_select: Number(cat.min_select) || 0,
+                        max_select: Number(cat.max_select) || 0,
+                        required: Boolean(cat.required),
+                        allow_multiple: cat.allow_multiple !== false,
+                        sort_order: i
+                    })
+                    .select()
+                    .single();
+
+                if (!catErr && insertedCat && Array.isArray(cat.components)) {
+                    const compRows = cat.components.map((comp, j) => ({
+                        category_id: insertedCat.id,
+                        product_id: savedProduct.id,
+                        name: comp.name || "Item",
+                        image_url: comp.image_url || "",
+                        emoji_icon: comp.emoji_icon || "✨",
+                        price: Number(comp.price) || 0,
+                        stock: comp.stock !== undefined ? Number(comp.stock) : -1,
+                        min_qty: Number(comp.min_qty) || 0,
+                        max_qty: Number(comp.max_qty) || 0,
+                        active: comp.active !== false,
+                        sort_order: j
+                    }));
+
+                    if (compRows.length > 0) {
+                        await supabase.from("byo_components").insert(compRows);
+                    }
+                }
+            }
+        }
+
+        // Also save in memory cache for resilient fallback
+        MEMORY_BYO_STORE.set(savedProduct.slug, { ...savedProduct, categories });
+        MEMORY_BYO_STORE.set(savedProduct.id, { ...savedProduct, categories });
+        console.log("✅ BYO Product Saved:", savedProduct.name, "| Slug:", savedProduct.slug);
+
+        return res.json({
+            success: true,
+            product: savedProduct,
+            message: "Build Your Own product saved successfully"
+        });
+    } catch (err) {
+        console.error("POST /api/byo/save error:", err);
+        return res.status(500).json({ error: err.message || "Failed to save product" });
+    }
+});
+
+
+// 5. SELLER: Delete a BYO Product
+app.delete("/api/byo/products/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const profileId = req.query.profileId || req.headers["x-profile-id"];
+
+        if (!id) return res.status(400).json({ error: "Product ID is required" });
+
+        let query = supabase.from("byo_products").delete().eq("id", id);
+        if (profileId) {
+            query = query.eq("profile_id", profileId);
+        }
+
+        const { error } = await query;
+        if (error) throw error;
+
+        return res.json({ success: true, message: "Product deleted successfully" });
+    } catch (err) {
+        console.error("DELETE /api/byo/products/:id error:", err);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
 // =====================================================
 // MENU PDF
 // =====================================================

@@ -164,6 +164,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
   <nav class="nav">
     <a href="pouch-dashboard.html" class="nav-item active"><span class="icon">📦</span> Order Pipeline</a>
     <a href="pouch-catalog.html" class="nav-item"><span class="icon">🛍️</span> Product Catalog</a>
+    <a href="pouch-build.html" class="nav-item"><span class="icon">🧩</span> Build Your Own</a>
     <a href="pouch-customers.html" class="nav-item"><span class="icon">👥</span> Customer Book</a>
     <a href="pouch-analytics.html" class="nav-item"><span class="icon">📈</span> Analytics</a>
     <a href="pouch-settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
@@ -557,7 +558,9 @@ async function loadOrders() {
         card.onclick = () => openOrderDrawer(idStr);
 
         const payStatus = b.payment_status || 'Payment Not Requested';
-        const needsHuman = (b.notes && b.notes.includes("Needs Human")) || b.intent === 'custom_order' || (b.custom_requirements && stage === 'inquiry');
+        const isByo = (b.source === 'Build Your Own' || b.source === 'Build Your Own (Web)' || (b.custom_requirements && b.custom_requirements.includes('"type":"byo"')));
+        const byoTag = isByo ? '<span style="font-size:9px;background:#EDE9FE;color:#6D28D9;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:4px">🧩 Build Your Own</span>' : '';
+        const needsHuman = (b.notes && b.notes.includes("Needs Human")) || (b.intent === 'custom_order' && !isByo) || (b.custom_requirements && !isByo && stage === 'inquiry');
         const humanTag = needsHuman ? '<span style="font-size:9px;background:#FEE2E2;color:#DC2626;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:4px">⚠️ Needs Human</span>' : '';
         const payTag = payStatus === 'Payment Screenshot Received'
           ? '<span style="font-size:9px;background:#FEF3C7;color:#B45309;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:4px">📸 Screenshot</span>'
@@ -571,7 +574,7 @@ async function loadOrders() {
 
         card.innerHTML = `
           <div class="order-top"><span>${shortId}</span><span>${orders[idStr].source}</span></div>
-          <h4>${orders[idStr].name} ${humanTag} ${payTag}</h4>
+          <h4>${orders[idStr].name} ${byoTag} ${humanTag} ${payTag}</h4>
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">📸 ${orders[idStr].handle}</div>
           <p class="order-desc">${orders[idStr].details}</p>
           ${orders[idStr].custom_requirements ? `<div style="background:#F5F3FF;border:1px solid #DDD6FE;color:#5B21B6;border-radius:8px;padding:5px 8px;font-size:11px;font-weight:600;margin:6px 0">✨ <strong>Pref:</strong> ${orders[idStr].custom_requirements}</div>` : ''}
@@ -625,7 +628,32 @@ function openOrderDrawer(id) {
   const cleanPhone = (o.phone && !o.phone.startsWith('instagram:')) ? o.phone : '';
   document.getElementById('dPhoneInput').value = cleanPhone;
   document.getElementById('dDetails').textContent = o.details;
-  document.getElementById('dCustomReq').textContent = o.custom_requirements || 'No specific preferences specified.';
+  if (o.custom_requirements && o.custom_requirements.includes('"type":"byo"')) {
+    try {
+      const byo = JSON.parse(o.custom_requirements);
+      let itemsHtml = '<div style="background:#FAF5FF;border:1.5px solid #DDD6FE;border-radius:12px;padding:14px;margin-top:6px">';
+      itemsHtml += '<div style="font-weight:800;color:#5B21B6;margin-bottom:8px;font-size:13px">🧩 Build Your Own: ' + (byo.product_name || 'Custom Product') + '</div>';
+      itemsHtml += '<div style="font-size:12px;color:#6D28D9;margin-bottom:6px">Base Container: ₹' + (byo.base_price || 0) + '</div>';
+      itemsHtml += '<div style="border-top:1px dashed #DDD6FE;padding-top:8px;display:flex;flex-direction:column;gap:5px">';
+      (byo.items || []).forEach(item => {
+        itemsHtml += '<div style="display:flex;justify-content:space-between;font-size:12px"><span>' + (item.emoji || '✨') + ' <strong>' + item.name + '</strong> × ' + item.qty + '</span><span>₹' + item.line_total + '</span></div>';
+      });
+      itemsHtml += '</div>';
+      itemsHtml += '<div style="border-top:1.5px solid #C4B5FD;margin-top:8px;padding-top:6px;display:flex;justify-content:space-between;font-weight:800;font-size:13px;color:#5B21B6"><span>Total Configuration:</span><span>₹' + byo.total_price + '</span></div>';
+      if (byo.customer?.address) {
+        itemsHtml += '<div style="margin-top:8px;font-size:11px;color:#7C3AED">📍 Delivery Address: ' + byo.customer.address + '</div>';
+      }
+      if (byo.customer?.note) {
+        itemsHtml += '<div style="margin-top:4px;font-size:11px;color:#7C3AED">📝 Custom Gift Note: ' + byo.customer.note + '</div>';
+      }
+      itemsHtml += '</div>';
+      document.getElementById('dCustomReq').innerHTML = itemsHtml;
+    } catch(e) {
+      document.getElementById('dCustomReq').textContent = o.custom_requirements;
+    }
+  } else {
+    document.getElementById('dCustomReq').textContent = o.custom_requirements || 'No specific preferences specified.';
+  }
   document.getElementById('dDate').textContent = o.date;
   document.getElementById('dStatus').value = o.status;
 

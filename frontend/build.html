@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Build Your Own | Custom Storefront</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+
+<style>
+:root {
+  --primary: #7C3AED;
+  --primary-hover: #6D28D9;
+  --primary-light: #F5F3FF;
+  --primary-glow: rgba(124, 58, 237, 0.25);
+  --ink: #0F172A;
+  --muted: #64748B;
+  --muted-light: #94A3B8;
+  --surface: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --line: #E2E8F0;
+  --line-strong: #CBD5E1;
+  --success: #10B981;
+  --success-light: #ECFDF5;
+  --danger: #EF4444;
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 45px rgba(124, 58, 237, 0.12);
+  --radius: 20px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--surface);
+  min-height: 100vh;
+  padding-bottom: 120px;
+  overflow-x: hidden;
+}
+
+/* HEADER */
+.store-header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), #9333EA);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 14px;
+}
+.brand-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.brand-sub {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.powered-by {
+  font-size: 11px;
+  color: var(--muted-light);
+  font-weight: 600;
+}
+.powered-by strong { color: var(--primary); }
+
+/* CONTAINER */
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+/* HERO PRODUCT CARD */
+.hero-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--primary), #EC4899, #F59E0B);
+}
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+.hero-price {
+  text-align: right;
+}
+.hero-price span {
+  font-size: 11px;
+  color: var(--muted);
+  display: block;
+  font-weight: 600;
+}
+.hero-price strong {
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.hero-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.hero-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* DYNAMIC VISUALIZER */
+.visualizer-card {
+  background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 50%, #FDF4FF 100%);
+  border: 2px dashed #D8B4FE;
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  margin-bottom: 24px;
+  text-align: center;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+.box-icon-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+.box-main-icon {
+  font-size: 56px;
+  display: inline-block;
+  filter: drop-shadow(0 8px 16px rgba(124, 58, 237, 0.2));
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.box-icon-wrap.bump .box-main-icon {
+  transform: scale(1.18) rotate(-4deg);
+}
+.selected-tray {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  align-items: center;
+  margin: 12px 0 6px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 14px;
+  border: 1px solid #E9D5FF;
+}
+.tray-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1.5px solid #DDD6FE;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5B21B6;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.08);
+  animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tray-chip span.qty {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.tray-empty-text {
+  font-size: 12px;
+  color: #7E22CE;
+  font-weight: 600;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* CATEGORY ACCORDIONS / SECTIONS */
+.category-section {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.cat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.cat-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cat-rule-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--surface);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* COMPONENT GRID */
+.components-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+.comp-card {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.comp-card.selected {
+  background: #FAF5FF;
+  border-color: #C084FC;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.12);
+}
+.comp-icon {
+  font-size: 32px;
+  margin-bottom: 6px;
+  display: inline-block;
+}
+.comp-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+.comp-price {
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+.comp-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 2px 4px;
+}
+.comp-card.selected .comp-stepper {
+  border-color: #DDD6FE;
+  background: #FFFFFF;
+}
+.step-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.step-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+.step-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+}
+.step-qty {
+  font-size: 13px;
+  font-weight: 800;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* LIVE BREAKDOWN ACCORDION */
+.breakdown-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.breakdown-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.breakdown-row.total {
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+  border-bottom: none;
+  padding-top: 12px;
+  margin-top: 6px;
+}
+.breakdown-row.total strong {
+  color: var(--primary);
+  font-size: 18px;
+}
+
+/* FIXED BOTTOM BAR */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--line);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(12px);
+  z-index: 200;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.bottom-price-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.bottom-total-price {
+  font-family: 'Manrope', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.order-btn {
+  background: linear-gradient(135deg, var(--primary), #9333EA);
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px var(--primary-glow);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.order-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px var(--primary-glow);
+}
+.order-btn:active {
+  transform: scale(0.98);
+}
+
+/* CHECKOUT MODAL */
+.checkout-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
+  display: none;
+  place-items: center;
+  z-index: 999;
+  padding: 16px;
+  overflow-y: auto;
+}
+.checkout-modal.open { display: grid; }
+.checkout-box {
+  background: var(--card-bg);
+  width: min(500px, 100%);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--line);
+  margin: auto;
+}
+.checkout-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.checkout-head h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+}
+.form-field { margin-bottom: 14px; }
+.form-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+.form-field input, .form-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: 0.2s;
+}
+.form-field input:focus, .form-field textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  background: #fff;
+}
+
+/* SUCCESS CARD */
+.success-screen {
+  display: none;
+  text-align: center;
+  padding: 40px 20px;
+}
+.success-screen.show { display: block; }
+.success-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  display: inline-block;
+  animation: bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes bounce {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.success-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.success-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.order-id-badge {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  padding: 8px 18px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+
+/* LOADING & ERROR */
+.loading-state, .error-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #E9D5FF;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+
+<body>
+
+<!-- TOP BRAND HEADER -->
+<header class="store-header">
+  <div class="brand-badge">
+    <div class="brand-icon">P</div>
+    <div>
+      <div class="brand-title" id="sellerBizName">Custom Store</div>
+      <div class="brand-sub">Build Your Own Product</div>
+    </div>
+  </div>
+  <div class="powered-by">Powered by <strong>POUCH</strong></div>
+</header>
+
+<div class="container">
+  <!-- LOADING -->
+  <div id="loadingState" class="loading-state">
+    <div class="spinner"></div>
+    <p style="font-weight:700;color:var(--muted)">Loading your custom product...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div id="errorState" class="error-state" style="display:none">
+    <div style="font-size:48px;margin-bottom:12px">⚠️</div>
+    <h3 style="font-family:Manrope;font-size:20px;margin-bottom:8px">Product Not Available</h3>
+    <p style="color:var(--muted);font-size:14px" id="errorMessage">This custom product link might be inactive or expired.</p>
+  </div>
+
+  <!-- MAIN SHOPPING EXPERIENCE -->
+  <div id="shopExperience" style="display:none">
+
+    <!-- HERO PRODUCT CARD -->
+    <div class="hero-card">
+      <div class="hero-top">
+        <span class="hero-badge" id="productCatBadge">✨ Custom Product</span>
+        <div class="hero-price">
+          <span>Starting at</span>
+          <strong id="productBasePrice">₹0</strong>
+        </div>
+      </div>
+      <h1 class="hero-title" id="productTitle">Build Your Own</h1>
+      <p class="hero-desc" id="productDesc">Choose your items below to customize your order with live visual feedback and pricing.</p>
+    </div>
+
+    <!-- DYNAMIC VISUALIZER -->
+    <div class="visualizer-card">
+      <div class="box-icon-wrap" id="boxIconWrap">
+        <span class="box-main-icon" id="boxMainIcon">🎁</span>
+      </div>
+      <h3 style="font-family:Manrope;font-size:16px;font-weight:800;color:#5B21B6" id="boxVisualTitle">Your Custom Box</h3>
+      <p style="font-size:12px;color:#7E22CE;margin-top:2px" id="totalItemsSummary">0 items selected</p>
+
+      <div class="selected-tray" id="selectedTray">
+        <span class="tray-empty-text">Select components below to fill your box! 👇</span>
+      </div>
+    </div>
+
+    <!-- CATEGORIES & COMPONENTS -->
+    <div id="categoriesContainer">
+      <!-- Dynamically rendered categories -->
+    </div>
+
+    <!-- LIVE BREAKDOWN -->
+    <div class="breakdown-card">
+      <div class="breakdown-title">
+        <span>🧾 Price Breakdown</span>
+        <span id="breakdownItemCount" style="font-size:12px;color:var(--muted);font-weight:600">0 items</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Base Product (<span id="bdBaseName">Gift Box</span>)</span>
+        <strong id="bdBasePrice">₹0</strong>
+      </div>
+      <div id="breakdownItemsList">
+        <!-- Dynamically injected item rows -->
+      </div>
+      <div class="breakdown-row total">
+        <span>Total Payable</span>
+        <strong id="bdTotalPrice">₹0</strong>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ORDER SUCCESS SCREEN -->
+  <div id="successScreen" class="success-screen">
+    <span class="success-icon">🎉</span>
+    <h2 class="success-title">Order Placed Successfully!</h2>
+    <p class="success-desc">We have received your custom order specifications. Our team will prepare your order and update you via WhatsApp.</p>
+    
+    <div class="order-id-badge" id="successOrderId">#P-ORDER</div>
+
+    <div style="background:var(--card-bg);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:left;margin-bottom:24px;box-shadow:var(--shadow-sm)" id="successSummary">
+      <!-- Order details preview -->
+    </div>
+
+    <button class="order-btn" style="width:100%;justify-content:center;margin-bottom:12px" id="whatsappConfirmBtn">
+      💬 Message Seller on WhatsApp
+    </button>
+    <button class="order-btn" style="width:100%;justify-content:center;background:var(--surface);color:var(--ink);box-shadow:none;border:1px solid var(--line)" onclick="location.reload()">
+      🔄 Build Another Product
+    </button>
+  </div>
+</div>
+
+<!-- FIXED BOTTOM ACTION BAR -->
+<div class="bottom-bar" id="bottomBar" style="display:none">
+  <div>
+    <div class="bottom-price-label">Total Amount</div>
+    <div class="bottom-total-price" id="bottomTotal">₹0</div>
+  </div>
+  <button class="order-btn" onclick="openCheckoutModal()">
+    <span>Review & Order</span> ➡️
+  </button>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="checkout-modal" id="checkoutModal">
+  <div class="checkout-box">
+    <div class="checkout-head">
+      <h3>Complete Your Order</h3>
+      <button style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted)" onclick="closeCheckoutModal()">&times;</button>
+    </div>
+
+    <div class="form-field">
+      <label>Your Full Name *</label>
+      <input type="text" id="custName" placeholder="e.g. Priya Sharma" required>
+    </div>
+
+    <div class="form-field">
+      <label>WhatsApp Phone Number *</label>
+      <input type="tel" id="custPhone" placeholder="e.g. 9876543210" required>
+    </div>
+
+    <div class="form-field">
+      <label>Delivery Address *</label>
+      <textarea id="custAddress" rows="2" placeholder="Full address with pincode" required></textarea>
+    </div>
+
+    <div class="form-field">
+      <label>Custom Gift Note / Instructions (Optional)</label>
+      <textarea id="custNote" rows="2" placeholder="e.g. Gift tag: 'Happy Birthday Rahul!'"></textarea>
+    </div>
+
+    <div style="background:var(--surface);border-radius:12px;padding:12px 16px;margin:16px 0;display:flex;justify-content:space-between;align-items:center;font-weight:700">
+      <span>Total Amount:</span>
+      <strong style="color:var(--primary);font-size:18px" id="checkoutTotalAmount">₹0</strong>
+    </div>
+
+    <button class="order-btn" style="width:100%;justify-content:center;padding:15px" id="submitOrderBtn" onclick="submitCustomOrder()">
+      ✅ Confirm & Place Order
+    </button>
+  </div>
+</div>
+
+<script>
+let productData = null;
+let categories = [];
+let components = [];
+let seller = {};
+let selections = {}; // { compId: quantity }
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const slugOrId = urlParams.get('id') || 'default';
+
+  await loadProduct(slugOrId);
+});
+
+async function loadProduct(slugOrId) {
+  try {
+    const res = await fetch('/api/public/byo/' + encodeURIComponent(slugOrId));
+    const json = await res.json();
+
+    if (!json.success || !json.product) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      if (json.error) document.getElementById('errorMessage').textContent = json.error;
+      return;
+    }
+
+    productData = json.product;
+    categories = json.categories || [];
+    components = json.components || [];
+    seller = json.seller || {};
+
+    renderProductExperience();
+  } catch (err) {
+    console.error('Load error:', err);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+  }
+}
+
+function renderProductExperience() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('shopExperience').style.display = 'block';
+  document.getElementById('bottomBar').style.display = 'flex';
+
+  // Seller info
+  if (seller.name) {
+    document.getElementById('sellerBizName').textContent = seller.name;
+    document.title = productData.name + ' | ' + seller.name;
+  }
+
+  // Hero Product
+  document.getElementById('productTitle').textContent = productData.name;
+  document.getElementById('productDesc').textContent = productData.description || 'Customize your product below.';
+  document.getElementById('productCatBadge').textContent = '✨ ' + (productData.category || 'Custom Product');
+  document.getElementById('productBasePrice').textContent = '₹' + productData.base_price;
+  document.getElementById('bdBaseName').textContent = productData.name;
+  document.getElementById('bdBasePrice').textContent = '₹' + productData.base_price;
+
+  if (productData.image_url && productData.image_url.length < 5) {
+    document.getElementById('boxMainIcon').textContent = productData.image_url;
+  } else {
+    document.getElementById('boxMainIcon').textContent = '🎁';
+  }
+
+  // Render Categories & Components
+  const catContainer = document.getElementById('categoriesContainer');
+  catContainer.innerHTML = '';
+
+  categories.forEach(cat => {
+    const catComps = components.filter(c => String(c.category_id) === String(cat.id) || (!c.category_id && categories.length === 1));
+
+    const section = document.createElement('div');
+    section.className = 'category-section';
+
+    let ruleTag = '';
+    if (cat.required) ruleTag += '<span class="cat-rule-tag" style="background:#FEE2E2;color:#DC2626">Required</span> ';
+    if (cat.max_select > 0) ruleTag += '<span class="cat-rule-tag">Max ' + cat.max_select + '</span>';
+
+    let compCards = '';
+    catComps.forEach(comp => {
+      const compId = String(comp.id);
+      const qty = selections[compId] || 0;
+      const isSelected = qty > 0;
+
+      compCards += `
+        <div class="comp-card ${isSelected ? 'selected' : ''}" id="card-${compId}">
+          <span class="comp-icon">${comp.emoji_icon || '✨'}</span>
+          <div class="comp-name">${comp.name}</div>
+          <div class="comp-price">+ ₹${comp.price}</div>
+          <div class="comp-stepper">
+            <button class="step-btn" onclick="changeQty('${compId}', -1)" ${qty === 0 ? 'disabled' : ''}>-</button>
+            <span class="step-qty" id="qty-${compId}">${qty}</span>
+            <button class="step-btn" onclick="changeQty('${compId}', 1)">+</button>
+          </div>
+        </div>
+      `;
+    });
+
+    section.innerHTML = `
+      <div class="cat-head">
+        <div class="cat-title">📁 ${cat.name}</div>
+        <div>${ruleTag}</div>
+      </div>
+      <div class="components-grid">
+        ${compCards}
+      </div>
+    `;
+
+    catContainer.appendChild(section);
+  });
+
+  recalculateTotal();
+}
+
+function changeQty(compId, delta) {
+  const current = selections[compId] || 0;
+  const next = Math.max(0, current + delta);
+
+  if (next === 0) {
+    delete selections[compId];
+  } else {
+    selections[compId] = next;
+  }
+
+  // Update DOM stepper
+  const qtyEl = document.getElementById('qty-' + compId);
+  if (qtyEl) qtyEl.textContent = next;
+
+  const card = document.getElementById('card-' + compId);
+  if (card) {
+    if (next > 0) card.classList.add('selected');
+    else card.classList.remove('selected');
+
+    const minusBtn = card.querySelector('.step-btn');
+    if (minusBtn) minusBtn.disabled = (next === 0);
+  }
+
+  // Trigger visualizer bump animation
+  const iconWrap = document.getElementById('boxIconWrap');
+  iconWrap.classList.add('bump');
+  setTimeout(() => iconWrap.classList.remove('bump'), 250);
+
+  recalculateTotal();
+}
+
+function recalculateTotal() {
+  const base = Number(productData?.base_price) || 0;
+  let itemTotal = 0;
+  let totalCount = 0;
+
+  const tray = document.getElementById('selectedTray');
+  const breakdownList = document.getElementById('breakdownItemsList');
+  tray.innerHTML = '';
+  breakdownList.innerHTML = '';
+
+  const selectedEntries = Object.entries(selections);
+
+  if (selectedEntries.length === 0) {
+    tray.innerHTML = '<span class="tray-empty-text">Select components below to fill your box! 👇</span>';
+  }
+
+  selectedEntries.forEach(([compId, qty]) => {
+    const comp = components.find(c => String(c.id) === compId);
+    if (!comp || qty <= 0) return;
+
+    const lineTotal = (Number(comp.price) || 0) * qty;
+    itemTotal += lineTotal;
+    totalCount += qty;
+
+    // Add to visual tray
+    const chip = document.createElement('div');
+    chip.className = 'tray-chip';
+    chip.innerHTML = `${comp.emoji_icon || '✨'} ${comp.name} <span class="qty">×${qty}</span>`;
+    tray.appendChild(chip);
+
+    // Add to breakdown
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    row.innerHTML = `
+      <span>${comp.emoji_icon || '✨'} ${comp.name} × ${qty}</span>
+      <strong>₹${lineTotal}</strong>
+    `;
+    breakdownList.appendChild(row);
+  });
+
+  const grandTotal = base + itemTotal;
+
+  document.getElementById('totalItemsSummary').textContent = totalCount + ' items in your box';
+  document.getElementById('breakdownItemCount').textContent = totalCount + ' items';
+  document.getElementById('bdTotalPrice').textContent = '₹' + grandTotal.toLocaleString('en-IN');
+  document.getElementById('bottomTotal').textContent = '₹' + grandTotal.toLocaleString('en-IN');
+  document.getElementById('checkoutTotalAmount').textContent = '₹' + grandTotal.toLocaleString('en-IN');
+}
+
+function openCheckoutModal() {
+  document.getElementById('checkoutModal').classList.add('open');
+}
+
+function closeCheckoutModal() {
+  document.getElementById('checkoutModal').classList.remove('open');
+}
+
+async function submitCustomOrder() {
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const address = document.getElementById('custAddress').value.trim();
+  const note = document.getElementById('custNote').value.trim();
+
+  if (!name) { alert('Please enter your name'); return; }
+  if (!phone) { alert('Please enter your WhatsApp phone number'); return; }
+  if (!address) { alert('Please enter your delivery address'); return; }
+
+  const formattedSelections = Object.entries(selections).map(([compId, qty]) => ({
+    componentId: compId,
+    qty: qty
+  }));
+
+  const submitBtn = document.getElementById('submitOrderBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = '⏳ Submitting Order...';
+
+  try {
+    const res = await fetch('/api/public/byo/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productId: productData.id,
+        customerName: name,
+        phone: phone,
+        address: address,
+        note: note,
+        selections: formattedSelections
+      })
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      closeCheckoutModal();
+      showSuccessScreen(json);
+    } else {
+      alert('Error placing order: ' + (json.error || 'Please try again'));
+      submitBtn.disabled = false;
+      submitBtn.textContent = '✅ Confirm & Place Order';
+    }
+  } catch (err) {
+    console.error('Order submission error:', err);
+    alert('Failed to submit order. Please check your internet connection.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = '✅ Confirm & Place Order';
+  }
+}
+
+function showSuccessScreen(orderResult) {
+  document.getElementById('shopExperience').style.display = 'none';
+  document.getElementById('bottomBar').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
+
+  document.getElementById('successOrderId').textContent = orderResult.shortId || '#P-ORDER';
+
+  const summaryEl = document.getElementById('successSummary');
+  summaryEl.innerHTML = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">ORDER SUMMARY</div>
+    <div style="font-weight:800;font-size:15px;margin-bottom:8px">${orderResult.productName || 'Build Your Own'}</div>
+    <div style="font-size:13px;line-height:1.6;color:var(--ink);white-space:pre-line">${orderResult.summary || ''}</div>
+    <div style="border-top:1px dashed var(--line);margin-top:12px;padding-top:10px;display:flex;justify-content:space-between;font-weight:800">
+      <span>Total Bill:</span>
+      <span style="color:var(--primary);font-size:16px">₹${orderResult.total}</span>
+    </div>
+  `;
+
+  const sellerPhone = (seller.phone || '').replace(/[^0-9]/g, '');
+  const waBtn = document.getElementById('whatsappConfirmBtn');
+
+  const waMessage = encodeURIComponent(`Hi ${seller.name || 'there'}! I just placed custom order ${orderResult.shortId} on your Build Your Own store.\n\nTotal: ₹${orderResult.total}\n\nPlease confirm my order!`);
+  
+  if (sellerPhone) {
+    waBtn.onclick = () => window.open(`https://wa.me/${sellerPhone}?text=${waMessage}`, '_blank');
+  } else {
+    waBtn.onclick = () => window.open(`https://wa.me/?text=${waMessage}`, '_blank');
+  }
+}
+</script>
+
+</body>
+</html>
