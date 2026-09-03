@@ -6889,6 +6889,10 @@ app.get("/api/public/byo/:slugOrId", async (req, res) => {
             }
         }
 
+        const boxes = product.config_data?.boxes || [
+            { id: "box-default", name: product.name || "Base Box", price: Number(product.base_price) || 0, emoji: product.image_url || "🎁", description: "Standard base container" }
+        ];
+
         return res.json({
             success: true,
             product: {
@@ -6901,7 +6905,8 @@ app.get("/api/public/byo/:slugOrId", async (req, res) => {
                 image_url: product.image_url || "",
                 category: product.category || "Custom",
                 rules: product.rules || { min_total: 0, max_total: 0, allow_notes: true },
-                active: product.active
+                active: product.active,
+                boxes
             },
             categories,
             components,
@@ -6919,6 +6924,7 @@ app.post("/api/public/byo/order", async (req, res) => {
     try {
         const {
             productId,
+            boxId,
             customerName,
             phone,
             address,
@@ -6973,7 +6979,10 @@ app.post("/api/public/byo/order", async (req, res) => {
         }
 
         // 3. Server-Side Price Calculation & Validation (NEVER TRUST CLIENT TOTAL)
-        const basePrice = Number(product.base_price) || 0;
+        const boxes = product.config_data?.boxes || [];
+        const chosenBox = boxes.find(b => String(b.id) === String(boxId)) || (boxes.length > 0 ? boxes[0] : null);
+        const basePrice = chosenBox ? (Number(chosenBox.price) || 0) : (Number(product.base_price) || 0);
+        const baseBoxName = chosenBox ? chosenBox.name : (product.name || "Base Container");
         let calculatedItemTotal = 0;
         const validItems = [];
         let totalUnitsCount = 0;
@@ -7035,6 +7044,7 @@ app.post("/api/public/byo/order", async (req, res) => {
             type: "byo",
             product_id: product.id,
             product_name: product.name,
+            base_box_name: baseBoxName,
             base_price: basePrice,
             total_price: grandTotal,
             total_units: totalUnitsCount,
@@ -7199,8 +7209,12 @@ app.post("/api/byo/save", async (req, res) => {
             finalSlug += "-" + Math.random().toString(36).substring(2, 6);
         }
 
-        // Prepare full snapshot
+        const { boxes } = req.body;
+        // Prepare full snapshot with boxes and categories
         const configSnapshot = {
+            boxes: Array.isArray(boxes) && boxes.length > 0 ? boxes : [
+                { id: "box-1", name: name || "Base Box", price: Number(basePrice) || 0, emoji: imageUrl || "🎁", description: "Standard base container" }
+            ],
             categories: categories || [],
             components: (categories || []).flatMap(c => c.components || [])
         };

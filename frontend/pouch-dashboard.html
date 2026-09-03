@@ -500,6 +500,53 @@ async function loadProfileData() {
   }
 }
 
+
+function formatCustomRequirementsPreview(reqStr) {
+  if (!reqStr) return '';
+  if (reqStr.includes('"type":"byo"') || reqStr.includes('"items"')) {
+    try {
+      const parsed = typeof reqStr === 'string' ? JSON.parse(reqStr) : reqStr;
+      const items = parsed.items || [];
+      const baseName = parsed.base_box_name || (parsed.product_name ? parsed.product_name.replace('Build Your Own: ', '') : 'Custom Box');
+      const basePrice = parsed.base_price;
+      
+      const itemChips = items.map(it => 
+        `<span style="display:inline-flex;align-items:center;gap:4px;background:#EDE9FE;color:#5B21B6;border:1px solid #DDD6FE;border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;margin:2px 3px 2px 0;">
+          ${it.emoji || '✨'} ${it.name} <strong style="color:#7C3AED;">×${it.qty}</strong>
+        </span>`
+      ).join('');
+
+      let noteHtml = '';
+      if (parsed.customer?.note) {
+        noteHtml = `<div style="font-size:11px;color:#6D28D9;margin-top:6px;font-style:italic;">📝 Note: "${parsed.customer.note}"</div>`;
+      }
+
+      let addressHtml = '';
+      if (parsed.customer?.address) {
+        addressHtml = `<div style="font-size:11px;color:#64748B;margin-top:4px;">📍 Deliver to: <strong>${parsed.customer.address}</strong></div>`;
+      }
+
+      return `
+        <div style="background:#FAF5FF;border:1.5px solid #DDD6FE;border-radius:12px;padding:10px 12px;margin:8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:11px;font-weight:800;color:#5B21B6;text-transform:uppercase;letter-spacing:0.5px;">📦 Custom Box</span>
+            ${basePrice !== undefined ? `<span style="font-size:11px;font-weight:800;color:#7C3AED;">Base: ₹${basePrice}</span>` : ''}
+          </div>
+          ${baseName ? `<div style="font-size:12px;font-weight:800;color:#4C1D95;margin-bottom:6px;">${baseName}</div>` : ''}
+          <div style="display:flex;flex-wrap:wrap;align-items:center;">
+            ${itemChips || '<span style="font-size:11px;color:#7C3AED;">Base container only</span>'}
+          </div>
+          ${noteHtml}
+          ${addressHtml}
+        </div>
+      `;
+    } catch(e) {
+      console.warn("Could not parse BYO json preview:", e);
+    }
+  }
+  return `<div style="background:#F5F3FF;border:1px solid #DDD6FE;color:#5B21B6;border-radius:8px;padding:5px 8px;font-size:11px;font-weight:600;margin:6px 0">✨ <strong>Pref:</strong> ${reqStr}</div>`;
+}
+
 async function loadOrders() {
   try {
     const { data, error } = await client
@@ -577,7 +624,7 @@ async function loadOrders() {
           <h4>${orders[idStr].name} ${byoTag} ${humanTag} ${payTag}</h4>
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">📸 ${orders[idStr].handle}</div>
           <p class="order-desc">${orders[idStr].details}</p>
-          ${orders[idStr].custom_requirements ? `<div style="background:#F5F3FF;border:1px solid #DDD6FE;color:#5B21B6;border-radius:8px;padding:5px 8px;font-size:11px;font-weight:600;margin:6px 0">✨ <strong>Pref:</strong> ${orders[idStr].custom_requirements}</div>` : ''}
+          ${formatCustomRequirementsPreview(orders[idStr].custom_requirements)}
           <div class="order-meta">
             <span class="order-price">₹${price.toLocaleString('en-IN')}</span>
             <span class="tag ${stage === 'inquiry' ? 'tag-pending' : (stage === 'prod' ? 'tag-prod' : 'tag-paid')}">
@@ -628,23 +675,47 @@ function openOrderDrawer(id) {
   const cleanPhone = (o.phone && !o.phone.startsWith('instagram:')) ? o.phone : '';
   document.getElementById('dPhoneInput').value = cleanPhone;
   document.getElementById('dDetails').textContent = o.details;
-  if (o.custom_requirements && o.custom_requirements.includes('"type":"byo"')) {
+  if (o.custom_requirements && (o.custom_requirements.includes('"type":"byo"') || o.custom_requirements.includes('"items"'))) {
     try {
-      const byo = JSON.parse(o.custom_requirements);
-      let itemsHtml = '<div style="background:#FAF5FF;border:1.5px solid #DDD6FE;border-radius:12px;padding:14px;margin-top:6px">';
-      itemsHtml += '<div style="font-weight:800;color:#5B21B6;margin-bottom:8px;font-size:13px">🧩 Build Your Own: ' + (byo.product_name || 'Custom Product') + '</div>';
-      itemsHtml += '<div style="font-size:12px;color:#6D28D9;margin-bottom:6px">Base Container: ₹' + (byo.base_price || 0) + '</div>';
-      itemsHtml += '<div style="border-top:1px dashed #DDD6FE;padding-top:8px;display:flex;flex-direction:column;gap:5px">';
+      const byo = typeof o.custom_requirements === 'string' ? JSON.parse(o.custom_requirements) : o.custom_requirements;
+      const baseName = byo.base_box_name || byo.product_name || 'Custom Base Box';
+      const basePrice = Number(byo.base_price) || 0;
+      
+      let itemsHtml = '<div style="background:#FAF5FF;border:1.5px solid #DDD6FE;border-radius:14px;padding:16px;margin-top:8px">';
+      itemsHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+      itemsHtml += '  <span style="font-weight:800;color:#5B21B6;font-size:14px">🧩 ' + (byo.product_name || 'Build Your Own') + '</span>';
+      itemsHtml += '  <span style="background:#EDE9FE;color:#6D28D9;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800">CUSTOM CONFIG</span>';
+      itemsHtml += '</div>';
+      
+      itemsHtml += '<div style="display:flex;justify-content:space-between;align-items:center;background:#fff;padding:8px 12px;border-radius:8px;border:1px solid #E9D5FF;font-size:12px;margin-bottom:10px">';
+      itemsHtml += '  <span>📦 <strong>Base Box:</strong> ' + baseName + '</span>';
+      itemsHtml += '  <strong style="color:#7C3AED">₹' + basePrice + '</strong>';
+      itemsHtml += '</div>';
+
+      itemsHtml += '<div style="font-size:11px;font-weight:800;color:#6D28D9;text-transform:uppercase;margin-bottom:6px">Selected Components:</div>';
+      itemsHtml += '<div style="display:flex;flex-direction:column;gap:6px;background:#fff;padding:10px 12px;border-radius:8px;border:1px solid #E9D5FF">';
       (byo.items || []).forEach(item => {
-        itemsHtml += '<div style="display:flex;justify-content:space-between;font-size:12px"><span>' + (item.emoji || '✨') + ' <strong>' + item.name + '</strong> × ' + item.qty + '</span><span>₹' + item.line_total + '</span></div>';
+        itemsHtml += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0">';
+        itemsHtml += '  <span>' + (item.emoji || '✨') + ' <strong>' + item.name + '</strong> × ' + item.qty + ' <small style="color:#64748B">(₹' + item.unit_price + ' ea)</small></span>';
+        itemsHtml += '  <strong style="color:#0F172A">₹' + item.line_total + '</strong>';
+        itemsHtml += '</div>';
       });
       itemsHtml += '</div>';
-      itemsHtml += '<div style="border-top:1.5px solid #C4B5FD;margin-top:8px;padding-top:6px;display:flex;justify-content:space-between;font-weight:800;font-size:13px;color:#5B21B6"><span>Total Configuration:</span><span>₹' + byo.total_price + '</span></div>';
+
+      itemsHtml += '<div style="border-top:1.5px solid #C4B5FD;margin-top:12px;padding-top:10px;display:flex;justify-content:space-between;font-weight:800;font-size:14px;color:#5B21B6">';
+      itemsHtml += '  <span>Total Calculated:</span>';
+      itemsHtml += '  <span style="font-size:16px;color:#7C3AED">₹' + byo.total_price + '</span>';
+      itemsHtml += '</div>';
+
       if (byo.customer?.address) {
-        itemsHtml += '<div style="margin-top:8px;font-size:11px;color:#7C3AED">📍 Delivery Address: ' + byo.customer.address + '</div>';
+        itemsHtml += '<div style="margin-top:10px;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid #E9D5FF;font-size:12px;color:#4C1D95">';
+        itemsHtml += '  📍 <strong>Delivery Address:</strong> ' + byo.customer.address;
+        itemsHtml += '</div>';
       }
       if (byo.customer?.note) {
-        itemsHtml += '<div style="margin-top:4px;font-size:11px;color:#7C3AED">📝 Custom Gift Note: ' + byo.customer.note + '</div>';
+        itemsHtml += '<div style="margin-top:6px;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid #E9D5FF;font-size:12px;color:#6D28D9">';
+        itemsHtml += '  📝 <strong>Gift Note:</strong> "' + byo.customer.note + '"';
+        itemsHtml += '</div>';
       }
       itemsHtml += '</div>';
       document.getElementById('dCustomReq').innerHTML = itemsHtml;

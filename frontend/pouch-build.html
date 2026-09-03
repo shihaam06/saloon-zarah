@@ -3,28 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Build Your Own | POUCH by Kangro</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<title>Build Your Own Studio | POUCH by Kangro</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 
 <style>
 :root{
-  --ink:#101828;
-  --muted:#667085;
-  --muted2:#98A2B3;
-  --line:#E4E7EC;
+  --ink:#0F172A;
+  --muted:#64748B;
+  --muted2:#94A3B8;
+  --line:#E2E8F0;
   --surface:#F8FAFC;
-  --surface2:#F2F4F7;
+  --surface2:#F1F5F9;
   --white:#fff;
   --pouch:#7C3AED;
   --pouch-hover:#6D28D9;
   --pouch-light:#F5F3FF;
-  --green:#12B76A;
-  --green-light:#ECFDF3;
-  --red:#F04438;
-  --red-light:#FEF3F2;
-  --shadow:0 12px 35px rgba(16,24,40,.08);
+  --pouch-border:#DDD6FE;
+  --green:#10B981;
+  --green-light:#ECFDF5;
+  --red:#EF4444;
+  --red-light:#FEF2F2;
+  --shadow:0 12px 35px rgba(15,23,42,.08);
+  --shadow-sm:0 2px 8px rgba(15,23,42,.04);
 }
 body.dark{
   --ink:#F8FAFC;--muted:#A7B0C0;--muted2:#7F8A9D;--line:#263244;
@@ -33,7 +35,7 @@ body.dark{
   background:#0B1220;color:var(--ink);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(--surface);min-height:100vh;display:flex}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--ink);background:var(--surface);min-height:100vh;display:flex}
 
 /* SIDEBAR */
 .sidebar{width:260px;background:#111827;color:#98A2B3;padding:24px 16px;display:flex;flex-direction:column;flex-shrink:0;min-height:100vh}
@@ -74,7 +76,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 .stat-card strong{font-family:Manrope;font-size:24px;font-weight:800;display:block}
 .stat-card small{font-size:11px;color:var(--muted);margin-top:4px;display:block}
 
-/* INSTAGRAM BANNER */
+/* BANNER */
 .ig-banner{background:linear-gradient(135deg,#F5F3FF 0%,#EDE9FE 100%);border:1.5px solid #DDD6FE;border-radius:16px;padding:20px 24px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .ig-banner-text h3{font-family:Manrope;font-size:16px;font-weight:800;color:#5B21B6;margin-bottom:4px}
 .ig-banner-text p{font-size:13px;color:#6D28D9;line-height:1.4}
@@ -88,7 +90,8 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 .byo-price{font-family:Manrope;font-size:20px;font-weight:800;color:var(--ink)}
 .byo-title{font-family:Manrope;font-size:17px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .byo-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px;flex:1}
-.byo-meta{display:flex;gap:12px;font-size:12px;color:var(--muted);background:var(--surface2);padding:10px 14px;border-radius:10px;margin-bottom:16px;font-weight:600}
+.byo-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);background:var(--surface2);padding:10px 14px;border-radius:10px;margin-bottom:16px;font-weight:700}
+.byo-meta span{display:inline-flex;align-items:center;gap:4px}
 .byo-actions{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
 
 /* EMPTY STATE */
@@ -100,7 +103,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 /* BUILDER MODAL */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);display:none;place-items:center;z-index:999;padding:20px;overflow-y:auto}
 .modal.show{display:grid}
-.modal-box{background:var(--white);width:min(860px,100%);border-radius:22px;padding:32px;box-shadow:var(--shadow);border:1px solid var(--line);max-height:92vh;overflow-y:auto;margin:auto}
+.modal-box{background:var(--white);width:min(900px,100%);border-radius:22px;padding:32px;box-shadow:var(--shadow);border:1px solid var(--line);max-height:92vh;overflow-y:auto;margin:auto}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .modal-head h3{font-family:Manrope;font-size:20px;font-weight:800}
 .close-btn{background:none;border:none;font-size:26px;cursor:pointer;color:var(--muted);line-height:1}
@@ -116,18 +119,30 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 .form-group{margin-bottom:16px}
 .form-group label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em}
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:13px;outline:none;font-family:inherit;transition:.2s}
-.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--pouch);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--pouch);box-shadow:0 0 0 3px rgba(124,58,237,.12);background:#fff}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 
+/* BOX CONTAINER ROW */
+.box-option-card{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:grid;grid-template-columns:50px 1.5fr 1fr 1.5fr 40px;gap:10px;align-items:center}
+.box-option-card input{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#fff}
+
 /* CATEGORY CARD IN BUILDER */
-.builder-cat-card{background:var(--surface2);border:1.5px solid var(--line);border-radius:16px;padding:18px;margin-bottom:18px}
-.cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.cat-title{font-family:Manrope;font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px}
-.comp-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
-.comp-row{display:grid;grid-template-columns:50px 1.5fr 1fr 1fr 40px;gap:8px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.builder-cat-card{background:#FAFAFC;border:1.5px solid #CBD5E1;border-radius:16px;padding:20px;margin-bottom:22px;box-shadow:var(--shadow-sm)}
+.cat-top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.cat-name-input{font-family:Manrope;font-size:16px;font-weight:800;border:none;background:none;border-bottom:1.5px solid transparent;padding:4px 0;outline:none;color:var(--ink);width:60%}
+.cat-name-input:focus{border-bottom-color:var(--pouch)}
+
+.cat-rules-bar{display:flex;gap:14px;flex-wrap:wrap;background:#F1F5F9;padding:8px 12px;border-radius:10px;margin-bottom:14px;font-size:12px}
+.cat-rules-bar label{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--ink);cursor:pointer}
+.cat-rules-bar input[type="number"]{width:60px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;font-size:12px;background:#fff}
+
+.comp-table-header{display:grid;grid-template-columns:50px 2fr 1fr 1fr 40px;gap:8px;font-size:11px;font-weight:800;color:var(--muted);padding:0 12px;margin-bottom:6px;text-transform:uppercase}
+.comp-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.comp-row{display:grid;grid-template-columns:50px 2fr 1fr 1fr 40px;gap:8px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
 .comp-row input{padding:7px 9px;border:1px solid var(--line);border-radius:8px;font-size:12px}
 .remove-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;display:grid;place-items:center}
+.remove-btn:hover{transform:scale(1.15)}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:14px 22px;border-radius:12px;font-size:13px;font-weight:700;display:none;z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,.25);align-items:center;gap:8px}
@@ -137,6 +152,7 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
   body{flex-direction:column}
   .sidebar{width:100%;min-height:auto}
   .form-row,.form-row-3{grid-template-columns:1fr}
+  .box-option-card{grid-template-columns:1fr 1fr;gap:6px}
   .comp-row{grid-template-columns:1fr 1fr;gap:6px}
 }
 </style>
@@ -170,37 +186,37 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 <main class="main">
   <div class="topbar">
     <div class="top-title">
-      <h1><span>🧩</span> Build Your Own</h1>
-      <p>Design customizable physical products & generate shareable customer links for Instagram.</p>
+      <h1><span>🧩</span> Build Your Own Studio</h1>
+      <p>Configure modular physical products with custom boxes, category-wise components, and live shareable links.</p>
     </div>
     <div class="top-actions">
-      <button class="btn btn-pouch" onclick="openNewBuilderModal()">➕ Create Build Your Own</button>
+      <button class="btn btn-pouch" onclick="openNewBuilderModal()">➕ Create Product</button>
     </div>
   </div>
 
   <div class="ig-banner">
     <div class="ig-banner-text">
-      <h3>🚀 Turn your Instagram audience into custom orders!</h3>
-      <p>Create a modular configurator (Gift Boxes, Charm Bracelets, Hampers). Share the unique link in your Instagram Bio & DMs.</p>
+      <h3>🚀 Instagram-First Product Configurator</h3>
+      <p>Give customers the freedom to customize their orders box-by-box, category-by-category, with zero confusion.</p>
     </div>
-    <button class="btn btn-pouch" style="background:#6D28D9" onclick="openNewBuilderModal()">✨ Create New Product</button>
+    <button class="btn btn-pouch" style="background:#6D28D9" onclick="openNewBuilderModal()">✨ New Configurator</button>
   </div>
 
   <div class="stat-grid">
     <div class="stat-card">
-      <label>Active BYO Products</label>
+      <label>Active Products</label>
       <strong id="activeByoCount">0</strong>
-      <small>Live for customers</small>
+      <small>Live for customer orders</small>
+    </div>
+    <div class="stat-card">
+      <label>Total Categories</label>
+      <strong id="totalCatCount">0</strong>
+      <small>Structured component groups</small>
     </div>
     <div class="stat-card">
       <label>Total Components</label>
       <strong id="totalCompCount">0</strong>
       <small>Across all configurators</small>
-    </div>
-    <div class="stat-card">
-      <label>BYO Custom Orders</label>
-      <strong id="byoOrdersCount">0</strong>
-      <small>Received via shared links</small>
     </div>
   </div>
 
@@ -210,9 +226,9 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 
   <div id="emptyState" class="empty-state" style="display:none">
     <span class="empty-icon">🎁</span>
-    <h3>Create your first Build Your Own product</h3>
-    <p>Let your customers customize their own gift boxes, hampers, bead jewellery, charm bracelets, and more with live pricing and dynamic visual feedback.</p>
-    <button class="btn btn-pouch" onclick="openNewBuilderModal()">➕ Create Build Your Own</button>
+    <h3>No Build Your Own Products Yet</h3>
+    <p>Let customers build their own gift boxes, hampers, bead jewellery, custom bouquets, bakery boxes and more. Add your own boxes and categories from scratch!</p>
+    <button class="btn btn-pouch" onclick="openNewBuilderModal()">➕ Create First Product</button>
   </div>
 </main>
 
@@ -226,56 +242,69 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 
     <!-- TABS -->
     <div class="tab-nav">
-      <button class="tab-btn active" onclick="switchTab('tabBase')">1. Base Product</button>
-      <button class="tab-btn" onclick="switchTab('tabComponents')">2. Categories & Components</button>
-      <button class="tab-btn" onclick="switchTab('tabRules')">3. Configuration Rules</button>
-      <button class="tab-btn" onclick="switchTab('tabShare')">4. Preview & Share</button>
+      <button class="tab-btn active" onclick="switchTab('tabBase')">1. Product & Base Boxes</button>
+      <button class="tab-btn" onclick="switchTab('tabComponents')">2. Category-Wise Components</button>
+      <button class="tab-btn" onclick="switchTab('tabRules')">3. Store Rules & Settings</button>
+      <button class="tab-btn" onclick="switchTab('tabShare')">4. Preview & Share Link</button>
     </div>
 
-    <!-- TAB 1: BASE PRODUCT -->
+    <!-- TAB 1: PRODUCT & BASE BOXES -->
     <div id="tabBase" class="tab-content active">
       <div class="form-row">
         <div class="form-group">
-          <label>Product Name *</label>
-          <input type="text" id="byoName" placeholder="e.g. Build Your Own Gift Box" required>
+          <label>Product Title *</label>
+          <input type="text" id="byoName" placeholder="e.g. Build Your Own Gift Box / Custom Hamper" required>
         </div>
         <div class="form-group">
-          <label>Category</label>
-          <input type="text" id="byoCategory" placeholder="e.g. Gift Boxes, Jewellery, Hampers" value="Gift Boxes">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Base Price (₹) *</label>
-          <input type="number" id="byoBasePrice" placeholder="499" value="499" min="0" required>
-        </div>
-        <div class="form-group">
-          <label>Custom Link Slug (Optional)</label>
-          <input type="text" id="byoSlug" placeholder="e.g. giftbox-special (leave blank for auto)">
+          <label>Category Tag</label>
+          <input type="text" id="byoCategory" placeholder="e.g. Gift Boxes, Hampers, Jewellery, Bakery" value="Gift Boxes">
         </div>
       </div>
 
       <div class="form-group">
-        <label>Main Product Image URL or Visual Icon</label>
-        <input type="text" id="byoImage" placeholder="e.g. https://... or 🎁">
+        <label>Short Customer Description</label>
+        <textarea id="byoDesc" rows="2" placeholder="Tell customers what they are designing (e.g. Choose your box size and customize your favorite treats and ribbons)."></textarea>
+      </div>
+
+      <!-- BASE BOX / CONTAINER OPTIONS -->
+      <div style="background:var(--surface2);border:1.5px solid var(--line);border-radius:14px;padding:18px;margin:18px 0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <h4 style="font-family:Manrope;font-size:14px;font-weight:800;color:var(--ink)">📦 Base Box / Container Options</h4>
+            <p style="font-size:12px;color:var(--muted)">Offer 1 or multiple base boxes/containers. If multiple, customers choose their box first!</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="addNewBoxOption()">➕ Add Box Option</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:50px 1.5fr 1fr 1.5fr 40px;gap:10px;font-size:11px;font-weight:800;color:var(--muted);padding:0 12px;margin-bottom:6px;text-transform:uppercase">
+          <span>Icon</span><span>Box Name</span><span>Base Price (₹)</span><span>Details/Size</span><span></span>
+        </div>
+        <div id="boxesContainer">
+          <!-- Dynamically populated box options -->
+        </div>
       </div>
 
       <div class="form-group">
-        <label>Short Description</label>
-        <textarea id="byoDesc" rows="3" placeholder="Explain what the customer is building (e.g. Choose your favourite beads, charms, and packaging to create a unique personalized gift box)."></textarea>
+        <label>Custom Link Slug (Optional)</label>
+        <input type="text" id="byoSlug" placeholder="e.g. custom-hamper-2026 (leave empty for auto-generated slug)">
       </div>
 
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
-        <button class="btn btn-pouch" onclick="switchTab('tabComponents')">Next: Add Components ➡️</button>
+        <button class="btn btn-pouch" onclick="switchTab('tabComponents')">Next: Components ➡️</button>
       </div>
     </div>
 
-    <!-- TAB 2: CATEGORIES & COMPONENTS -->
+    <!-- TAB 2: CATEGORY-WISE COMPONENTS -->
     <div id="tabComponents" class="tab-content">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <p style="font-size:13px;color:var(--muted)">Organize your components into categories (e.g. Beads, Charms, Ribbons, Add-ons).</p>
-        <button class="btn btn-outline btn-sm" onclick="addNewCategory()">➕ Add Category</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <h4 style="font-family:Manrope;font-size:15px;font-weight:800">Categories & Components</h4>
+          <p style="font-size:12px;color:var(--muted)">Components are strictly organized category-by-category. No two categories will ever mix.</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="loadInspirationTemplate()">✨ Load Sample Example</button>
+          <button class="btn btn-pouch btn-sm" onclick="addNewCategory()">➕ Add Category</button>
+        </div>
       </div>
 
       <div id="categoriesContainer">
@@ -292,54 +321,54 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
     <div id="tabRules" class="tab-content">
       <div class="form-row">
         <div class="form-group">
-          <label>Minimum Total Items Required</label>
+          <label>Minimum Total Items Required Across All Categories</label>
           <input type="number" id="ruleMinTotal" placeholder="0 (No minimum)" value="0" min="0">
         </div>
         <div class="form-group">
-          <label>Maximum Total Items Allowed</label>
+          <label>Maximum Total Items Allowed In Entire Order</label>
           <input type="number" id="ruleMaxTotal" placeholder="0 (Unlimited)" value="0" min="0">
         </div>
       </div>
 
-      <div class="form-group">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none">
-          <input type="checkbox" id="ruleAllowNotes" checked style="width:auto">
-          Allow customer to leave a custom gift message or instruction note
+      <div class="form-group" style="background:var(--surface2);padding:14px;border-radius:12px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;font-weight:700">
+          <input type="checkbox" id="ruleAllowNotes" checked style="width:auto;height:18px">
+          Allow customer to leave a custom gift message, card note, or special delivery instructions
         </label>
       </div>
 
-      <div class="form-group">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none">
-          <input type="checkbox" id="byoActive" checked style="width:auto">
-          Product is active & open for orders
+      <div class="form-group" style="background:var(--surface2);padding:14px;border-radius:12px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;font-weight:700">
+          <input type="checkbox" id="byoActive" checked style="width:auto;height:18px">
+          Product is Active & Open for Customer Orders
         </label>
       </div>
 
       <div style="display:flex;justify-content:space-between;margin-top:24px">
         <button class="btn btn-outline" onclick="switchTab('tabComponents')">⬅️ Back</button>
-        <button class="btn btn-pouch" onclick="switchTab('tabShare')">Next: Preview & Save ➡️</button>
+        <button class="btn btn-pouch" onclick="switchTab('tabShare')">Next: Preview & Share ➡️</button>
       </div>
     </div>
 
-    <!-- TAB 4: SHARE & SAVE -->
+    <!-- TAB 4: SHARE & PREVIEW -->
     <div id="tabShare" class="tab-content">
-      <div style="background:var(--surface2);border-radius:14px;padding:18px;margin-bottom:20px">
-        <h4 style="font-family:Manrope;font-size:14px;font-weight:800;margin-bottom:8px">🔗 Customer Shareable Link</h4>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Share this link directly with customers on Instagram, WhatsApp, or Stories.</p>
-        <div style="display:flex;gap:8px">
-          <input type="text" id="shareUrlInput" readonly style="font-size:12px;background:var(--white);font-weight:600;color:var(--pouch)">
-          <button class="btn btn-pouch btn-sm" onclick="copyShareUrlFromModal()">📋 Copy Link</button>
+      <div style="background:linear-gradient(135deg,#FAF5FF,#F3E8FF);border:1.5px solid #DDD6FE;border-radius:16px;padding:22px;margin-bottom:20px">
+        <h4 style="font-family:Manrope;font-size:16px;font-weight:800;color:#5B21B6;margin-bottom:6px">🔗 Your Public Customer Link</h4>
+        <p style="font-size:13px;color:#6D28D9;margin-bottom:14px">Customers can open this link directly on their mobile phone from your Instagram Bio, Story sticker, or WhatsApp DM.</p>
+        <div style="display:flex;gap:10px">
+          <input type="text" id="shareUrlInput" readonly style="font-size:13px;background:var(--white);font-weight:700;color:var(--pouch);border:1.5px solid #DDD6FE">
+          <button class="btn btn-pouch" onclick="copyShareUrlFromModal()">📋 Copy Link</button>
         </div>
       </div>
 
       <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
         <button class="btn btn-outline" onclick="openLivePreviewTab()">👁️ Open Customer Page</button>
-        <button class="btn btn-outline" onclick="copyInstagramBioText()">📸 Copy Instagram Caption</button>
+        <button class="btn btn-outline" onclick="copyInstagramBioText()">📸 Copy Instagram Bio Text</button>
       </div>
 
       <div style="display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:20px">
         <button class="btn btn-outline" onclick="switchTab('tabRules')">⬅️ Back</button>
-        <button class="btn btn-pouch" style="padding:12px 24px" onclick="saveByoProduct()">💾 Save & Publish Product</button>
+        <button class="btn btn-pouch" style="padding:12px 28px;font-size:14px" onclick="saveByoProduct()">💾 Save & Publish Configurator</button>
       </div>
     </div>
 
@@ -355,6 +384,9 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 let currentUser = null;
 let byoProducts = [];
 let editingProductId = null;
+
+// Clean structures without forced hardcoded items
+let currentBoxes = [];
 let currentCategories = [];
 
 function getBackendUrl() {
@@ -368,45 +400,6 @@ function getBackendUrl() {
 function getLocalStorageKey() {
   return 'kangro_byo_prods_' + (currentUser ? currentUser.id : 'guest');
 }
-
-// Default demo template if brand new
-const DEFAULT_CATEGORIES = [
-  {
-    name: "Beads",
-    description: "Choose beads for your design",
-    min_select: 0,
-    max_select: 0,
-    required: false,
-    components: [
-      { name: "Blue Bead", emoji_icon: "🔵", price: 10, stock: -1 },
-      { name: "Pink Bead", emoji_icon: "🌸", price: 10, stock: -1 },
-      { name: "Pearl Bead", emoji_icon: "⚪", price: 15, stock: -1 }
-    ]
-  },
-  {
-    name: "Charms",
-    description: "Pick custom charms",
-    min_select: 0,
-    max_select: 0,
-    required: false,
-    components: [
-      { name: "Heart Charm", emoji_icon: "💗", price: 25, stock: -1 },
-      { name: "Star Charm", emoji_icon: "⭐", price: 20, stock: -1 },
-      { name: "Flower Charm", emoji_icon: "🌼", price: 30, stock: -1 }
-    ]
-  },
-  {
-    name: "Add-ons & Ribbons",
-    description: "Special packaging extras",
-    min_select: 0,
-    max_select: 0,
-    required: false,
-    components: [
-      { name: "Pink Ribbon", emoji_icon: "🎀", price: 20, stock: -1 },
-      { name: "Mini Teddy", emoji_icon: "🧸", price: 80, stock: -1 }
-    ]
-  }
-];
 
 window.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -436,7 +429,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function loadByoProducts() {
   byoProducts = [];
 
-  // 1. Try Supabase direct query
+  // 1. Direct Supabase
   try {
     const { data, error } = await client
       .from('byo_products')
@@ -454,7 +447,7 @@ async function loadByoProducts() {
     console.warn('Supabase byo_products table check:', e);
   }
 
-  // 2. Try Backend API
+  // 2. Backend API
   try {
     const backendUrl = getBackendUrl();
     const res = await fetch(backendUrl + '/api/byo/products?profileId=' + currentUser.id);
@@ -467,16 +460,12 @@ async function loadByoProducts() {
         return;
       }
     }
-  } catch (e) {
-    console.warn('Backend API fetch skipped/failed:', e);
-  }
+  } catch (e) {}
 
-  // 3. Fallback to LocalStorage
+  // 3. LocalStorage
   const saved = localStorage.getItem(getLocalStorageKey());
   if (saved) {
-    try {
-      byoProducts = JSON.parse(saved);
-    } catch(e) {}
+    try { byoProducts = JSON.parse(saved); } catch(e) {}
   }
 
   renderProductsGrid();
@@ -490,7 +479,15 @@ function renderProductsGrid() {
   document.getElementById('activeByoCount').textContent = byoProducts.filter(p => p.active !== false).length;
 
   let totalComps = 0;
-  byoProducts.forEach(p => totalComps += (p.component_count || (p.config_data?.components?.length || (p.config_data?.categories?.flatMap(c => c.components)?.length || 0))));
+  let totalCats = 0;
+
+  byoProducts.forEach(p => {
+    const cats = p.config_data?.categories || [];
+    totalCats += cats.length;
+    cats.forEach(c => totalComps += (c.components || []).length);
+  });
+
+  document.getElementById('totalCatCount').textContent = totalCats;
   document.getElementById('totalCompCount').textContent = totalComps;
 
   if (byoProducts.length === 0) {
@@ -505,18 +502,26 @@ function renderProductsGrid() {
 
     const slug = p.slug || p.id;
     const shareUrl = window.location.origin + (window.location.pathname.includes('/frontend/') ? '/frontend/' : '/') + 'build.html?id=' + slug;
-    const compCount = p.component_count || (p.config_data?.components?.length || (p.config_data?.categories?.flatMap(c => c.components)?.length || 0));
-    const catCount = p.category_count || (p.config_data?.categories?.length || 0);
+    
+    const boxes = p.config_data?.boxes || [{ name: 'Standard Box', price: p.base_price || 0, emoji: '🎁' }];
+    const cats = p.config_data?.categories || [];
+    let compCount = 0;
+    cats.forEach(c => compCount += (c.components || []).length);
+
+    const basePriceDisplay = boxes.length > 1 
+      ? ('From ₹' + Math.min(...boxes.map(b => Number(b.price) || 0)))
+      : ('₹' + (boxes[0]?.price || p.base_price || 0));
 
     card.innerHTML = `
       <div class="byo-top">
         <span class="byo-badge">${p.category || 'Custom Product'}</span>
-        <span class="byo-price">₹${p.base_price || 0}</span>
+        <span class="byo-price">${basePriceDisplay}</span>
       </div>
-      <div class="byo-title">${p.image_url && p.image_url.length < 5 ? p.image_url : '🎁'} ${p.name}</div>
-      <p class="byo-desc">${p.description || 'Configurable physical product.'}</p>
+      <div class="byo-title">${boxes[0]?.emoji || '🎁'} ${p.name}</div>
+      <p class="byo-desc">${p.description || 'Customizable product.'}</p>
       <div class="byo-meta">
-        <span>🧩 ${catCount} Categories</span>
+        <span>📦 ${boxes.length} Box Options</span>
+        <span>📁 ${cats.length} Categories</span>
         <span>✨ ${compCount} Components</span>
         <span>${p.active !== false ? '🟢 Live' : '⚪ Inactive'}</span>
       </div>
@@ -534,18 +539,24 @@ function renderProductsGrid() {
 function openNewBuilderModal() {
   editingProductId = null;
   document.getElementById('modalTitle').textContent = 'Create Build Your Own Product';
-  document.getElementById('byoName').value = 'Build Your Own Gift Box';
+  document.getElementById('byoName').value = '';
   document.getElementById('byoCategory').value = 'Gift Boxes';
-  document.getElementById('byoBasePrice').value = '499';
   document.getElementById('byoSlug').value = '';
-  document.getElementById('byoImage').value = '🎁';
-  document.getElementById('byoDesc').value = 'Personalize your very own gift box with beads, charms, and custom packaging!';
+  document.getElementById('byoDesc').value = '';
   document.getElementById('ruleMinTotal').value = '0';
   document.getElementById('ruleMaxTotal').value = '0';
   document.getElementById('ruleAllowNotes').checked = true;
   document.getElementById('byoActive').checked = true;
 
-  currentCategories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+  // Single clean starter box option
+  currentBoxes = [
+    { id: 'box-1', emoji: '🎁', name: 'Standard Gift Box', price: 499, description: 'Eco-friendly cardboard gift box with satin bow' }
+  ];
+
+  // Completely clean categories list (NO hardcoded beads/ribbons)
+  currentCategories = [];
+
+  renderBoxesBuilder();
   renderCategoriesBuilder();
   updateShareUrlPreview();
   switchTab('tabBase');
@@ -561,21 +572,20 @@ function editByoProduct(id) {
   document.getElementById('modalTitle').textContent = 'Edit ' + prod.name;
   document.getElementById('byoName').value = prod.name;
   document.getElementById('byoCategory').value = prod.category || 'Gift Boxes';
-  document.getElementById('byoBasePrice').value = prod.base_price;
   document.getElementById('byoSlug').value = prod.slug || '';
-  document.getElementById('byoImage').value = prod.image_url || '🎁';
   document.getElementById('byoDesc').value = prod.description || '';
   document.getElementById('ruleMinTotal').value = prod.rules?.min_total || 0;
   document.getElementById('ruleMaxTotal').value = prod.rules?.max_total || 0;
   document.getElementById('ruleAllowNotes').checked = prod.rules?.allow_notes !== false;
   document.getElementById('byoActive').checked = prod.active !== false;
 
-  if (prod.config_data && prod.config_data.categories && prod.config_data.categories.length > 0) {
-    currentCategories = JSON.parse(JSON.stringify(prod.config_data.categories));
-  } else {
-    currentCategories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-  }
+  currentBoxes = prod.config_data?.boxes || [
+    { id: 'box-1', emoji: '🎁', name: prod.name || 'Standard Box', price: prod.base_price || 499, description: '' }
+  ];
 
+  currentCategories = JSON.parse(JSON.stringify(prod.config_data?.categories || []));
+
+  renderBoxesBuilder();
   renderCategoriesBuilder();
   updateShareUrlPreview();
   switchTab('tabBase');
@@ -602,14 +612,73 @@ function switchTab(tabId) {
 }
 
 function updateShareUrlPreview() {
-  const slug = document.getElementById('byoSlug').value.trim() || 'giftbox-' + Math.random().toString(36).substring(2, 6);
+  const name = document.getElementById('byoName').value.trim() || 'custom-order';
+  const slug = document.getElementById('byoSlug').value.trim() || (name.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 15) + '-' + Math.random().toString(36).substring(2, 6));
   const url = window.location.origin + (window.location.pathname.includes('/frontend/') ? '/frontend/' : '/') + 'build.html?id=' + slug;
   document.getElementById('shareUrlInput').value = url;
 }
 
+// --- BOXES / BASE CONTAINERS BUILDER ---
+function renderBoxesBuilder() {
+  const container = document.getElementById('boxesContainer');
+  container.innerHTML = '';
+
+  currentBoxes.forEach((box, idx) => {
+    const row = document.createElement('div');
+    row.className = 'box-option-card';
+    row.innerHTML = `
+      <input type="text" value="${box.emoji || '🎁'}" placeholder="🎁" onchange="updateBox(${idx}, 'emoji', this.value)" style="text-align:center;font-size:16px">
+      <input type="text" value="${box.name || ''}" placeholder="Box Name (e.g. Luxury Box)" onchange="updateBox(${idx}, 'name', this.value)">
+      <input type="number" value="${box.price !== undefined ? box.price : 0}" placeholder="Base Price ₹" onchange="updateBox(${idx}, 'price', Number(this.value))">
+      <input type="text" value="${box.description || ''}" placeholder="Description / Dimensions" onchange="updateBox(${idx}, 'description', this.value)">
+      <button class="remove-btn" onclick="removeBox(${idx})" title="Delete Box">${currentBoxes.length > 1 ? '🗑️' : ''}</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function addNewBoxOption() {
+  currentBoxes.push({
+    id: 'box-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
+    emoji: '🪵',
+    name: 'New Box Option ' + (currentBoxes.length + 1),
+    price: 599,
+    description: 'Custom container'
+  });
+  renderBoxesBuilder();
+}
+
+function removeBox(idx) {
+  if (currentBoxes.length <= 1) {
+    alert('You must have at least one base box container');
+    return;
+  }
+  currentBoxes.splice(idx, 1);
+  renderBoxesBuilder();
+}
+
+function updateBox(idx, field, val) {
+  if (currentBoxes[idx]) {
+    currentBoxes[idx][field] = val;
+  }
+}
+
+// --- CATEGORIES & COMPONENTS BUILDER ---
 function renderCategoriesBuilder() {
   const container = document.getElementById('categoriesContainer');
   container.innerHTML = '';
+
+  if (currentCategories.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;border:2px dashed var(--line);border-radius:14px;background:#fff;margin:10px 0">
+        <div style="font-size:36px;margin-bottom:10px">📁</div>
+        <h4 style="font-family:Manrope;font-size:16px;font-weight:800;margin-bottom:6px">No Categories Added Yet</h4>
+        <p style="font-size:13px;color:var(--muted);max-width:400px;margin:0 auto 16px">Add your first category to group your components (e.g. Charms, Beads, Flavors, Ribbons, Candles).</p>
+        <button class="btn btn-pouch btn-sm" onclick="addNewCategory()">➕ Add First Category</button>
+      </div>
+    `;
+    return;
+  }
 
   currentCategories.forEach((cat, catIdx) => {
     const card = document.createElement('div');
@@ -619,8 +688,8 @@ function renderCategoriesBuilder() {
     (cat.components || []).forEach((comp, compIdx) => {
       compsHtml += `
         <div class="comp-row">
-          <input type="text" value="${comp.emoji_icon || '✨'}" placeholder="Emoji" onchange="updateComp(${catIdx}, ${compIdx}, 'emoji_icon', this.value)" style="text-align:center">
-          <input type="text" value="${comp.name || ''}" placeholder="Component Name" onchange="updateComp(${catIdx}, ${compIdx}, 'name', this.value)">
+          <input type="text" value="${comp.emoji_icon || '✨'}" placeholder="Emoji" onchange="updateComp(${catIdx}, ${compIdx}, 'emoji_icon', this.value)" style="text-align:center;font-size:16px">
+          <input type="text" value="${comp.name || ''}" placeholder="Item Name" onchange="updateComp(${catIdx}, ${compIdx}, 'name', this.value)">
           <input type="number" value="${comp.price || 0}" placeholder="Price ₹" onchange="updateComp(${catIdx}, ${compIdx}, 'price', Number(this.value))">
           <input type="number" value="${comp.stock !== undefined ? comp.stock : -1}" placeholder="Stock (-1 unltd)" onchange="updateComp(${catIdx}, ${compIdx}, 'stock', Number(this.value))">
           <button class="remove-btn" onclick="removeComp(${catIdx}, ${compIdx})">🗑️</button>
@@ -629,20 +698,38 @@ function renderCategoriesBuilder() {
     });
 
     card.innerHTML = `
-      <div class="cat-header">
-        <div class="cat-title">
-          <span>📁</span>
-          <input type="text" value="${cat.name}" placeholder="Category Name" onchange="updateCat(${catIdx}, 'name', this.value)" style="font-weight:800;font-size:14px;border:none;background:none;border-bottom:1px solid var(--line);outline:none">
+      <div class="cat-top-bar">
+        <div style="display:flex;align-items:center;gap:10px;width:70%">
+          <span style="font-size:18px">📁</span>
+          <input type="text" class="cat-name-input" value="${cat.name || ''}" placeholder="Category Name (e.g. Beads / Charms / Chocolates)" onchange="updateCat(${catIdx}, 'name', this.value)">
         </div>
-        <button class="remove-btn" onclick="removeCategory(${catIdx})">❌ Remove Category</button>
+        <button class="remove-btn" onclick="removeCategory(${catIdx})" style="font-size:13px;color:var(--red);display:flex;align-items:center;gap:4px">❌ Delete Category</button>
       </div>
+
+      <div style="margin-bottom:12px">
+        <input type="text" value="${cat.description || ''}" placeholder="Customer guidance prompt (e.g. Choose up to 3 charms)" onchange="updateCat(${catIdx}, 'description', this.value)" style="width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#fff">
+      </div>
+
+      <div class="cat-rules-bar">
+        <label>
+          <input type="checkbox" ${cat.required ? 'checked' : ''} onchange="updateCat(${catIdx}, 'required', this.checked)">
+          🔴 Required Category (Customer must pick at least 1)
+        </label>
+        <label>
+          Max Items Allowed:
+          <input type="number" value="${cat.max_select || 0}" min="0" onchange="updateCat(${catIdx}, 'max_select', Number(this.value))" title="0 = Unlimited">
+          <small style="color:var(--muted)">(0 = unlimited)</small>
+        </label>
+      </div>
+
       <div class="comp-list">
-        <div style="display:grid;grid-template-columns:50px 1.5fr 1fr 1fr 40px;gap:8px;font-size:11px;font-weight:700;color:var(--muted);padding:0 12px;text-transform:uppercase">
-          <span>Icon</span><span>Name</span><span>Price (₹)</span><span>Stock</span><span></span>
+        <div class="comp-table-header">
+          <span>Icon</span><span>Item Name</span><span>Price (₹)</span><span>Stock</span><span></span>
         </div>
         ${compsHtml}
       </div>
-      <button class="btn btn-outline btn-sm" onclick="addNewComp(${catIdx})">➕ Add Item in ${cat.name}</button>
+
+      <button class="btn btn-outline btn-sm" onclick="addNewComp(${catIdx})">➕ Add Item in ${cat.name || 'this category'}</button>
     `;
     container.appendChild(card);
   });
@@ -650,21 +737,24 @@ function renderCategoriesBuilder() {
 
 function addNewCategory() {
   currentCategories.push({
-    name: 'New Category ' + (currentCategories.length + 1),
-    description: '',
+    id: 'cat-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
+    name: 'Category ' + (currentCategories.length + 1),
+    description: 'Select your preferred items',
     min_select: 0,
     max_select: 0,
     required: false,
     components: [
-      { name: 'Item 1', emoji_icon: '✨', price: 20, stock: -1 }
+      { id: 'comp-' + Date.now(), name: 'Item 1', emoji_icon: '✨', price: 50, stock: -1 }
     ]
   });
   renderCategoriesBuilder();
 }
 
 function removeCategory(catIdx) {
-  currentCategories.splice(catIdx, 1);
-  renderCategoriesBuilder();
+  if (confirm('Delete this category and all its items?')) {
+    currentCategories.splice(catIdx, 1);
+    renderCategoriesBuilder();
+  }
 }
 
 function updateCat(catIdx, field, val) {
@@ -676,9 +766,10 @@ function updateCat(catIdx, field, val) {
 function addNewComp(catIdx) {
   if (!currentCategories[catIdx].components) currentCategories[catIdx].components = [];
   currentCategories[catIdx].components.push({
+    id: 'comp-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
     name: 'New Item',
     emoji_icon: '✨',
-    price: 15,
+    price: 25,
     stock: -1
   });
   renderCategoriesBuilder();
@@ -695,12 +786,54 @@ function updateComp(catIdx, compIdx, field, val) {
   }
 }
 
+function loadInspirationTemplate() {
+  if (currentCategories.length > 0 && !confirm('Replace current categories with sample template?')) return;
+  currentCategories = [
+    {
+      id: 'cat-charms',
+      name: 'Charms & Trinkets',
+      description: 'Choose up to 3 charms',
+      min_select: 0,
+      max_select: 3,
+      required: true,
+      components: [
+        { id: 'comp-1', name: 'Heart Charm', emoji_icon: '💗', price: 40, stock: -1 },
+        { id: 'comp-2', name: 'Golden Star', emoji_icon: '⭐', price: 35, stock: -1 },
+        { id: 'comp-3', name: 'Mini Teddy', emoji_icon: '🧸', price: 80, stock: -1 }
+      ]
+    },
+    {
+      id: 'cat-sweets',
+      name: 'Treats & Chocolates',
+      description: 'Handcrafted artisan chocolates',
+      min_select: 0,
+      max_select: 0,
+      required: false,
+      components: [
+        { id: 'comp-4', name: 'Dark Truffles', emoji_icon: '🍫', price: 120, stock: -1 },
+        { id: 'comp-5', name: 'French Macarons', emoji_icon: '🧁', price: 90, stock: -1 }
+      ]
+    },
+    {
+      id: 'cat-ribbons',
+      name: 'Packaging & Ribbons',
+      description: 'Wrap your box in style',
+      min_select: 0,
+      max_select: 1,
+      required: false,
+      components: [
+        { id: 'comp-6', name: 'Silk Pink Ribbon', emoji_icon: '🎀', price: 30, stock: -1 },
+        { id: 'comp-7', name: 'Velvet Navy Ribbon', emoji_icon: '🎗️', price: 40, stock: -1 }
+      ]
+    }
+  ];
+  renderCategoriesBuilder();
+}
+
 async function saveByoProduct() {
   const name = document.getElementById('byoName').value.trim();
-  const category = document.getElementById('byoCategory').value.trim() || 'Custom';
-  const basePrice = Number(document.getElementById('byoBasePrice').value) || 0;
+  const category = document.getElementById('byoCategory').value.trim() || 'Gift Boxes';
   let slug = document.getElementById('byoSlug').value.trim();
-  const imageUrl = document.getElementById('byoImage').value.trim() || '🎁';
   const description = document.getElementById('byoDesc').value.trim();
   const minTotal = Number(document.getElementById('ruleMinTotal').value) || 0;
   const maxTotal = Number(document.getElementById('ruleMaxTotal').value) || 0;
@@ -708,7 +841,13 @@ async function saveByoProduct() {
   const active = document.getElementById('byoActive').checked;
 
   if (!name) {
-    alert('Please enter a product name');
+    alert('Please enter a product title (e.g. Build Your Own Gift Box)');
+    switchTab('tabBase');
+    return;
+  }
+
+  if (currentBoxes.length === 0) {
+    alert('Please add at least one base box container option');
     switchTab('tabBase');
     return;
   }
@@ -719,47 +858,44 @@ async function saveByoProduct() {
   }
 
   const prodId = editingProductId || ('byo-' + Date.now());
+  const lowestBasePrice = Math.min(...currentBoxes.map(b => Number(b.price) || 0));
 
   const newProductObj = {
     id: prodId,
     profile_id: currentUser.id,
     name,
     category,
-    base_price: basePrice,
+    base_price: lowestBasePrice,
     slug,
-    image_url: imageUrl,
+    image_url: currentBoxes[0]?.emoji || '🎁',
     description,
     rules: { min_total: minTotal, max_total: maxTotal, allow_notes: allowNotes },
     active,
     config_data: {
+      boxes: currentBoxes,
       categories: currentCategories,
       components: currentCategories.flatMap(c => c.components || [])
     },
     created_at: new Date().toISOString()
   };
 
-  // 1. Save to LocalStorage immediately
+  // 1. LocalStorage
   const existingIdx = byoProducts.findIndex(p => p.id === prodId || p.slug === slug);
-  if (existingIdx >= 0) {
-    byoProducts[existingIdx] = newProductObj;
-  } else {
-    byoProducts.unshift(newProductObj);
-  }
+  if (existingIdx >= 0) byoProducts[existingIdx] = newProductObj;
+  else byoProducts.unshift(newProductObj);
   localStorage.setItem(getLocalStorageKey(), JSON.stringify(byoProducts));
-
-  // Also store in shared public localStorage cache for build.html
   localStorage.setItem('kangro_public_byo_' + slug, JSON.stringify(newProductObj));
 
-  // 2. Try saving to Supabase directly
+  // 2. Direct Supabase
   try {
     await client.from('byo_products').upsert({
       id: editingProductId || undefined,
       profile_id: currentUser.id,
       name,
       category,
-      base_price: basePrice,
+      base_price: lowestBasePrice,
       slug,
-      image_url: imageUrl,
+      image_url: currentBoxes[0]?.emoji || '🎁',
       description,
       rules: { min_total: minTotal, max_total: maxTotal, allow_notes: allowNotes },
       config_data: newProductObj.config_data,
@@ -769,7 +905,7 @@ async function saveByoProduct() {
     console.warn('Direct Supabase upsert note:', err);
   }
 
-  // 3. Try syncing with Backend API
+  // 3. Backend API sync
   try {
     const backendUrl = getBackendUrl();
     await fetch(backendUrl + '/api/byo/save', {
@@ -780,12 +916,13 @@ async function saveByoProduct() {
         productId: editingProductId,
         name,
         category,
-        basePrice,
+        basePrice: lowestBasePrice,
         slug,
-        imageUrl,
+        imageUrl: currentBoxes[0]?.emoji || '🎁',
         description,
         rules: { min_total: minTotal, max_total: maxTotal, allow_notes: allowNotes },
         active,
+        boxes: currentBoxes,
         categories: currentCategories
       })
     });
@@ -801,17 +938,14 @@ async function saveByoProduct() {
 async function deleteByoProduct(id) {
   if (!confirm('Are you sure you want to delete this Build Your Own product?')) return;
 
-  // 1. Remove from local array & LocalStorage
   byoProducts = byoProducts.filter(p => p.id !== id);
   localStorage.setItem(getLocalStorageKey(), JSON.stringify(byoProducts));
   renderProductsGrid();
 
-  // 2. Try deleting from Supabase
   try {
     await client.from('byo_products').delete().eq('id', id).eq('profile_id', currentUser.id);
   } catch(e) {}
 
-  // 3. Try deleting via Backend API
   try {
     const backendUrl = getBackendUrl();
     await fetch(backendUrl + '/api/byo/products/' + id + '?profileId=' + currentUser.id, { method: 'DELETE' });
@@ -830,9 +964,9 @@ function copyShareUrlFromModal() {
 }
 
 function copyInstagramBioText() {
-  const name = document.getElementById('byoName').value.trim();
+  const name = document.getElementById('byoName').value.trim() || 'Custom Gift Box';
   const url = document.getElementById('shareUrlInput').value;
-  const text = `✨ Design your personalized ${name}!\nClick the link to build yours: ${url}`;
+  const text = `✨ Design your customized ${name}!\nTap the link to build yours: ${url}`;
   navigator.clipboard.writeText(text).then(() => showToast('📸 Instagram caption copied!'));
 }
 
