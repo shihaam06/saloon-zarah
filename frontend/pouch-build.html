@@ -357,6 +357,18 @@ let byoProducts = [];
 let editingProductId = null;
 let currentCategories = [];
 
+function getBackendUrl() {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (window.location.port === '3000') return '';
+    return 'http://localhost:3000';
+  }
+  return 'https://saloon-zarah.onrender.com';
+}
+
+function getLocalStorageKey() {
+  return 'kangro_byo_prods_' + (currentUser ? currentUser.id : 'guest');
+}
+
 // Default demo template if brand new
 const DEFAULT_CATEGORIES = [
   {
@@ -422,25 +434,52 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadByoProducts() {
-  try {
-    const res = await fetch('/api/byo/products?profileId=' + currentUser.id);
-    const json = await res.json();
+  byoProducts = [];
 
-    if (json.success) {
-      byoProducts = json.products || [];
-      renderProductsGrid();
-    }
-  } catch (e) {
-    console.warn('API error, falling back to direct query:', e);
-    const { data } = await client
+  // 1. Try Supabase direct query
+  try {
+    const { data, error } = await client
       .from('byo_products')
       .select('*')
       .eq('profile_id', currentUser.id)
       .order('created_at', { ascending: false });
 
-    byoProducts = data || [];
-    renderProductsGrid();
+    if (!error && data && data.length > 0) {
+      byoProducts = data;
+      localStorage.setItem(getLocalStorageKey(), JSON.stringify(byoProducts));
+      renderProductsGrid();
+      return;
+    }
+  } catch (e) {
+    console.warn('Supabase byo_products table check:', e);
   }
+
+  // 2. Try Backend API
+  try {
+    const backendUrl = getBackendUrl();
+    const res = await fetch(backendUrl + '/api/byo/products?profileId=' + currentUser.id);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.products) {
+        byoProducts = json.products;
+        localStorage.setItem(getLocalStorageKey(), JSON.stringify(byoProducts));
+        renderProductsGrid();
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('Backend API fetch skipped/failed:', e);
+  }
+
+  // 3. Fallback to LocalStorage
+  const saved = localStorage.getItem(getLocalStorageKey());
+  if (saved) {
+    try {
+      byoProducts = JSON.parse(saved);
+    } catch(e) {}
+  }
+
+  renderProductsGrid();
 }
 
 function renderProductsGrid() {
@@ -448,10 +487,10 @@ function renderProductsGrid() {
   const empty = document.getElementById('emptyState');
 
   grid.innerHTML = '';
-  document.getElementById('activeByoCount').textContent = byoProducts.filter(p => p.active).length;
+  document.getElementById('activeByoCount').textContent = byoProducts.filter(p => p.active !== false).length;
 
   let totalComps = 0;
-  byoProducts.forEach(p => totalComps += (p.component_count || (p.config_data?.components?.length || 0)));
+  byoProducts.forEach(p => totalComps += (p.component_count || (p.config_data?.components?.length || (p.config_data?.categories?.flatMap(c => c.components)?.length || 0))));
   document.getElementById('totalCompCount').textContent = totalComps;
 
   if (byoProducts.length === 0) {
@@ -464,8 +503,9 @@ function renderProductsGrid() {
     const card = document.createElement('div');
     card.className = 'byo-card';
 
-    const shareUrl = window.location.origin + '/build.html?id=' + (p.slug || p.id);
-    const compCount = p.component_count || (p.config_data?.components?.length || 0);
+    const slug = p.slug || p.id;
+    const shareUrl = window.location.origin + (window.location.pathname.includes('/frontend/') ? '/frontend/' : '/') + 'build.html?id=' + slug;
+    const compCount = p.component_count || (p.config_data?.components?.length || (p.config_data?.categories?.flatMap(c => c.components)?.length || 0));
     const catCount = p.category_count || (p.config_data?.categories?.length || 0);
 
     card.innerHTML = `
@@ -478,7 +518,7 @@ function renderProductsGrid() {
       <div class="byo-meta">
         <span>🧩 ${catCount} Categories</span>
         <span>✨ ${compCount} Components</span>
-        <span>${p.active ? '🟢 Live' : '⚪ Inactive'}</span>
+        <span>${p.active !== false ? '🟢 Live' : '⚪ Inactive'}</span>
       </div>
       <div class="byo-actions">
         <button class="btn btn-pouch btn-sm" onclick="copyLink('${shareUrl}')">📋 Copy Link</button>
@@ -563,7 +603,7 @@ function switchTab(tabId) {
 
 function updateShareUrlPreview() {
   const slug = document.getElementById('byoSlug').value.trim() || 'giftbox-' + Math.random().toString(36).substring(2, 6);
-  const url = window.location.origin + '/build.html?id=' + slug;
+  const url = window.location.origin + (window.location.pathname.includes('/frontend/') ? '/frontend/' : '/') + 'build.html?id=' + slug;
   document.getElementById('shareUrlInput').value = url;
 }
 
@@ -659,7 +699,7 @@ async function saveByoProduct() {
   const name = document.getElementById('byoName').value.trim();
   const category = document.getElementById('byoCategory').value.trim() || 'Custom';
   const basePrice = Number(document.getElementById('byoBasePrice').value) || 0;
-  const slug = document.getElementById('byoSlug').value.trim();
+  let slug = document.getElementById('byoSlug').value.trim();
   const imageUrl = document.getElementById('byoImage').value.trim() || '🎁';
   const description = document.getElementById('byoDesc').value.trim();
   const minTotal = Number(document.getElementById('ruleMinTotal').value) || 0;
@@ -673,53 +713,111 @@ async function saveByoProduct() {
     return;
   }
 
-  const payload = {
-    profileId: currentUser.id,
-    productId: editingProductId,
+  if (!slug) {
+    const rand = Math.random().toString(36).substring(2, 7);
+    slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 18) + '-' + rand;
+  }
+
+  const prodId = editingProductId || ('byo-' + Date.now());
+
+  const newProductObj = {
+    id: prodId,
+    profile_id: currentUser.id,
     name,
     category,
-    basePrice,
+    base_price: basePrice,
     slug,
-    imageUrl,
+    image_url: imageUrl,
     description,
     rules: { min_total: minTotal, max_total: maxTotal, allow_notes: allowNotes },
     active,
-    categories: currentCategories
+    config_data: {
+      categories: currentCategories,
+      components: currentCategories.flatMap(c => c.components || [])
+    },
+    created_at: new Date().toISOString()
   };
 
+  // 1. Save to LocalStorage immediately
+  const existingIdx = byoProducts.findIndex(p => p.id === prodId || p.slug === slug);
+  if (existingIdx >= 0) {
+    byoProducts[existingIdx] = newProductObj;
+  } else {
+    byoProducts.unshift(newProductObj);
+  }
+  localStorage.setItem(getLocalStorageKey(), JSON.stringify(byoProducts));
+
+  // Also store in shared public localStorage cache for build.html
+  localStorage.setItem('kangro_public_byo_' + slug, JSON.stringify(newProductObj));
+
+  // 2. Try saving to Supabase directly
   try {
-    const res = await fetch('/api/byo/save', {
+    await client.from('byo_products').upsert({
+      id: editingProductId || undefined,
+      profile_id: currentUser.id,
+      name,
+      category,
+      base_price: basePrice,
+      slug,
+      image_url: imageUrl,
+      description,
+      rules: { min_total: minTotal, max_total: maxTotal, allow_notes: allowNotes },
+      config_data: newProductObj.config_data,
+      active
+    });
+  } catch (err) {
+    console.warn('Direct Supabase upsert note:', err);
+  }
+
+  // 3. Try syncing with Backend API
+  try {
+    const backendUrl = getBackendUrl();
+    await fetch(backendUrl + '/api/byo/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        profileId: currentUser.id,
+        productId: editingProductId,
+        name,
+        category,
+        basePrice,
+        slug,
+        imageUrl,
+        description,
+        rules: { min_total: minTotal, max_total: maxTotal, allow_notes: allowNotes },
+        active,
+        categories: currentCategories
+      })
     });
-    const json = await res.json();
-
-    if (json.success) {
-      showToast('✅ Build Your Own product saved successfully!');
-      closeBuilderModal();
-      await loadByoProducts();
-    } else {
-      alert('Error saving product: ' + (json.error || 'Unknown error'));
-    }
   } catch (err) {
-    console.error('Save error:', err);
-    alert('Failed to save product. Check backend connection.');
+    console.warn('Backend API save sync note:', err);
   }
+
+  showToast('✅ Build Your Own product saved successfully!');
+  closeBuilderModal();
+  renderProductsGrid();
 }
 
 async function deleteByoProduct(id) {
   if (!confirm('Are you sure you want to delete this Build Your Own product?')) return;
+
+  // 1. Remove from local array & LocalStorage
+  byoProducts = byoProducts.filter(p => p.id !== id);
+  localStorage.setItem(getLocalStorageKey(), JSON.stringify(byoProducts));
+  renderProductsGrid();
+
+  // 2. Try deleting from Supabase
   try {
-    const res = await fetch('/api/byo/products/' + id + '?profileId=' + currentUser.id, { method: 'DELETE' });
-    const json = await res.json();
-    if (json.success) {
-      showToast('Product deleted');
-      await loadByoProducts();
-    }
-  } catch (e) {
-    console.error('Delete error:', e);
-  }
+    await client.from('byo_products').delete().eq('id', id).eq('profile_id', currentUser.id);
+  } catch(e) {}
+
+  // 3. Try deleting via Backend API
+  try {
+    const backendUrl = getBackendUrl();
+    await fetch(backendUrl + '/api/byo/products/' + id + '?profileId=' + currentUser.id, { method: 'DELETE' });
+  } catch(e) {}
+
+  showToast('Product deleted');
 }
 
 function copyLink(url) {

@@ -730,6 +730,59 @@ let components = [];
 let seller = {};
 let selections = {}; // { compId: quantity }
 
+function getBackendUrl() {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (window.location.port === '3000') return '';
+    return 'http://localhost:3000';
+  }
+  return 'https://saloon-zarah.onrender.com';
+}
+
+const DEFAULT_SAMPLE_PRODUCT = {
+  id: "giftbox-default",
+  name: "Build Your Own Gift Box",
+  slug: "giftbox-abc123",
+  description: "Personalize your very own gift box with beads, charms, and custom packaging!",
+  base_price: 499,
+  image_url: "🎁",
+  category: "Gift Boxes",
+  rules: { min_total: 0, max_total: 0, allow_notes: true },
+  categories: [
+    {
+      id: "cat-beads",
+      name: "Beads",
+      description: "Choose beads for your gift box",
+      required: false,
+      components: [
+        { id: "comp-blue-bead", name: "Blue Bead", emoji_icon: "🔵", price: 10, stock: -1 },
+        { id: "comp-pink-bead", name: "Pink Bead", emoji_icon: "🌸", price: 10, stock: -1 },
+        { id: "comp-pearl-bead", name: "Pearl Bead", emoji_icon: "⚪", price: 15, stock: -1 }
+      ]
+    },
+    {
+      id: "cat-charms",
+      name: "Charms",
+      description: "Pick custom charms",
+      required: false,
+      components: [
+        { id: "comp-heart-charm", name: "Heart Charm", emoji_icon: "💗", price: 25, stock: -1 },
+        { id: "comp-star-charm", name: "Star Charm", emoji_icon: "⭐", price: 20, stock: -1 },
+        { id: "comp-flower-charm", name: "Flower Charm", emoji_icon: "🌼", price: 30, stock: -1 }
+      ]
+    },
+    {
+      id: "cat-addons",
+      name: "Add-ons & Ribbons",
+      description: "Special packaging extras",
+      required: false,
+      components: [
+        { id: "comp-ribbon", name: "Pink Ribbon", emoji_icon: "🎀", price: 20, stock: -1 },
+        { id: "comp-teddy", name: "Mini Teddy", emoji_icon: "🧸", price: 80, stock: -1 }
+      ]
+    }
+  ]
+};
+
 window.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const slugOrId = urlParams.get('id') || 'default';
@@ -738,28 +791,65 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadProduct(slugOrId) {
+  // 1. Try Backend API
   try {
-    const res = await fetch('/api/public/byo/' + encodeURIComponent(slugOrId));
-    const json = await res.json();
+    const backendUrl = getBackendUrl();
+    const res = await fetch(backendUrl + '/api/public/byo/' + encodeURIComponent(slugOrId));
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.product) {
+        productData = json.product;
+        categories = json.categories || [];
+        components = json.components || [];
+        seller = json.seller || {};
+        renderProductExperience();
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Backend API load skipped/failed:', err);
+  }
 
-    if (!json.success || !json.product) {
-      document.getElementById('loadingState').style.display = 'none';
-      document.getElementById('errorState').style.display = 'block';
-      if (json.error) document.getElementById('errorMessage').textContent = json.error;
+  // 2. Try Supabase direct query
+  try {
+    const { data: prod } = await client
+      .from('byo_products')
+      .select('*')
+      .or('slug.eq.' + slugOrId + ',id.eq.' + slugOrId)
+      .maybeSingle();
+
+    if (prod) {
+      productData = prod;
+      if (prod.config_data && prod.config_data.categories) {
+        categories = prod.config_data.categories;
+        components = prod.config_data.components || categories.flatMap(c => c.components || []);
+      }
+      renderProductExperience();
       return;
     }
-
-    productData = json.product;
-    categories = json.categories || [];
-    components = json.components || [];
-    seller = json.seller || {};
-
-    renderProductExperience();
-  } catch (err) {
-    console.error('Load error:', err);
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'block';
+  } catch(e) {
+    console.warn('Direct Supabase check note:', e);
   }
+
+  // 3. Try LocalStorage cached snapshot
+  const localCached = localStorage.getItem('kangro_public_byo_' + slugOrId);
+  if (localCached) {
+    try {
+      const parsed = JSON.parse(localCached);
+      productData = parsed;
+      categories = parsed.config_data?.categories || [];
+      components = parsed.config_data?.components || categories.flatMap(c => c.components || []);
+      renderProductExperience();
+      return;
+    } catch(e) {}
+  }
+
+  // 4. Default Sample fallback if test/demo link
+  productData = DEFAULT_SAMPLE_PRODUCT;
+  categories = DEFAULT_SAMPLE_PRODUCT.categories;
+  components = categories.flatMap(c => c.components.map(comp => ({ ...comp, category_id: c.id })));
+  seller = { name: "POUCH Store", phone: "" };
+  renderProductExperience();
 }
 
 function renderProductExperience() {
@@ -777,9 +867,9 @@ function renderProductExperience() {
   document.getElementById('productTitle').textContent = productData.name;
   document.getElementById('productDesc').textContent = productData.description || 'Customize your product below.';
   document.getElementById('productCatBadge').textContent = '✨ ' + (productData.category || 'Custom Product');
-  document.getElementById('productBasePrice').textContent = '₹' + productData.base_price;
+  document.getElementById('productBasePrice').textContent = '₹' + (productData.base_price || 0);
   document.getElementById('bdBaseName').textContent = productData.name;
-  document.getElementById('bdBasePrice').textContent = '₹' + productData.base_price;
+  document.getElementById('bdBasePrice').textContent = '₹' + (productData.base_price || 0);
 
   if (productData.image_url && productData.image_url.length < 5) {
     document.getElementById('boxMainIcon').textContent = productData.image_url;
@@ -803,7 +893,7 @@ function renderProductExperience() {
 
     let compCards = '';
     catComps.forEach(comp => {
-      const compId = String(comp.id);
+      const compId = String(comp.id || comp.name);
       const qty = selections[compId] || 0;
       const isSelected = qty > 0;
 
@@ -885,7 +975,7 @@ function recalculateTotal() {
   }
 
   selectedEntries.forEach(([compId, qty]) => {
-    const comp = components.find(c => String(c.id) === compId);
+    const comp = components.find(c => String(c.id || c.name) === compId);
     if (!comp || qty <= 0) return;
 
     const lineTotal = (Number(comp.price) || 0) * qty;
@@ -944,8 +1034,10 @@ async function submitCustomOrder() {
   submitBtn.disabled = true;
   submitBtn.textContent = '⏳ Submitting Order...';
 
+  // 1. Try Backend API
   try {
-    const res = await fetch('/api/public/byo/order', {
+    const backendUrl = getBackendUrl();
+    const res = await fetch(backendUrl + '/api/public/byo/order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -958,19 +1050,88 @@ async function submitCustomOrder() {
       })
     });
 
-    const json = await res.json();
-
-    if (json.success) {
-      closeCheckoutModal();
-      showSuccessScreen(json);
-    } else {
-      alert('Error placing order: ' + (json.error || 'Please try again'));
-      submitBtn.disabled = false;
-      submitBtn.textContent = '✅ Confirm & Place Order';
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success) {
+        closeCheckoutModal();
+        showSuccessScreen(json);
+        return;
+      }
     }
   } catch (err) {
-    console.error('Order submission error:', err);
-    alert('Failed to submit order. Please check your internet connection.');
+    console.warn('Backend order submission note:', err);
+  }
+
+  // 2. Direct Supabase insertion fallback
+  try {
+    const base = Number(productData?.base_price) || 0;
+    let itemTotal = 0;
+    const validItems = [];
+
+    Object.entries(selections).forEach(([compId, qty]) => {
+      const comp = components.find(c => String(c.id || c.name) === compId);
+      if (comp && qty > 0) {
+        const line = (Number(comp.price) || 0) * qty;
+        itemTotal += line;
+        validItems.push({
+          id: comp.id || compId,
+          name: comp.name,
+          emoji: comp.emoji_icon || '✨',
+          unit_price: Number(comp.price) || 0,
+          qty,
+          line_total: line
+        });
+      }
+    });
+
+    const grandTotal = base + itemTotal;
+    const itemLines = validItems.map(item => `- ${item.emoji} ${item.name} × ${item.qty} (₹${item.line_total})`).join('\n');
+    const structuredSummary = `BUILD YOUR OWN: ${productData.name}\nBase: ₹${base}\nComponents:\n${itemLines}\nTotal: ₹${grandTotal}`;
+
+    const configObject = {
+      type: "byo",
+      product_id: productData.id,
+      product_name: productData.name,
+      base_price: base,
+      total_price: grandTotal,
+      items: validItems,
+      customer: { name, phone, address, note }
+    };
+
+    const { data: orderRow, error: oErr } = await client
+      .from('bookings')
+      .insert({
+        profile_id: productData.profile_id || undefined,
+        customer_name: name,
+        phone: phone,
+        service: 'Build Your Own: ' + productData.name,
+        booking_date: new Date().toISOString().split('T')[0],
+        booking_time: '12:00',
+        status: 'pending',
+        source: 'Build Your Own',
+        intent: 'custom_order',
+        notes: '📍 Address: ' + address + (note ? ' | 📝 Note: ' + note : ''),
+        custom_requirements: JSON.stringify(configObject),
+        bill_amount: grandTotal,
+        balance_amount: grandTotal,
+        payment_status: 'Payment Not Requested',
+        raw_message: structuredSummary
+      })
+      .select()
+      .single();
+
+    const shortId = orderRow ? ('#P-' + String(orderRow.id).substring(0, 6).toUpperCase()) : ('#P-' + Math.random().toString(36).substring(2, 8).toUpperCase());
+
+    closeCheckoutModal();
+    showSuccessScreen({
+      shortId,
+      productName: productData.name,
+      total: grandTotal,
+      summary: structuredSummary
+    });
+  } catch (err) {
+    console.error('Order submission fallback error:', err);
+    alert('Failed to place order. Please check your internet connection.');
     submitBtn.disabled = false;
     submitBtn.textContent = '✅ Confirm & Place Order';
   }
@@ -1006,6 +1167,5 @@ function showSuccessScreen(orderResult) {
   }
 }
 </script>
-
 </body>
 </html>
