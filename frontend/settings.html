@@ -1765,29 +1765,6 @@ document.addEventListener(
 
         }
 
-                console.error(
-                    "Settings save error:",
-                    error
-                );
-
-                showStatus(
-                    error.message ||
-                    "Could not save settings.",
-                    "error"
-                );
-
-            }
-            finally{
-
-                saveBtn.disabled = false;
-
-                saveBtn.textContent =
-                    "Save Changes";
-
-            }
-
-        }
-
 
         function showStatus(
             message,
