@@ -703,14 +703,18 @@ app.post("/api/upload-qr", async (req, res) => {
 app.post("/api/test-ai", async (req, res) => {
     try {
         const { profile_id, message, preview_profile } = req.body;
+        if (!profile_id) {
+            return res.status(400).json({ error: "profile_id is required to test AI" });
+        }
         if (!message || !message.trim()) {
             return res.status(400).json({ error: "Message is required" });
         }
 
-        // 1. Load base profile from DB (or default)
+        // 1. Load base profile from DB (enforces profiles.product)
         let biz = await getBusinessProfile(profile_id);
 
-        // 2. If preview_profile provided from frontend form, override fields
+        // 2. If preview_profile provided from frontend form, override content fields ONLY
+        // (profiles.product remains strictly immutable)
         if (preview_profile && typeof preview_profile === "object") {
             if (preview_profile.business_name) biz.name = preview_profile.business_name.trim();
             if (preview_profile.business_category) biz.category = preview_profile.business_category.trim();
@@ -727,7 +731,6 @@ app.post("/api/test-ai", async (req, res) => {
             if (preview_profile.faq_data !== undefined) biz.faqData = preview_profile.faq_data.trim();
             if (preview_profile.upi_id !== undefined) biz.upiId = preview_profile.upi_id.trim();
             if (preview_profile.advance_amount !== undefined) biz.advance = Number(preview_profile.advance_amount) || 0;
-            biz.isSalon = biz.category.toLowerCase() === "salon";
         }
 
         const systemPrompt = buildAISystemPrompt(biz);
@@ -1031,24 +1034,23 @@ const BUSINESS = {
 
 const conversations = new Map();
 
-
-function getConversation(phone) {
-
-    if (!conversations.has(phone)) {
-
-        conversations.set(phone, []);
-
-    }
-
-    return conversations.get(phone);
-
+function buildConversationKey(profileId, identifier) {
+    const cleanProfile = profileId ? String(profileId).trim() : "global";
+    const cleanId = identifier ? String(identifier).trim() : "unknown";
+    return `${cleanProfile}:${cleanId}`;
 }
 
+function getConversation(identifier, profileId) {
+    const key = buildConversationKey(profileId, identifier);
+    if (!conversations.has(key)) {
+        conversations.set(key, []);
+    }
+    return conversations.get(key);
+}
 
-function addConversation(phone, role, message) {
-
-    const history =
-        getConversation(phone);
+function addConversation(identifier, role, message, profileId) {
+    const key = buildConversationKey(profileId, identifier);
+    const history = getConversation(identifier, profileId);
 
     history.push({
         role,
@@ -1057,14 +1059,8 @@ function addConversation(phone, role, message) {
 
     // Keep last 20 messages
     if (history.length > 20) {
-
-        history.splice(
-            0,
-            history.length - 20
-        );
-
+        history.splice(0, history.length - 20);
     }
-
 }
 
 
@@ -1171,7 +1167,7 @@ async function findServiceInDatabase(serviceName, profileId) {
         return null;
     }
 
-    const resolvedProfileId = profileId || PROFILE_ID;
+    const resolvedProfileId = profileId; if (!resolvedProfileId) { console.warn('Missing profileId for query'); return []; }
 
     const {
         data,
@@ -1222,7 +1218,7 @@ async function findServiceInDatabase(serviceName, profileId) {
 
 // Get ALL active services
 async function getServicesFromDatabase(profileId) {
-    const resolvedProfileId = profileId || PROFILE_ID;
+    const resolvedProfileId = profileId; if (!resolvedProfileId) { console.warn('Missing profileId for query'); return []; }
     const {
         data,
         error
@@ -1300,7 +1296,7 @@ async function getServicePrice(serviceName, profileId) {
 
 // Get active staff for a salon profile
 async function getStaffFromDatabase(profileId) {
-    const resolvedProfileId = profileId || PROFILE_ID;
+    const resolvedProfileId = profileId; if (!resolvedProfileId) { console.warn('Missing profileId for query'); return []; }
     const { data, error } = await supabase
         .from("staff")
         .select("id, name, role, working_days, start_time, end_time")
@@ -1320,18 +1316,28 @@ async function getStaffFromDatabase(profileId) {
 // =====================================================
 
 async function getBusinessProfile(profileId) {
-    const id = profileId || PROFILE_ID;
+    if (!profileId) {
+        console.error("❌ getBusinessProfile called without profileId");
+        throw new Error("profileId is required to load business profile");
+    }
+
     const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", id)
+        .eq("id", profileId)
         .maybeSingle();
 
     if (error) {
-        console.warn("getBusinessProfile error:", error.message);
+        console.error("❌ getBusinessProfile database error:", error.message);
+        throw new Error(`Failed to fetch profile: ${error.message}`);
     }
 
-    const p = data || {};
+    if (!data) {
+        console.error(`❌ Profile not found in database for ID: ${profileId}`);
+        throw new Error(`Profile not found: ${profileId}`);
+    }
+
+    const p = data;
 
     let extra = {};
     if (p.ai_business_profile) {
@@ -1342,13 +1348,19 @@ async function getBusinessProfile(profileId) {
         }
     }
 
-    // Product type resolution: 'sal' or 'pouch'
-    const productType = (p.product || extra.product || "sal").toLowerCase();
-    const category = p.business_category || extra.business_category || (productType === "pouch" ? "Home Business" : "Salon");
-    const isSalon = productType === "sal" || category.toLowerCase() === "salon";
+    // STRICT PRODUCT IDENTITY: Determined ONLY by database column profiles.product
+    // Allowed values: 'sal', 'pouch'. business_category must NEVER determine product.
+    const rawProduct = (p.product || "").trim().toLowerCase();
+    if (rawProduct !== "sal" && rawProduct !== "pouch") {
+        console.error(`❌ Invalid or missing profiles.product "${p.product}" for profile ID: ${profileId}`);
+        throw new Error(`Invalid product assignment "${p.product}" on profile ${profileId}. Must be 'sal' or 'pouch'.`);
+    }
+    const productType = rawProduct;
+    const isSalon = productType === "sal";
 
+    const category = p.business_category || extra.business_category || (isSalon ? "Salon" : "Store");
     const tone = p.ai_tone || extra.ai_tone || "Friendly";
-    const name = p.business_name || extra.business_name || (isSalon ? "Salon Zarah" : "Kangro Store");
+    const name = p.business_name || extra.business_name || (isSalon ? "Salon" : "Store");
     const address = p.business_address || extra.business_address || "";
     const phone = p.business_phone || extra.business_phone || "";
     const hours = p.business_hours || extra.business_hours || "10:00 AM - 8:00 PM";
@@ -1363,24 +1375,31 @@ async function getBusinessProfile(profileId) {
     const qrUrl = p.gpay_qr_url || p.upi_qr_image || extra.gpay_qr_url || extra.upi_qr_image || "";
     const advance = Number(p.advance_amount || extra.advance_amount) || 0;
 
-    // Load active inventory, services, and staff
-    const [products, services, staff] = await Promise.all([
-        getInventoryFromDatabase(id),
-        getServicesFromDatabase(id),
-        getStaffFromDatabase(id)
-    ]);
-
+    // STRICT DATA ISOLATION:
+    // SAL loads ONLY services & staff. Never loads inventory products.
+    // POUCH loads ONLY inventory/products. Never loads salon services or staff.
+    let products = [];
+    let services = [];
+    let staff = [];
     let catalogSummary = "";
-    if (products && products.length > 0) {
-        catalogSummary += "PRODUCTS IN INVENTORY / STORE CATALOG:\n" + products.map(prod => `- ${prod.name} (₹${prod.price}) [Stock: ${Number(prod.stock) > 0 ? `${prod.stock} units in stock` : 'Made to order / custom'}]${prod.category ? ` (Category: ${prod.category})` : ''}`).join("\n");
-    }
-    if (services && services.length > 0) {
-        if (catalogSummary) catalogSummary += "\n\n";
-        catalogSummary += "SERVICES MENU:\n" + services.map(s => `- ${s.name} (₹${s.price})${s.duration ? ` [Duration: ${s.duration} mins]` : ''}${s.category ? ` (Category: ${s.category})` : ''}`).join("\n");
+
+    if (productType === "sal") {
+        [services, staff] = await Promise.all([
+            getServicesFromDatabase(profileId),
+            getStaffFromDatabase(profileId)
+        ]);
+        if (services && services.length > 0) {
+            catalogSummary = "SERVICES MENU:\n" + services.map(s => `- ${s.name} (₹${s.price})${s.duration ? ` [Duration: ${s.duration} mins]` : ''}${s.category ? ` (Category: ${s.category})` : ''}`).join("\n");
+        }
+    } else if (productType === "pouch") {
+        products = await getInventoryFromDatabase(profileId);
+        if (products && products.length > 0) {
+            catalogSummary = "PRODUCTS IN INVENTORY / STORE CATALOG:\n" + products.map(prod => `- ${prod.name} (₹${prod.price}) [Stock: ${Number(prod.stock) > 0 ? `${prod.stock} units in stock` : 'Made to order / custom'}]${prod.category ? ` (Category: ${prod.category})` : ''}`).join("\n");
+        }
     }
 
     return {
-        id,
+        id: profileId,
         name,
         category,
         tone,
@@ -1516,14 +1535,25 @@ COMMUNICATION & COMMERCE ORDER RULES:
 // =====================================================
 
 function buildAISystemPrompt(biz) {
-    if (biz.product === "pouch" || (!biz.isSalon && biz.category !== "Salon")) {
+    if (!biz || !biz.product) {
+        console.error("❌ buildAISystemPrompt received invalid biz object or missing product:", biz);
+        throw new Error("Cannot generate AI system prompt without valid biz.product ('sal' or 'pouch')");
+    }
+
+    if (biz.product === "sal") {
+        return buildSalAISystemPrompt(biz);
+    }
+
+    if (biz.product === "pouch") {
         return buildPouchAISystemPrompt(biz);
     }
-    return buildSalAISystemPrompt(biz);
+
+    console.error(`❌ Unknown product type in buildAISystemPrompt: "${biz.product}"`);
+    throw new Error(`Unknown product type: "${biz.product}". Must be 'sal' or 'pouch'.`);
 }
 
 async function getInventoryFromDatabase(profileId) {
-    const resolvedProfileId = profileId || PROFILE_ID;
+    const resolvedProfileId = profileId; if (!resolvedProfileId) { console.warn('Missing profileId for query'); return []; }
     const { data, error } = await supabase
         .from("inventory")
         .select("id, name, category, price, stock, low_stock_threshold")
@@ -1539,7 +1569,7 @@ async function getInventoryFromDatabase(profileId) {
 
 async function findProductInDatabase(productName, profileId) {
     if (!productName) return null;
-    const resolvedProfileId = profileId || PROFILE_ID;
+    const resolvedProfileId = profileId; if (!resolvedProfileId) { console.warn('Missing profileId for query'); return []; }
     const wanted = cleanServiceName(productName);
 
     const products = await getInventoryFromDatabase(resolvedProfileId);
@@ -1821,8 +1851,7 @@ async function understandCustomer(
 
     const biz = await getBusinessProfile(profileId);
 
-    const history =
-        getConversation(phone);
+    const history = getConversation(phone, profileId);
 
     const historyText =
         history.length
@@ -2094,7 +2123,7 @@ if (!content) {
 
 async function findPendingBooking(phone, profileId) {
 
-    const resolvedProfileId = profileId || PROFILE_ID;
+    const resolvedProfileId = profileId; if (!resolvedProfileId) { console.warn('Missing profileId for query'); return []; }
 
     const {
         data,
@@ -2171,7 +2200,7 @@ async function generateHumanReply({
     // Load live business profile from DB (falls back to BUSINESS const if missing)
     const biz = await getBusinessProfile(profileId);
 
-    const history = getConversation(phone);
+    const history = getConversation(phone, profileId);
 
     const historyText = history.length
         ? history
@@ -5127,11 +5156,7 @@ const activeInstagramProfileId =
                             activeInstagramProfileId
                         );
 
-                        addConversation(
-                            instagramPhone,
-                            "assistant",
-                            ackMessage
-                        );
+                        addConversation(instagramPhone, "assistant", ackMessage, activeInstagramProfileId);
                     } catch (sendErr) {
                         console.error("Failed to send screenshot acknowledgement message:", sendErr);
                     }
@@ -5168,11 +5193,7 @@ const activeInstagramProfileId =
                 // SAVE CUSTOMER MESSAGE
                 // -----------------------------------------
 
-                addConversation(
-                    instagramPhone,
-                    "customer",
-                    message
-                );
+                addConversation(instagramPhone, "customer", message, activeInstagramProfileId);
 
                 // -----------------------------------------
                 // AI UNDERSTANDING
@@ -5199,7 +5220,11 @@ const activeInstagramProfileId =
                 let systemResult = "";
 
                 const igBizProfile = await getBusinessProfile(activeInstagramProfileId);
-                const isPouch = igBizProfile.product === "pouch" || (!igBizProfile.isSalon && igBizProfile.category !== "Salon");
+                if (igBizProfile.product !== "pouch" && igBizProfile.product !== "sal") {
+                    console.error(`❌ Unknown product "${igBizProfile.product}" for Instagram profile ${activeInstagramProfileId}`);
+                    continue;
+                }
+                const isPouch = igBizProfile.product === "pouch";
 
                 if (isPouch) {
                     // =========================================================

@@ -1358,6 +1358,14 @@ textarea{
 
 
 <script>
+function getBackendUrl() {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (window.location.port === '3000') return '';
+    return 'getBackendUrl() + "';
+  }
+  return 'https://saloon-zarah.onrender.com';
+}
+
 
 function updateAiPreview() {
     const name = (document.getElementById("businessName")?.value || "").trim() || "Zarah Elite";
@@ -1404,7 +1412,7 @@ async function handleQrFileUpload(event) {
 
         try {
             const { data: { user } } = await window.client.auth.getUser();
-            const res = await fetch("http://localhost:3000/api/upload-qr", {
+            const res = await fetch(getBackendUrl() + "/api/upload-qr", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -1486,7 +1494,7 @@ async function runAiTest() {
 
     try {
         const { data: { user } } = await window.client.auth.getUser();
-        const res = await fetch("http://localhost:3000/api/test-ai", {
+        const res = await fetch(getBackendUrl() + "/api/test-ai", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1716,7 +1724,7 @@ document.addEventListener(
 
                 // Try saving via backend endpoint (handles columns + JSON fallback seamlessly)
                 try {
-                    const res = await fetch("http://localhost:3000/api/profile/ai-settings", {
+                    const res = await fetch(getBackendUrl() + "/api/profile/ai-settings", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({

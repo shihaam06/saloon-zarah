@@ -367,6 +367,14 @@ body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);background:var(
 <script src="js/supabase.js"></script>
 <script src="js/theme.js"></script>
 <script>
+function getBackendUrl() {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (window.location.port === '3000') return '';
+    return 'getBackendUrl() + "';
+  }
+  return 'https://saloon-zarah.onrender.com';
+}
+
 let currentUser = null;
 
 function updateAiPreview() {
@@ -408,7 +416,7 @@ async function handleQrFileUpload(event) {
     updateQrPreview(base64);
 
     try {
-      const res = await fetch("http://localhost:3000/api/upload-qr", {
+      const res = await fetch(getBackendUrl() + "/api/upload-qr", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -485,7 +493,7 @@ async function runAiTest() {
   };
 
   try {
-    const res = await fetch("http://localhost:3000/api/test-ai", {
+    const res = await fetch(getBackendUrl() + "/api/test-ai", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -618,7 +626,7 @@ document.getElementById("saveSettingsBtn").addEventListener("click", async () =>
 
   try {
     // Save via backend API endpoint (handles fallback smoothly)
-    const res = await fetch("http://localhost:3000/api/profile/ai-settings", {
+    const res = await fetch(getBackendUrl() + "/api/profile/ai-settings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
