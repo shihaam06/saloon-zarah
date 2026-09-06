@@ -1468,15 +1468,28 @@ ${biz.phone ? `- Phone / Contact: ${biz.phone}\n` : ''}
 ${servicesBlock}
 ==================================================
 ${staffBlock ? staffBlock + '\n==================================================\n' : ''}${biz.bookingRules ? `BOOKING & CANCELLATION POLICIES:\n${biz.bookingRules}\n==================================================\n` : ''}${biz.paymentInfo ? `PAYMENT INFORMATION:\n${biz.paymentInfo}\n==================================================\n` : ''}${biz.faqData ? `SALON FAQS:\n${biz.faqData}\n==================================================\n` : ''}${biz.aiInstructions ? `OWNER SPECIAL INSTRUCTIONS:\n${biz.aiInstructions}\n==================================================\n` : ''}
-COMMUNICATION RULES FOR SALON APPOINTMENTS:
-1. Greet clients warmly, answer questions about salon treatments, prices, durations, and timings.
+COMMUNICATION & BOOKING RULES FOR SALON APPOINTMENTS:
+1. Greet clients warmly and answer questions about salon treatments, prices, durations, staff, and timings accurately from the menu.
 2. ALWAYS ask the client if they have any specific preferences or customizations (e.g. hair length/style preferences, skin type, or stylist preference).
-3. If the client wants to book an appointment:
-   - Ask for: Service desired, Preferred Date, and Preferred Time.
-   - Once all 3 are provided, confirm the booking warmly with the total bill amount.
-   - Payment is paid at the salon after service. Do NOT ask for advance payment or send payment links unless specifically instructed.
-3. Keep replies concise (1-3 sentences), natural, and formatted cleanly for Instagram DMs / WhatsApp.
-4. Never invent services, prices, or policies not in the menu.`;
+3. APPOINTMENT BOOKING DETAILS REQUIRED:
+   To confirm any appointment, ALWAYS collect:
+   - Service desired
+   - Preferred Date & Time
+   - Client's Full Name
+   - Client's WhatsApp / Phone Number
+4. ADVANCE PAYMENT POLICY (BASED ON SALON SETTINGS):
+   ${biz.advance > 0 ? `
+   - An advance deposit of ₹${biz.advance} is REQUIRED to reserve and secure the appointment slot.
+   - Official UPI ID: ${biz.upiId || 'Available on request'}.
+   - Our official payment QR Code will be sent in this chat.
+   - Inform the client: "Please pay the advance of ₹${biz.advance} via UPI/QR code and share a screenshot here so we can confirm your slot!"
+   - Once they send the screenshot, their appointment is officially confirmed.
+   ` : `
+   - ZERO advance payment is required.
+   - The total bill is paid directly when they visit the salon after service.
+   - Confirm the appointment warmly once they provide their Name, Phone, Service, Date, and Time.
+   `}
+5. Keep replies concise (1-3 sentences), natural, warm, and formatted cleanly for Instagram DMs / WhatsApp.`;
 }
 
 // =====================================================
@@ -5147,7 +5160,41 @@ const activeInstagramProfileId =
                     }
 
                     const igBiz = await getBusinessProfile(activeInstagramProfileId);
-                    const ackMessage = `Thank you! 📸 We've received your payment screenshot.\n\nOur team is reviewing it and will confirm your order shortly! 🙏\n\n— ${igBiz.name}`;
+                    
+                    // If SAL profile, also mark any pending advance booking as confirmed
+                    if (igBiz.product === "sal") {
+                        try {
+                            const { data: pendBooking } = await supabase
+                                .from("bookings")
+                                .select("id, service, booking_date, booking_time, customer_name, advance_amount")
+                                .eq("profile_id", activeInstagramProfileId)
+                                .eq("instagram_user_id", senderId)
+                                .in("payment_status", ["Advance Pending", "Payment Not Requested"])
+                                .order("created_at", { ascending: false })
+                                .limit(1)
+                                .maybeSingle();
+
+                            if (pendBooking) {
+                                await supabase
+                                    .from("bookings")
+                                    .update({
+                                        status: "Confirmed",
+                                        payment_status: "Payment Screenshot Received",
+                                        payment_proof_image: proofImageUrl,
+                                        payment_proof_timestamp: new Date().toISOString(),
+                                        advance_paid: pendBooking.advance_amount || 0
+                                    })
+                                    .eq("id", pendBooking.id);
+                                console.log("✅ Marked SAL booking as confirmed with advance screenshot:", pendBooking.id);
+                            }
+                        } catch (pendErr) {
+                            console.warn("Error updating pending SAL booking with screenshot:", pendErr);
+                        }
+                    }
+
+                    const ackMessage = igBiz.product === "sal"
+                        ? `Thank you! 📸 We've received your advance payment screenshot.\n\nYour salon appointment is confirmed! We look forward to seeing you at ${igBiz.name}. ✨`
+                        : `Thank you! 📸 We've received your payment screenshot.\n\nOur team is reviewing it and will confirm your order shortly! 🙏\n\n— ${igBiz.name}`;
 
                     try {
                         await sendInstagramMessage(
@@ -5388,42 +5435,56 @@ Do not say the booking is confirmed unless the payment result says so.
                     }
                     else if (booking?.intent === "booking") {
                         const missing = [];
-                        if (!booking.service) missing.push("service");
-                        if (!booking.booking_date) missing.push("date");
-                        if (!booking.booking_time) missing.push("time");
+                        if (!booking.service) missing.push("service desired");
+                        if (!booking.booking_date) missing.push("preferred date");
+                        if (!booking.booking_time) missing.push("preferred time");
+                        
+                        // Check for customer name and phone
+                        const rawName = (booking.customer_name || "").trim();
+                        const isGenericName = !rawName || rawName.toLowerCase() === "customer" || rawName.toLowerCase() === "instagram customer";
+                        if (isGenericName) missing.push("your full name");
+
+                        const rawPhone = (booking.phone || "").trim();
+                        const isMissingPhone = !rawPhone || rawPhone.startsWith("instagram:");
+                        if (isMissingPhone) missing.push("your phone / WhatsApp number");
 
                         if (missing.length > 0) {
                             systemResult = `
 The customer wants to make a salon appointment booking.
 The booking has NOT been created yet.
-Missing information: ${missing.join(", ")}
+Missing information needed to complete booking: ${missing.join(", ")}
 
-Ask naturally only for the missing information.
-Do not say the appointment is confirmed.
-Do not invent availability.
+Ask naturally and warmly ONLY for the missing details (especially their Name and Phone number if missing).
+Do not say the appointment is confirmed yet.
 `;
                         } else {
                             const service = booking.service;
                             const servicePrice = await getServicePrice(service, activeInstagramProfileId);
-                            const customerName = booking.customer_name || "Instagram Customer";
+                            const customerName = rawName;
+                            const customerPhone = rawPhone;
+                            const advanceAmount = Number(igBizProfile.advance) || 0;
+                            const hasAdvance = advanceAmount > 0;
+
+                            const initialStatus = hasAdvance ? "Pending Advance" : "Confirmed";
+                            const initialPaymentStatus = hasAdvance ? "Advance Pending" : "Payment at Salon";
 
                             const { data: createdBooking, error: bookingInsertError } = await supabase
                                 .from("bookings")
                                 .insert({
                                     profile_id: activeInstagramProfileId,
                                     customer_name: customerName,
-                                    phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : `instagram:${senderId}`,
+                                    phone: customerPhone,
                                     service: service,
                                     booking_date: booking.booking_date,
                                     booking_time: booking.booking_time,
-                                    status: "Confirmed",
+                                    status: initialStatus,
                                     source: "Instagram",
-                                    notes: "Confirmed directly via Instagram AI",
-                                    payment_status: "Payment at Salon",
-                                    advance_required: false,
-                                    advance_amount: 0,
+                                    notes: hasAdvance ? `Advance of ₹${advanceAmount} required via UPI` : "Confirmed directly via Instagram AI",
+                                    payment_status: initialPaymentStatus,
+                                    advance_required: hasAdvance,
+                                    advance_amount: advanceAmount,
                                     advance_paid: 0,
-                                    balance_amount: servicePrice,
+                                    balance_amount: Math.max(0, servicePrice - (hasAdvance ? advanceAmount : 0)),
                                     instagram_user_id: senderId,
                                     intent: "booking",
                                     raw_message: message,
@@ -5434,33 +5495,61 @@ Do not invent availability.
 
                             if (bookingInsertError) {
                                 console.error("❌ Instagram salon booking error:", bookingInsertError);
-                                systemResult = "An error occurred while confirming the booking. Please ask the customer to try again.";
+                                systemResult = "An error occurred while registering the booking. Please ask the customer to try again.";
                             } else {
                                 await findOrCreateCustomer({
                                     profileId: activeInstagramProfileId,
                                     name: customerName,
-                                    phone: (booking.phone && booking.phone !== instagramPhone) ? booking.phone : `instagram:${senderId}`
+                                    phone: customerPhone
                                 });
 
-                                systemResult = `
+                                // If advance required and QR code image exists in settings, send QR image directly to Instagram DM!
+                                if (hasAdvance && igBizProfile.qrUrl) {
+                                    try {
+                                        await sendInstagramImage(senderId, igBizProfile.qrUrl, activeInstagramProfileId);
+                                        console.log("✅ Sent salon payment QR code to customer Instagram DM");
+                                    } catch (qrErr) {
+                                        console.warn("Could not send QR image directly:", qrErr.message);
+                                    }
+                                }
+
+                                if (hasAdvance) {
+                                    systemResult = `
+The appointment has been registered in the salon dashboard, pending advance payment!
+
+Booking ID: ${createdBooking.id}
+Customer: ${customerName}
+Phone: ${customerPhone}
+Service: ${service}
+Date: ${formatDateForCustomer(createdBooking.booking_date)}
+Time: ${formatTimeForCustomer(createdBooking.booking_time)}
+Total Bill: ₹${servicePrice}
+Advance Required: ₹${advanceAmount}
+UPI ID: ${igBizProfile.upiId || 'our official UPI'}
+
+CRITICAL INSTRUCTIONS FOR AI:
+- Tell ${customerName} that their appointment slot is reserved!
+- State that an advance deposit of ₹${advanceAmount} is required to confirm the slot.
+- Mention that the official QR Code has been sent directly in this chat ${igBizProfile.upiId ? `(UPI ID: ${igBizProfile.upiId})` : ''}.
+- Ask them to share a payment screenshot once paid so our team can confirm the booking immediately!
+`;
+                                } else {
+                                    systemResult = `
 The salon appointment has been successfully confirmed and saved in the database!
 
 Booking ID: ${createdBooking.id}
 Customer: ${customerName}
+Phone: ${customerPhone}
 Service: ${service}
 Date: ${formatDateForCustomer(createdBooking.booking_date)}
 Time: ${formatTimeForCustomer(createdBooking.booking_time)}
 Total Bill: ₹${servicePrice}
 
-Tell the customer warmly and clearly that their appointment is CONFIRMED!
-State the total bill amount (₹${servicePrice}) and that payment is to be made when they visit the salon.
-
-CRITICAL RULES:
-- Do NOT ask for any advance payment.
-- Do NOT ask for a payment screenshot.
-- Do NOT send any QR code or payment link.
-- Simply confirm their slot with warm wishes!
+Tell ${customerName} warmly that their appointment is CONFIRMED!
+State the total bill amount (₹${servicePrice}) and that payment is to be made at the salon when they visit.
+Do NOT ask for advance payment since advance is ₹0.
 `;
+                                }
                             }
                         }
                     }
