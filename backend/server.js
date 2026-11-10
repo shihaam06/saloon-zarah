@@ -314,9 +314,10 @@ app.post(
                         balance_amount:
     Math.max(
         (await getServicePrice(
-            booking.service
+            booking.service,
+            booking.profile_id
         )) -
-        ADVANCE_AMOUNT,
+        (Number(booking.advance_amount) || ADVANCE_AMOUNT),
         0
     )
 
@@ -450,25 +451,28 @@ app.post(
 // SEND PAYMENT CONFIRMATION
 // ==========================================
 
-const confirmationMessage = `
-Perfect! Your appointment is confirmed. Ã°Å¸ËœÅ 
+let rzpBiz = {};
+try {
+    rzpBiz = await getBusinessProfile(updatedBooking.profile_id);
+} catch (e) {
+    rzpBiz = { name: "Our Salon", address: "" };
+}
 
-Ã¢Å“Â¨ ${BUSINESS.name}
+const confirmationMessage = `
+Perfect! Your appointment is confirmed. 😊
+
+✨ ${rzpBiz.name}
 
 Service: ${updatedBooking.service}
-Date: ${formatDateForCustomer(
-    updatedBooking.booking_date
-)}
-Time: ${formatTimeForCustomer(
-    updatedBooking.booking_time
-)}
+Date: ${formatDateForCustomer(updatedBooking.booking_date)}
+Time: ${formatTimeForCustomer(updatedBooking.booking_time)}
 
-Ã°Å¸â€™Â³ Advance paid: Ã¢â€šÂ¹${ADVANCE_AMOUNT}
-Ã°Å¸â€™Â° Balance remaining: Ã¢â€šÂ¹${updatedBooking.balance_amount}
+💳 Advance paid: ₹${updatedBooking.advance_paid || ADVANCE_AMOUNT}
+💰 Balance remaining: ₹${updatedBooking.balance_amount}
+${rzpBiz.address ? `
+📍 ${rzpBiz.address}` : ""}
 
-Ã°Å¸â€œÂ ${BUSINESS.address}
-
-We look forward to seeing you! Ã°Å¸ËœÅ 
+We look forward to seeing you! 😊
 `;
 
 try {
@@ -887,7 +891,7 @@ Thank you! 🙏
                     await sendInstagramImage(instagram_user_id, qrUrl, profile_id);
                     igImageSent = true;
                 }
-                addConversation(`instagram:${instagram_user_id}`, "assistant", billMsg);
+                addConversation(`instagram:${instagram_user_id}`, "assistant", billMsg, profile_id);
             } catch (igErr) {
                 console.warn("Instagram send in send-payment-qr:", igErr.message);
             }
@@ -989,7 +993,7 @@ app.post("/api/pouch/update-payment-status", async (req, res) => {
                 const biz = await getBusinessProfile(profile_id || updatedOrder.profile_id);
                 const confMsg = `🎉 *Payment Confirmed!* Your payment has been verified and your order is now confirmed & in production! 📦✨\n\n— ${biz.name}`;
                 await sendInstagramMessage(updatedOrder.instagram_user_id, confMsg, profile_id || updatedOrder.profile_id);
-                addConversation(`instagram:${updatedOrder.instagram_user_id}`, "assistant", confMsg);
+                addConversation(`instagram:${updatedOrder.instagram_user_id}`, "assistant", confMsg, profile_id || updatedOrder.profile_id);
             } catch(e) {
                 console.warn("Instagram confirmation message notice:", e.message);
             }
@@ -2751,7 +2755,8 @@ app.post(
             addConversation(
                 phone,
                 "customer",
-                message
+                message,
+                activeProfileId
             );
 
 
@@ -3269,7 +3274,7 @@ Do NOT say the appointment is confirmed.
 
                     .eq(
                         "profile_id",
-                        PROFILE_ID
+                        activeProfileId
                     )
 
                     .eq(
@@ -3605,7 +3610,7 @@ Tell the customer politely that the catalog is being updated and offer to answer
     systemResult = `
 The business is open during these hours:
 
-${bizProfile.hours || BUSINESS.hours}
+${bizProfile.hours || "Please contact us for operating hours."}
 
 Answer naturally.
 `;
@@ -3623,7 +3628,7 @@ Answer naturally.
     systemResult = `
 The business is located at:
 
-${bizProfile.address || BUSINESS.address}
+${bizProfile.address || "Please contact us for location and directions."}
 
 Answer naturally.
 `;
@@ -3718,7 +3723,8 @@ Do not invent information.
             addConversation(
                 phone,
                 "assistant",
-                reply
+                reply,
+                activeProfileId
             );
 
 
@@ -5004,20 +5010,9 @@ if (instagramProfileError) {
 }
 
 let instagramProfile = matchingProfiles && matchingProfiles.length > 0 ? matchingProfiles[0] : null;
-if (!instagramProfile && PROFILE_ID) {
-    const { data: fallbackProf } = await supabase
-        .from("profiles")
-        .select("id, instagram_user_id, instagram_connected, business_name")
-        .eq("id", PROFILE_ID)
-        .maybeSingle();
-    if (fallbackProf) {
-        instagramProfile = fallbackProf;
-        console.log("ℹ️ Fallback to default Kangro profile for Instagram:", fallbackProf.business_name || fallbackProf.id);
-    }
-}
 if (!instagramProfile) {
     console.error(
-        "❌ No Kangro profile found for Instagram account:",
+        "❌ No connected Kangro profile found for Instagram business ID:",
         instagramBusinessId
     );
     continue;
@@ -5651,7 +5646,8 @@ Do not invent services, prices, or availability.
                 addConversation(
                     instagramPhone,
                     "assistant",
-                    reply
+                    reply,
+                    activeInstagramProfileId
                 );
 
                 // -----------------------------------------

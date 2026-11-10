@@ -206,7 +206,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             const { error: updErr } = await client
                 .from('inventory')
                 .update({ stock: newStock })
-                .eq('id', id);
+                .eq('id', id)
+                .eq('profile_id', pid);
             
             if (updErr) throw updErr;
 
@@ -229,7 +230,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             const { error } = await client
                 .from('inventory')
                 .delete()
-                .eq('id', id);
+                .eq('id', id)
+                .eq('profile_id', pid);
 
             if (error) throw error;
             await loadInventory();
@@ -306,7 +308,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const { error } = await client
                     .from('inventory')
                     .update(payload)
-                    .eq('id', prodId.value);
+                    .eq('id', prodId.value)
+                    .eq('profile_id', pid);
                 if (error) throw error;
             } else {
                 // Insert

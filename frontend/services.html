@@ -1007,7 +1007,7 @@ document.addEventListener("DOMContentLoaded", async function(){
         try {
             let error;
             if(editingId){
-                const result = await client.from("services").update(payload).eq("id", editingId);
+                const result = await client.from("services").update(payload).eq("id", editingId).eq("profile_id", currentUser.id);
                 error = result.error;
             } else {
                 const result = await client.from("services").insert(payload);

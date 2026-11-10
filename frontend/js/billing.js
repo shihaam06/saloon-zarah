@@ -2229,6 +2229,7 @@ balance_amount:
                             .from("inventory")
                             .select("stock")
                             .eq("id", prod.inventory_id)
+                            .eq("profile_id", user.id)
                             .single();
 
                         if (invItem) {
@@ -2236,7 +2237,8 @@ balance_amount:
                             await client
                                 .from("inventory")
                                 .update({ stock: newStock })
-                                .eq("id", prod.inventory_id);
+                                .eq("id", prod.inventory_id)
+                                .eq("profile_id", user.id);
                         }
 
                         await client.from("inventory_transactions").insert([{

@@ -48,8 +48,7 @@ if (registerBtn) {
             id: data.user.id,
             business_name: businessName,
             owner_pin: ownerPin || password,
-            product: product,
-            plain_password: password
+            product: product
         };
 
         const { error: profileError } =
@@ -139,10 +138,14 @@ if (loginBtn) {
                     .eq("id", data.user.id)
                     .maybeSingle();
 
-                const userProduct = prof?.product || localStorage.getItem("kangro_active_product") || "SAL";
-                localStorage.setItem("kangro_active_product", userProduct);
+                const rawProduct = (prof?.product || "").trim().toUpperCase();
+                if (rawProduct !== "SAL" && rawProduct !== "POUCH") {
+                    alert("Invalid or missing product assignment on your Kangro account. Please contact support.");
+                    return;
+                }
+                localStorage.setItem("kangro_active_product", rawProduct);
 
-                if (userProduct === "POUCH") {
+                if (rawProduct === "POUCH") {
                     window.location.href = "pouch-dashboard.html";
                     return;
                 }
@@ -181,7 +184,8 @@ const isPouchPage = [
     "pouch-catalog.html",
     "pouch-customers.html",
     "pouch-analytics.html",
-    "pouch-settings.html"
+    "pouch-settings.html",
+    "pouch-build.html"
 ].some(p => window.location.pathname.endsWith(p));
 
 if (isSalPage || isPouchPage) {
@@ -206,7 +210,16 @@ async function checkUser() {
             .eq("id", data.session.user.id)
             .maybeSingle();
 
-        const userProduct = (prof?.product || "SAL").toUpperCase();
+        const rawProduct = (prof?.product || "").trim().toUpperCase();
+        if (rawProduct !== "SAL" && rawProduct !== "POUCH") {
+            console.error("❌ Invalid or missing product assignment on profile:", prof?.product);
+            alert("No valid product assignment ('SAL' or 'POUCH') found on your Kangro account. Please contact support.");
+            await client.auth.signOut();
+            window.location.href = "login.html";
+            return;
+        }
+
+        const userProduct = rawProduct;
         localStorage.setItem("kangro_active_product", userProduct);
 
         // Guard: POUCH user trying to access SAL pages
@@ -2326,22 +2339,26 @@ async function updateBookingStatus(
     id,
     status
 ) {
+    const { data: userData } = await client.auth.getUser();
+    const userId = userData?.user?.id;
+
+    let query = client
+        .from("bookings")
+        .update({
+            status: status
+        })
+        .eq(
+            "id",
+            id
+        );
+
+    if (userId) {
+        query = query.eq("profile_id", userId);
+    }
 
     const {
         error
-    } =
-        await client
-
-            .from("bookings")
-
-            .update({
-                status: status
-            })
-
-            .eq(
-                "id",
-                id
-            );
+    } = await query;
 
 
     if (error) {
