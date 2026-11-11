@@ -4602,32 +4602,167 @@ app.get("/instagram/webhook", (req, res) => {
 // =====================================================
 
 // =====================================================
-// INSTAGRAM CONNECT - START OAUTH
+// INSTAGRAM - STATUS
 // =====================================================
 
-app.get("/api/instagram/connect", async (req, res) => {
-
+app.get("/api/instagram/status", async (req, res) => {
     try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader?.replace("Bearer ", "");
+        if (!token) {
+            return res.status(401).json({ error: "Missing authorization token." });
+        }
 
         const {
-            data: {
-                user
-            },
-            error
-        } = await supabase.auth.getUser(
-            req.headers.authorization?.replace("Bearer ", "")
-        );
+            data: { user },
+            error: authError
+        } = await supabase.auth.getUser(token);
 
-        if (error || !user) {
-            return res.status(401).send(
-                "Please log in first."
-            );
+        if (authError || !user) {
+            return res.status(401).json({ error: "Please log in first." });
+        }
+
+        const { data: profile, error: profError } = await supabase
+            .from("profiles")
+            .select("id, product, instagram_connected, instagram_user_id, instagram_token_expires_at")
+            .eq("id", user.id)
+            .single();
+
+        if (profError || !profile) {
+            return res.status(404).json({ error: "Profile not found." });
+        }
+
+        const isConnected = !!profile.instagram_connected;
+        const expiresAt = profile.instagram_token_expires_at
+            ? new Date(profile.instagram_token_expires_at).getTime()
+            : null;
+        const now = Date.now();
+        const isExpired = isConnected && expiresAt ? (expiresAt - now <= 0) : false;
+        const isExpiringSoon = isConnected && expiresAt && !isExpired
+            ? ((expiresAt - now) < (7 * 24 * 60 * 60 * 1000))
+            : false;
+
+        return res.json({
+            connected: isConnected,
+            instagram_user_id: profile.instagram_user_id || null,
+            token_expires_at: profile.instagram_token_expires_at || null,
+            is_expired: isExpired,
+            is_expiring_soon: isExpiringSoon,
+            product: profile.product || null
+        });
+
+    } catch (err) {
+        console.error("Instagram status error:", err);
+        return res.status(500).json({ error: "Failed to fetch Instagram status." });
+    }
+});
+
+// =====================================================
+// INSTAGRAM - DISCONNECT
+// =====================================================
+
+async function handleInstagramDisconnect(req, res) {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader?.replace("Bearer ", "");
+        if (!token) {
+            return res.status(401).json({ error: "Missing authorization token." });
+        }
+
+        const {
+            data: { user },
+            error: authError
+        } = await supabase.auth.getUser(token);
+
+        if (authError || !user) {
+            return res.status(401).json({ error: "Please log in first." });
         }
 
         const profileId = user.id;
 
-        const redirectUri =
-            `${process.env.PUBLIC_BASE_URL}/api/instagram/callback`;
+        // Fetch current credentials to attempt remote revocation if possible
+        const { data: profile, error: profError } = await supabase
+            .from("profiles")
+            .select("id, product, instagram_access_token, instagram_connected, instagram_user_id")
+            .eq("id", profileId)
+            .single();
+
+        if (profError || !profile) {
+            return res.status(404).json({ error: "Profile not found." });
+        }
+
+        // Revoke token from Meta Graph API if supported
+        const currentToken = profile.instagram_access_token;
+        if (currentToken) {
+            try {
+                const revokeRes = await fetch(
+                    `https://graph.instagram.com/v23.0/me/permissions?access_token=${encodeURIComponent(currentToken)}`,
+                    { method: "DELETE" }
+                );
+                const revokeJson = await revokeRes.json().catch(() => ({}));
+                console.log(`[Instagram Disconnect] Meta revocation response for profile ${profileId}:`, revokeJson);
+            } catch (metaErr) {
+                console.warn(`[Instagram Disconnect] Meta API revoke notice for profile ${profileId}:`, metaErr.message);
+            }
+        }
+
+        // Safely clear ONLY Instagram credentials on this specific profile.
+        // Preserves all business info, products, services, appointments, customers, orders, and AI settings.
+        const { error: updateError } = await supabase
+            .from("profiles")
+            .update({
+                instagram_connected: false,
+                instagram_access_token: null,
+                instagram_user_id: null,
+                instagram_token_expires_at: null
+            })
+            .eq("id", profileId);
+
+        if (updateError) {
+            console.error(`❌ [Instagram Disconnect] Failed to update profile ${profileId}:`, updateError);
+            return res.status(500).json({ error: "Failed to clear Instagram credentials in database." });
+        }
+
+        console.log(`✅ [Instagram Disconnect] Profile ${profileId} (${profile.product}) Instagram disconnected.`);
+
+        return res.json({
+            success: true,
+            message: "Instagram account disconnected successfully."
+        });
+
+    } catch (err) {
+        console.error("❌ Instagram disconnect error:", err);
+        return res.status(500).json({ error: "Failed to disconnect Instagram: " + (err.message || "") });
+    }
+}
+
+app.post("/api/instagram/disconnect", handleInstagramDisconnect);
+app.delete("/api/instagram/disconnect", handleInstagramDisconnect);
+
+// =====================================================
+// INSTAGRAM CONNECT - START OAUTH
+// =====================================================
+
+app.get("/api/instagram/connect", async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader?.replace("Bearer ", "");
+        if (!token) {
+            return res.status(401).json({ error: "Please log in first." });
+        }
+
+        const {
+            data: { user },
+            error
+        } = await supabase.auth.getUser(token);
+
+        if (error || !user) {
+            return res.status(401).json({ error: "Please log in first." });
+        }
+
+        const profileId = user.id;
+        const baseUrl = process.env.PUBLIC_BASE_URL || "https://saloon-zarah.onrender.com";
+        const redirectUri = `${baseUrl}/api/instagram/callback`;
 
         const authUrl =
             "https://www.instagram.com/oauth/authorize" +
@@ -4637,18 +4772,11 @@ app.get("/api/instagram/connect", async (req, res) => {
             `&scope=instagram_business_basic,instagram_business_manage_messages` +
             `&state=${profileId}`;
 
-        res.json({ authUrl });
+        return res.json({ authUrl });
 
     } catch (error) {
-
-        console.error(
-            "Instagram connect error:",
-            error
-        );
-
-        res.status(500).send(
-            "Could not start Instagram connection."
-        );
+        console.error("Instagram connect error:", error);
+        return res.status(500).json({ error: "Could not start Instagram connection: " + (error.message || "") });
     }
 });
 
@@ -4658,311 +4786,324 @@ app.get("/api/instagram/connect", async (req, res) => {
 
 app.get("/api/instagram/callback", async (req, res) => {
     try {
-
         const { code, state, error, error_reason } = req.query;
+        const profileId = state;
+
+        // Resolve return path based on profile product if known
+        let returnPath = "/settings.html";
+        let productType = "sal";
+        if (profileId) {
+            try {
+                const { data: profObj } = await supabase
+                    .from("profiles")
+                    .select("product")
+                    .eq("id", profileId)
+                    .single();
+                if (profObj?.product) {
+                    productType = (profObj.product || "").toLowerCase();
+                    returnPath = productType === "pouch" ? "/pouch-settings.html" : "/settings.html";
+                }
+            } catch (e) {
+                console.warn("Could not determine product for redirect:", e.message);
+            }
+        }
+
+        const baseUrl = process.env.PUBLIC_BASE_URL || "";
+        const returnUrl = baseUrl + returnPath;
 
         // -----------------------------------------
         // USER CANCELLED / META ERROR
         // -----------------------------------------
-
         if (error) {
-            console.error(
-                "Ã¢ÂÅ’ Instagram OAuth error:",
-                error,
-                error_reason
-            );
+            console.error("❌ Instagram OAuth error:", error, error_reason);
+            const redirectErrUrl = `${returnUrl}?instagram=error`;
 
             return res.status(400).send(`
-                <h2>Instagram connection cancelled</h2>
-                <p>You can close this window and try again.</p>
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Instagram Connection Cancelled — Kangro</title>
+                    <style>
+                        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #1e293b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+                        .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px; max-width: 460px; width: 100%; text-align: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+                        .icon { font-size: 44px; margin-bottom: 12px; }
+                        h2 { margin: 0 0 10px; font-size: 22px; color: #0f172a; }
+                        p { color: #64748b; font-size: 14px; line-height: 1.5; margin: 0 0 24px; }
+                        .btn { display: inline-block; background: #2563eb; color: #fff; font-weight: 600; text-decoration: none; padding: 12px 24px; border-radius: 8px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="card">
+                        <div class="icon">⚠️</div>
+                        <h2>Instagram Connection Cancelled</h2>
+                        <p>${error_reason || error || "The Instagram authorization was cancelled or failed."}</p>
+                        <a href="${redirectErrUrl}" class="btn">Return to Kangro Settings</a>
+                    </div>
+                    <script>
+                        if (window.opener) {
+                            try { window.opener.postMessage({ type: "INSTAGRAM_ERROR" }, "*"); setTimeout(() => window.close(), 2500); } catch(e){}
+                        }
+                    </script>
+                </body>
+                </html>
             `);
         }
 
         // -----------------------------------------
         // REQUIRED PARAMETERS
         // -----------------------------------------
-
         if (!code || !state) {
-            return res.status(400).send(
-                "Missing Instagram authorization data."
-            );
+            return res.status(400).send(`
+                <h2>Missing Instagram authorization data.</h2>
+                <p><a href="${returnUrl}">Return to Kangro Settings</a></p>
+            `);
         }
 
-        const profileId = state;
-
-        const redirectUri =
-            `${process.env.PUBLIC_BASE_URL}/api/instagram/callback`;
+        const redirectUri = `${baseUrl || "https://saloon-zarah.onrender.com"}/api/instagram/callback`;
 
         // -----------------------------------------
-        // EXCHANGE CODE FOR ACCESS TOKEN
+        // EXCHANGE CODE FOR SHORT-LIVED ACCESS TOKEN
         // -----------------------------------------
+        const tokenResponse = await fetch("https://api.instagram.com/oauth/access_token", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                client_id: process.env.INSTAGRAM_APP_ID,
+                client_secret: process.env.INSTAGRAM_APP_SECRET,
+                grant_type: "authorization_code",
+                redirect_uri: redirectUri,
+                code: code
+            })
+        });
 
-        const tokenResponse = await fetch(
-            "https://api.instagram.com/oauth/access_token",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({
-                    client_id:
-                        process.env.INSTAGRAM_APP_ID,
+        const tokenData = await tokenResponse.json();
+        console.log("📸 Instagram short-lived token response:", tokenData);
 
-                    client_secret:
-                        process.env.INSTAGRAM_APP_SECRET,
-
-                    grant_type:
-                        "authorization_code",
-
-                    redirect_uri:
-                        redirectUri,
-
-                    code:
-                        code
-                })
-            }
-        );
-
-        const tokenData =
-            await tokenResponse.json();
-
-        console.log(
-            "Ã°Å¸â€œÂ¸ Instagram token response:",
-            tokenData
-        );
-
-        if (
-            !tokenResponse.ok ||
-            !tokenData.access_token
-        ) {
-            console.error(
-                "Ã¢ÂÅ’ Instagram token exchange failed:",
-                tokenData
-            );
-
+        if (!tokenResponse.ok || !tokenData.access_token) {
+            console.error("❌ Instagram token exchange failed:", tokenData);
             return res.status(400).send(`
-                <h2>Instagram connection failed</h2>
-                <p>Could not obtain an Instagram access token.</p>
+                <!DOCTYPE html>
+                <html>
+                <head><title>Connection Failed</title><style>body { font-family: sans-serif; text-align: center; padding: 60px 20px; }</style></head>
+                <body>
+                    <h2>❌ Instagram Connection Failed</h2>
+                    <p>Could not obtain an Instagram access token from Meta.</p>
+                    <p><a href="${returnUrl}?instagram=error">Return to Settings</a></p>
+                </body>
+                </html>
             `);
         }
 
         const shortLivedToken = tokenData.access_token;
 
-// =====================================================
-// EXCHANGE SHORT-LIVED TOKEN FOR LONG-LIVED TOKEN
-// =====================================================
-
-const longLivedResponse = await fetch(
-    "https://graph.instagram.com/access_token?" +
-    new URLSearchParams({
-        grant_type: "ig_exchange_token",
-        client_secret: process.env.INSTAGRAM_APP_SECRET,
-        access_token: shortLivedToken
-    }).toString()
-);
-
-const longLivedData =
-    await longLivedResponse.json();
-
-console.log(
-    "Ã°Å¸â€œÂ¸ Instagram long-lived token response:",
-    {
-        ok: longLivedResponse.ok,
-        expires_in: longLivedData.expires_in,
-        has_token: !!longLivedData.access_token
-    }
-);
-
-if (
-    !longLivedResponse.ok ||
-    !longLivedData.access_token
-) {
-    console.error(
-        "Ã¢ÂÅ’ Instagram long-lived token exchange failed:",
-        longLivedData
-    );
-
-    return res.status(400).send(`
-        <h2>Instagram connection failed</h2>
-        <p>Could not create a long-lived Instagram connection.</p>
-    `);
-}
-
-const accessToken =
-    longLivedData.access_token;
-
-const expiresIn =
-    Number(longLivedData.expires_in || 5184000);
-
-const tokenExpiresAt =
-    new Date(
-        Date.now() + expiresIn * 1000
-    ).toISOString();
-
-console.log(
-    "Ã¢Å“â€¦ Instagram long-lived token obtained"
-);
-
-console.log(
-    "Ã¢ÂÂ³ Instagram token expires:",
-    tokenExpiresAt
-);
-
-// =====================================================
-// GET INSTAGRAM ACCOUNT ID
-// =====================================================
-
-// =====================================================
-// GET INSTAGRAM ACCOUNT ID
-// =====================================================
-
-const meResponse = await fetch(
-    `https://graph.instagram.com/v23.0/me?fields=user_id,username&access_token=${encodeURIComponent(accessToken)}`
-);
-
-const meData = await meResponse.json();
-
-console.log(
-    "Ã°Å¸â€œÂ¸ Instagram /me:",
-    meData
-);
-
-if (
-    !meResponse.ok ||
-    !meData.user_id
-) {
-    console.error(
-        "Ã¢ÂÅ’ Could not get Instagram account ID:",
-        meData
-    );
-
-    return res.status(400).send(`
-        <h2>Instagram connection failed</h2>
-        <p>Could not identify the Instagram account.</p>
-    `);
-}
-
-const instagramUserId =
-    meData.user_id;
-
         // -----------------------------------------
-        // SAVE CONNECTION TO PROFILE
+        // EXCHANGE SHORT-LIVED TOKEN FOR LONG-LIVED (60-DAY) TOKEN
         // -----------------------------------------
+        const longLivedResponse = await fetch(
+            "https://graph.instagram.com/access_token?" +
+            new URLSearchParams({
+                grant_type: "ig_exchange_token",
+                client_secret: process.env.INSTAGRAM_APP_SECRET,
+                access_token: shortLivedToken
+            }).toString()
+        );
 
-        const {
-            error: saveError
-        } = await supabase
-            .from("profiles")
-            .update({
-    instagram_access_token:
-        accessToken,
+        const longLivedData = await longLivedResponse.json();
+        console.log("📸 Instagram long-lived token response:", {
+            ok: longLivedResponse.ok,
+            expires_in: longLivedData.expires_in,
+            has_token: !!longLivedData.access_token
+        });
 
-    instagram_user_id:
-        instagramUserId,
-
-    instagram_connected:
-        true,
-
-    instagram_token_expires_at:
-        tokenExpiresAt
-})
-            .eq(
-                "id",
-                profileId
-            );
-
-        if (saveError) {
-
-            console.error(
-                "Ã¢ÂÅ’ Instagram connection save failed:",
-                saveError
-            );
-
-            return res.status(500).send(`
-                <h2>Instagram connection failed</h2>
-                <p>Instagram was authorized, but we couldn't save the connection.</p>
+        if (!longLivedResponse.ok || !longLivedData.access_token) {
+            console.error("❌ Instagram long-lived token exchange failed:", longLivedData);
+            return res.status(400).send(`
+                <!DOCTYPE html>
+                <html>
+                <head><title>Connection Failed</title><style>body { font-family: sans-serif; text-align: center; padding: 60px 20px; }</style></head>
+                <body>
+                    <h2>❌ Instagram Connection Failed</h2>
+                    <p>Could not create a long-lived Instagram connection with Meta.</p>
+                    <p><a href="${returnUrl}?instagram=error">Return to Settings</a></p>
+                </body>
+                </html>
             `);
         }
 
-        console.log(
-            "================================="
-        );
-
-        console.log(
-            "Ã¢Å“â€¦ INSTAGRAM CONNECTED"
-        );
-
-        console.log(
-            "Profile:",
-            profileId
-        );
-
-        console.log(
-            "Instagram User ID:",
-            instagramUserId
-        );
-
-        console.log(
-            "================================="
-        );
+        const accessToken = longLivedData.access_token;
+        const expiresIn = Number(longLivedData.expires_in || 5184000); // 60 days default
+        const tokenExpiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
 
         // -----------------------------------------
-        // SUCCESS
+        // GET INSTAGRAM ACCOUNT ID & USERNAME
         // -----------------------------------------
+        let instagramUserId = tokenData.user_id;
+        try {
+            const meResponse = await fetch(
+                `https://graph.instagram.com/v23.0/me?fields=user_id,username&access_token=${encodeURIComponent(accessToken)}`
+            );
+            const meData = await meResponse.json();
+            console.log("📸 Instagram /me:", meData);
+            if (meData?.user_id) {
+                instagramUserId = meData.user_id;
+            }
+        } catch (meErr) {
+            console.warn("Could not query Instagram /me, falling back to tokenData user_id:", meErr.message);
+        }
+
+        if (!instagramUserId) {
+            console.error("❌ Could not identify Instagram account ID");
+            return res.status(400).send(`
+                <h2>Instagram Connection Failed</h2>
+                <p>Could not identify the Instagram account ID.</p>
+                <p><a href="${returnUrl}?instagram=error">Return to Settings</a></p>
+            `);
+        }
+
+        // -----------------------------------------
+        // SAVE NEW TOKEN & CREDENTIALS TO PROFILE
+        // Replaces old expired token with fresh long-lived token
+        // Scoped strictly to profileId
+        // -----------------------------------------
+        const { error: saveError } = await supabase
+            .from("profiles")
+            .update({
+                instagram_access_token: accessToken,
+                instagram_user_id: instagramUserId,
+                instagram_connected: true,
+                instagram_token_expires_at: tokenExpiresAt
+            })
+            .eq("id", profileId);
+
+        if (saveError) {
+            console.error("❌ Instagram connection save failed:", saveError);
+            return res.status(500).send(`
+                <h2>Instagram connection failed</h2>
+                <p>Instagram was authorized, but we couldn't save the connection to your profile.</p>
+                <p><a href="${returnUrl}?instagram=error">Return to Settings</a></p>
+            `);
+        }
+
+        console.log("=================================");
+        console.log("✅ INSTAGRAM CONNECTED / RECONNECTED");
+        console.log("Profile:", profileId, `(${productType})`);
+        console.log("Instagram User ID:", instagramUserId);
+        console.log("Expires At:", tokenExpiresAt);
+        console.log("=================================");
+
+        const successRedirectUrl = `${returnUrl}?instagram=connected`;
 
         return res.send(`
             <!DOCTYPE html>
-            <html>
+            <html lang="en">
             <head>
-                <title>Instagram Connected</title>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Instagram Connected — Kangro</title>
                 <style>
                     body {
-                        font-family: Arial, sans-serif;
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                        background: #f8fafc;
+                        color: #1e293b;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 100vh;
+                        margin: 0;
+                        padding: 20px;
+                        box-sizing: border-box;
+                    }
+                    .card {
+                        background: #ffffff;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 16px;
+                        padding: 40px;
+                        max-width: 480px;
+                        width: 100%;
                         text-align: center;
-                        padding: 60px 20px;
+                        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
                     }
-
+                    .icon {
+                        font-size: 48px;
+                        margin-bottom: 16px;
+                    }
                     h2 {
-                        color: #111;
+                        margin: 0 0 12px 0;
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #0f172a;
                     }
-
                     p {
-                        color: #666;
+                        color: #64748b;
+                        font-size: 14px;
+                        line-height: 1.6;
+                        margin: 0 0 20px 0;
+                    }
+                    .badge {
+                        display: inline-block;
+                        background: #dcfce7;
+                        color: #166534;
+                        font-weight: 600;
+                        font-size: 13px;
+                        padding: 6px 14px;
+                        border-radius: 20px;
+                        margin-bottom: 20px;
+                    }
+                    .btn {
+                        display: inline-block;
+                        background: #2563eb;
+                        color: #ffffff;
+                        font-weight: 600;
+                        text-decoration: none;
+                        padding: 12px 24px;
+                        border-radius: 10px;
+                        transition: background 0.2s;
+                    }
+                    .btn:hover {
+                        background: #1d4ed8;
                     }
                 </style>
             </head>
-
             <body>
-
-                <h2>Ã¢Å“â€¦ Instagram connected successfully</h2>
-
-                <p>
-                    Your Instagram account is now connected
-                    to your Kangro salon dashboard.
-                </p>
-
-                <p>
-                    You can close this window.
-                </p>
-
+                <div class="card">
+                    <div class="icon">📸</div>
+                    <span class="badge">✓ Connected & Active</span>
+                    <h2>Instagram Connected!</h2>
+                    <p>Your Instagram account (ID: <strong>${instagramUserId}</strong>) is now synchronized with Kangro. A fresh 60-day token has been activated.</p>
+                    <a href="${successRedirectUrl}" class="btn" id="returnBtn">Return to Dashboard</a>
+                </div>
+                <script>
+                    if (window.opener) {
+                        try {
+                            window.opener.postMessage({ type: "INSTAGRAM_CONNECTED", profileId: "${profileId}" }, "*");
+                            setTimeout(() => { window.close(); }, 2000);
+                        } catch(e) {}
+                    } else {
+                        setTimeout(() => { window.location.href = "${successRedirectUrl}"; }, 2500);
+                    }
+                </script>
             </body>
             </html>
         `);
 
     } catch (error) {
-
-        console.error(
-            "Ã¢ÂÅ’ Instagram callback error:",
-            error
-        );
-
+        console.error("❌ Instagram callback error:", error);
         return res.status(500).send(`
-            <h2>Instagram connection failed</h2>
-            <p>Please try connecting again.</p>
+            <!DOCTYPE html>
+            <html>
+            <head><title>Connection Error</title><style>body { font-family: sans-serif; text-align: center; padding: 60px 20px; }</style></head>
+            <body>
+                <h2>❌ Instagram Connection Error</h2>
+                <p>An unexpected error occurred while processing your Instagram authorization.</p>
+                <p><a href="/settings.html?instagram=error">Return to Settings</a></p>
+            </body>
+            </html>
         `);
     }
 });
+
 
 
 app.post("/instagram/webhook", async (req, res) => {

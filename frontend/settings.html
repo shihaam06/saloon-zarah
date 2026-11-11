@@ -1279,7 +1279,7 @@ textarea{
     </div>
 
     <!-- =========================
-     INSTAGRAM
+     INSTAGRAM CONNECTION MANAGEMENT
 ========================= -->
 
 <div class="card full">
@@ -1291,55 +1291,63 @@ textarea{
         </div>
 
         <div>
-            <h2>Instagram</h2>
-            <p>Connect your salon's Instagram account</p>
+            <h2>Instagram Connection Management</h2>
+            <p>Connect and synchronize your salon's Instagram account for automated DM replies and bookings</p>
         </div>
 
     </div>
 
-    <div style="
+    <div id="instagramCardBody" style="
         background:#f8fafc;
         border:1px solid #e2e8f0;
         border-radius:10px;
-        padding:18px;
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap:20px;
+        padding:20px;
     ">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:260px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+                    <strong id="instagramStatus" style="font-size:15px; color:#0f172a;">
+                        Instagram not connected
+                    </strong>
+                    <span id="instagramBadge" style="display:none; font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px;"></span>
+                </div>
+                <div id="instagramUsername" style="color:#64748b; font-size:13px; line-height:1.5;">
+                    Connect your salon's Instagram to receive customer enquiries and automated bookings.
+                </div>
+                <div id="instagramExpiryNotice" style="display:none; margin-top:12px; padding:12px 14px; border-radius:8px; font-size:12px; line-height:1.5;"></div>
+            </div>
 
-        <div>
-            <strong id="instagramStatus">
-                Instagram not connected
-            </strong>
-
-            <div
-                id="instagramUsername"
-                style="
-                    color:#64748b;
-                    font-size:12px;
-                    margin-top:5px;
-                "
-            >
-                Connect your salon's Instagram to receive customer enquiries and bookings.
+            <div id="instagramActions" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <button
+                    type="button"
+                    id="connectInstagramBtn"
+                    class="save-btn"
+                    style="margin:0;"
+                >
+                    Connect Instagram
+                </button>
+                <button
+                    type="button"
+                    id="reconnectInstagramBtn"
+                    class="save-btn"
+                    style="display:none; margin:0; background:#2563eb;"
+                >
+                    🔄 Reconnect Instagram
+                </button>
+                <button
+                    type="button"
+                    id="disconnectInstagramBtn"
+                    style="display:none; margin:0; background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; font-weight:600; padding:10px 16px; border-radius:8px; cursor:pointer;"
+                >
+                    Disconnect
+                </button>
             </div>
         </div>
-
-        <button
-            type="button"
-            id="connectInstagramBtn"
-            class="save-btn"
-        >
-            Connect Instagram
-        </button>
-
     </div>
 
 </div>
 
-
-    <div
-        id="statusMessage"
+    id="statusMessage"
         class="status"
     ></div>
 
@@ -1592,26 +1600,8 @@ document.addEventListener(
                     return;
                 }
 
-                // Instagram connection status
-                const instagramStatus = document.getElementById("instagramStatus");
-                const instagramUsername = document.getElementById("instagramUsername");
-                const connectInstagramBtn = document.getElementById("connectInstagramBtn");
-
-                if (data.instagram_connected) {
-                    if (instagramStatus) instagramStatus.textContent = "Instagram connected";
-                    if (instagramUsername) instagramUsername.textContent = "Your salon's Instagram account is connected.";
-                    if (connectInstagramBtn) {
-                        connectInstagramBtn.textContent = "Instagram Connected";
-                        connectInstagramBtn.disabled = true;
-                    }
-                } else {
-                    if (instagramStatus) instagramStatus.textContent = "Instagram not connected";
-                    if (instagramUsername) instagramUsername.textContent = "Connect your salon's Instagram to receive customer enquiries and bookings.";
-                    if (connectInstagramBtn) {
-                        connectInstagramBtn.textContent = "Connect Instagram";
-                        connectInstagramBtn.disabled = false;
-                    }
-                }
+                // Instagram connection management status render
+                renderInstagramStatus(data);
 
                 // Parse any extra JSON
                 let extra = {};
@@ -1796,56 +1786,223 @@ document.addEventListener(
             saveSettings
         );
 
-        const connectInstagramBtn =
-    document.getElementById("connectInstagramBtn");
+        function renderInstagramStatus(data) {
+            const statusEl = document.getElementById("instagramStatus");
+            const descEl = document.getElementById("instagramUsername");
+            const badgeEl = document.getElementById("instagramBadge");
+            const noticeEl = document.getElementById("instagramExpiryNotice");
+            const connectBtn = document.getElementById("connectInstagramBtn");
+            const reconnectBtn = document.getElementById("reconnectInstagramBtn");
+            const disconnectBtn = document.getElementById("disconnectInstagramBtn");
 
-connectInstagramBtn.addEventListener(
-    "click",
-    async function () {
+            const isConnected = !!data.instagram_connected;
+            const expiresAt = data.instagram_token_expires_at ? new Date(data.instagram_token_expires_at).getTime() : null;
+            const now = Date.now();
+            const isExpired = isConnected && expiresAt ? (expiresAt - now <= 0) : false;
+            const isExpiringSoon = isConnected && expiresAt && !isExpired ? ((expiresAt - now) < (7 * 24 * 60 * 60 * 1000)) : false;
 
-        try {
+            const formattedExpiry = data.instagram_token_expires_at
+                ? new Date(data.instagram_token_expires_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                : null;
 
-            const {
-                data: { session }
-            } = await client.auth.getSession();
-
-            if (!session) {
-                alert("Please log in first.");
-                return;
-            }
-
-            const response = await fetch(
-                "https://saloon-zarah.onrender.com/api/instagram/connect",
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${session.access_token}`
-                    }
+            if (!isConnected) {
+                if (statusEl) statusEl.textContent = "Instagram not connected";
+                if (descEl) descEl.textContent = "Connect your salon's Instagram to receive customer enquiries and automated appointment bookings.";
+                if (badgeEl) {
+                    badgeEl.style.display = "inline-block";
+                    badgeEl.style.background = "#f1f5f9";
+                    badgeEl.style.color = "#475569";
+                    badgeEl.textContent = "● Not Connected";
                 }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || "Instagram connection failed"
-                );
+                if (noticeEl) noticeEl.style.display = "none";
+                if (connectBtn) {
+                    connectBtn.style.display = "inline-block";
+                    connectBtn.disabled = false;
+                }
+                if (reconnectBtn) reconnectBtn.style.display = "none";
+                if (disconnectBtn) disconnectBtn.style.display = "none";
+            } else if (isExpired) {
+                // EXPIRED TOKEN - ACTION REQUIRED
+                if (statusEl) statusEl.textContent = "Instagram Connection Expired";
+                if (descEl) {
+                    descEl.textContent = "Connected Account ID: " + (data.instagram_user_id || "Linked") + ". Token expired on " + (formattedExpiry || "recently") + ".";
+                }
+                if (badgeEl) {
+                    badgeEl.style.display = "inline-block";
+                    badgeEl.style.background = "#fee2e2";
+                    badgeEl.style.color = "#991b1b";
+                    badgeEl.textContent = "⚠️ Token Expired";
+                }
+                if (noticeEl) {
+                    noticeEl.style.display = "block";
+                    noticeEl.style.background = "#fff1f2";
+                    noticeEl.style.border = "1px solid #fecdd3";
+                    noticeEl.style.color = "#be123c";
+                    noticeEl.innerHTML = "<strong>⚠️ Action Required:</strong> Your Instagram access token expired on <strong>" + formattedExpiry + "</strong>. Meta requires periodic re-authorization to keep DM automation active. Click <strong>Reconnect Instagram Now</strong> below to restore messaging.";
+                }
+                if (connectBtn) connectBtn.style.display = "none";
+                if (reconnectBtn) {
+                    reconnectBtn.style.display = "inline-block";
+                    reconnectBtn.textContent = "🔄 Reconnect Instagram Now";
+                }
+                if (disconnectBtn) disconnectBtn.style.display = "inline-block";
+            } else if (isExpiringSoon) {
+                // EXPIRING SOON
+                if (statusEl) statusEl.textContent = "Instagram Connected (Expiring Soon)";
+                if (descEl) {
+                    descEl.textContent = "Connected Account ID: " + (data.instagram_user_id || "Linked") + ". Valid until " + formattedExpiry + ".";
+                }
+                if (badgeEl) {
+                    badgeEl.style.display = "inline-block";
+                    badgeEl.style.background = "#fef3c7";
+                    badgeEl.style.color = "#92400e";
+                    badgeEl.textContent = "⏳ Expiring Soon";
+                }
+                if (noticeEl) {
+                    noticeEl.style.display = "block";
+                    noticeEl.style.background = "#fffbeb";
+                    noticeEl.style.border = "1px solid #fde68a";
+                    noticeEl.style.color = "#92400e";
+                    noticeEl.innerHTML = "<strong>Notice:</strong> Your token expires on <strong>" + formattedExpiry + "</strong>. Reconnect anytime to renew your 60-day token.";
+                }
+                if (connectBtn) connectBtn.style.display = "none";
+                if (reconnectBtn) {
+                    reconnectBtn.style.display = "inline-block";
+                    reconnectBtn.textContent = "🔄 Reconnect Instagram";
+                }
+                if (disconnectBtn) disconnectBtn.style.display = "inline-block";
+            } else {
+                // ACTIVE & CONNECTED
+                if (statusEl) statusEl.textContent = "Instagram Connected";
+                if (descEl) {
+                    descEl.textContent = "Connected Account ID: " + (data.instagram_user_id || "Linked") + ". " + (formattedExpiry ? "Token active until " + formattedExpiry + "." : "Account is actively synchronized.");
+                }
+                if (badgeEl) {
+                    badgeEl.style.display = "inline-block";
+                    badgeEl.style.background = "#dcfce7";
+                    badgeEl.style.color = "#166534";
+                    badgeEl.textContent = "✓ Connected & Active";
+                }
+                if (noticeEl) noticeEl.style.display = "none";
+                if (connectBtn) connectBtn.style.display = "none";
+                if (reconnectBtn) {
+                    reconnectBtn.style.display = "inline-block";
+                    reconnectBtn.textContent = "🔄 Reconnect Instagram";
+                }
+                if (disconnectBtn) disconnectBtn.style.display = "inline-block";
             }
-
-            window.location.href = data.authUrl;
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert(
-                "Could not connect Instagram. Please try again."
-            );
         }
 
-    }
-);
+        async function initiateInstagramOAuth() {
+            try {
+                const { data: { session } } = await client.auth.getSession();
+                if (!session) {
+                    alert("Please log in first.");
+                    return;
+                }
 
+                const response = await fetch(
+                    getBackendUrl() + "/api/instagram/connect",
+                    {
+                        headers: {
+                            Authorization: "Bearer " + session.access_token
+                        }
+                    }
+                );
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || "Instagram connection failed");
+                }
+
+                if (data.authUrl) {
+                    window.location.href = data.authUrl;
+                } else {
+                    throw new Error("No authorization URL returned from server.");
+                }
+            } catch (error) {
+                console.error("Instagram connect error:", error);
+                alert(error.message || "Could not connect Instagram. Please try again.");
+            }
+        }
+
+        async function handleInstagramDisconnect() {
+            const ok = confirm(
+                "Are you sure you want to disconnect your salon's Instagram account?\n\n" +
+                "• Kangro AI will stop responding to Instagram DMs.\n" +
+                "• Your salon services, bookings, calendar, and settings will NOT be deleted.\n" +
+                "• You can reconnect anytime."
+            );
+            if (!ok) return;
+
+            try {
+                const { data: { session } } = await client.auth.getSession();
+                if (!session) {
+                    alert("Please log in first.");
+                    return;
+                }
+
+                const disconnectBtn = document.getElementById("disconnectInstagramBtn");
+                if (disconnectBtn) {
+                    disconnectBtn.disabled = true;
+                    disconnectBtn.textContent = "Disconnecting...";
+                }
+
+                const response = await fetch(
+                    getBackendUrl() + "/api/instagram/disconnect",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: "Bearer " + session.access_token
+                        }
+                    }
+                );
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || "Failed to disconnect Instagram.");
+                }
+
+                showStatus("Instagram account disconnected successfully.", "success");
+                await loadSettings();
+            } catch (error) {
+                console.error("Instagram disconnect error:", error);
+                alert(error.message || "Could not disconnect Instagram. Please try again.");
+            } finally {
+                const disconnectBtn = document.getElementById("disconnectInstagramBtn");
+                if (disconnectBtn) {
+                    disconnectBtn.disabled = false;
+                    disconnectBtn.textContent = "Disconnect";
+                }
+            }
+        }
+
+        const connectInstagramBtn = document.getElementById("connectInstagramBtn");
+        if (connectInstagramBtn) connectInstagramBtn.addEventListener("click", initiateInstagramOAuth);
+
+        const reconnectInstagramBtn = document.getElementById("reconnectInstagramBtn");
+        if (reconnectInstagramBtn) reconnectInstagramBtn.addEventListener("click", initiateInstagramOAuth);
+
+        const disconnectInstagramBtn = document.getElementById("disconnectInstagramBtn");
+        if (disconnectInstagramBtn) disconnectInstagramBtn.addEventListener("click", handleInstagramDisconnect);
+
+        // Handle OAuth completion via message or query parameter
+        window.addEventListener("message", (event) => {
+            if (event.data && event.data.type === "INSTAGRAM_CONNECTED") {
+                showStatus("🎉 Instagram account connected successfully! Your new access token has been activated.", "success");
+                loadSettings();
+            }
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("instagram") === "connected") {
+            showStatus("🎉 Instagram account connected successfully! Your new access token has been activated.", "success");
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (urlParams.get("instagram") === "error") {
+            showStatus("⚠️ Instagram connection was cancelled or failed. Please try again.", "error");
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
 
         await loadSettings();
 
