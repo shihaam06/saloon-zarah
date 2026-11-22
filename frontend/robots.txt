@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /pouch-dashboard.html
+Disallow: /settings.html
+Disallow: /pouch-settings.html
+Disallow: /billing.html
+Disallow: /appointments.html
+Disallow: /calendar.html
+Disallow: /customers.html
+Disallow: /inventory.html
+Disallow: /invoice.html
+Disallow: /services.html
+Disallow: /staff.html
+Disallow: /staff-dashboard.html
+Disallow: /analytics.html
+Disallow: /pouch-analytics.html
+Disallow: /pouch-catalog.html
+Disallow: /pouch-customers.html
+Disallow: /build.html
+Disallow: /pouch-build.html
+Disallow: /reset-password.html
+Disallow: /forgot-password.html
+
+Sitemap: https://kangro.in/sitemap.xml

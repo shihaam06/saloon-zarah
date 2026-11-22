@@ -3,12 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POUCH by Kangro — Business Management for Instagram-First Businesses</title>
-<meta name="description" content="POUCH is the all-in-one operating platform for home bakers, crochet artists, DIY creators, and Instagram sellers — manage DMs, product catalog, orders, payments, and delivery tracking.">
+<title>POUCH by Kangro — Instagram Order & Business Management for Creators</title>
+<meta name="description" content="POUCH is the all-in-one operating platform for home bakers, crochet artists, DIY creators, and Instagram sellers in India — manage DM inquiries, product catalogs, UPI payments, and WhatsApp delivery tracking.">
+<meta name="keywords" content="Instagram seller order management, Instagram shop software India, home baker order software, Instagram DM order capture, Instagram boutique management, POUCH by Kangro">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 
+<!-- Open Graph / Social Sharing -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="POUCH by Kangro — Business Management for Instagram-First Businesses">
+<meta property="og:description" content="Capture Instagram DM orders, share UPI payment links, and send WhatsApp receipts. Built for Indian creators.">
+<meta property="og:url" content="https://kangro.in/pouch.html">
+<meta property="og:image" content="https://kangro.in/images/pouch-og-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="POUCH by Kangro — Order Management for Instagram Sellers">
+<meta name="twitter:description" content="Turn Instagram DMs into organized orders, UPI payments, and automatic WhatsApp delivery updates.">
+
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<!-- Analytics Placeholders -->
+<!-- TODO: Replace G-XXXXXXXXXX with your Google Analytics Measurement ID -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script> -->
+
+<!-- TODO: Replace YOUR_PIXEL_ID with your Meta Pixel ID -->
+<!-- <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', 'YOUR_PIXEL_ID');
+  fbq('track', 'PageView');
+</script> -->
 
 <style>
 :root{
@@ -25,6 +59,8 @@
   --grad:linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%);
   --green:#12B76A;
   --blue:#3157E8;
+  --wa:#25D366;
+  --wa-dark:#1EBE5D;
   --shadow:0 24px 70px rgba(16,24,40,.10);
   --shadow2:0 12px 35px rgba(16,24,40,.08);
 }
@@ -55,7 +91,7 @@ body.dark .mobile a{color:#F8FAFC}
 body.dark .mobile .sub{color:#94A3B8}
 body.dark .btn-outline{background:#111827;border-color:#334155;color:#F8FAFC}
 body.dark .btn-outline:hover{background:#1E293B;border-color:#475569}
-body.dark .hero{background:radial-gradient(circle at 80% 18%,rgba(124,58,237,.18),transparent 27%),radial-gradient(circle at 8% 12%,rgba(49,87,232,.09),transparent 25%)}
+body.dark .hero{background:radial-gradient(circle at 80% 18%,rgba(124,58,237,.18),transparent 27%),radial-gradient(circle at 8% 12%,rgba(49,87,232,.10),transparent 25%)}
 body.dark .hero-desc{color:#CBD5E1}
 body.dark .hero-note{color:#94A3B8}
 body.dark .hero-note b{color:#F8FAFC}
@@ -63,23 +99,15 @@ body.dark .section.alt{background:#0F172A}
 body.dark .trust{background:#0F172A;border-color:#334155}
 body.dark .trust-label{color:#94A3B8}
 body.dark .trust-points span{color:#CBD5E1}
-body.dark .audience-box,body.dark .feature-card,body.dark .pricing-card{background:#111827;border-color:#334155}
-body.dark .audience-box h4,body.dark .feature-card h3,body.dark .pricing-card h3{color:#F8FAFC}
-body.dark .audience-box p,body.dark .feature-card p,body.dark .pricing-card .p-desc,body.dark .section-head p{color:#CBD5E1}
+body.dark .feature-card,body.dark .pricing-card,body.dark .seller-card{background:#111827;border-color:#334155}
+body.dark .feature-card h3,body.dark .pricing-card h3,body.dark .seller-card h3{color:#F8FAFC}
+body.dark .feature-card p,body.dark .pricing-card .p-desc,body.dark .section-head p,body.dark .seller-card p{color:#CBD5E1}
 body.dark .p-features li{color:#CBD5E1}
 body.dark .pricing-card .price{color:#F8FAFC}
 body.dark .workflow-grid{background:#111827;border-color:#334155}
 body.dark .wf-step{border-color:#334155}
 body.dark .wf-step h3{color:#F8FAFC}
 body.dark .wf-step p{color:#CBD5E1}
-body.dark .mock-stat{background:#182234;border-color:#334155}
-body.dark .mock-stat strong{color:#F8FAFC}
-body.dark .mock-stat label{color:#94A3B8}
-body.dark .pipeline-col{background:#182234}
-body.dark .pipe-title{color:#94A3B8}
-body.dark .order-card{background:#111827;border-color:#334155;color:#F8FAFC}
-body.dark .order-card strong{color:#F8FAFC}
-body.dark .order-card span{color:#94A3B8}
 body.dark .footer{border-color:#334155;background:#0B1220}
 body.dark .footer h4{color:#F8FAFC}
 body.dark .footer-copy,body.dark .footer a:not(.logo),body.dark .footer-bottom{color:#94A3B8}
@@ -98,29 +126,53 @@ button{font:inherit}
 .eyebrow i{display:block;width:7px;height:7px;border-radius:50%;background:var(--pouch)}
 h1,h2,h3,h4{font-family:Manrope,Inter,sans-serif}
 h1,h2,h3{letter-spacing:-.045em}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:10px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
-.btn-primary{background:var(--grad);color:#fff;box-shadow:0 8px 22px rgba(124,58,237,.25)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(124,58,237,.35)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:10px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 8px 22px rgba(124,58,237,.22)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(124,58,237,.30)}
 .btn-outline{background:#fff;border-color:var(--line);color:#344054}
 .btn-outline:hover{border-color:#C7D0E0;background:var(--surface)}
 .btn-lg{padding:14px 22px;font-size:14px}
-.badge-pouch{display:inline-block;padding:4px 10px;border-radius:20px;background:var(--pouch-light);color:var(--pouch);font-size:11px;font-weight:800;letter-spacing:.05em}
+.btn-wa{background:var(--wa);color:#fff;box-shadow:0 8px 22px rgba(37,211,102,.28)}
+.btn-wa:hover{background:var(--wa-dark);transform:translateY(-2px);box-shadow:0 14px 30px rgba(37,211,102,.38);color:#fff}
+.btn-wa-nav{background:#E8F8F0;border:1px solid #B7EBCE;color:#0F7642;padding:9px 14px;font-size:12px;font-weight:700}
+.btn-wa-nav:hover{background:#25D366;color:#fff;border-color:#25D366}
+
+/* FLOATING WHATSAPP CTA */
+.wa-float{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  display:inline-flex;align-items:center;gap:9px;
+  background:#25D366;color:#fff;padding:12px 18px;
+  border-radius:50px;box-shadow:0 10px 30px rgba(37,211,102,.42);
+  font-size:13px;font-weight:700;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+}
+.wa-float:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 14px 35px rgba(37,211,102,.55);color:#fff}
+.wa-float svg{flex:none;width:24px;height:24px}
+
+.toggle{
+  width:38px;height:38px;border:1px solid var(--line);background:#fff;color:#344054;
+  border-radius:10px;display:grid;place-items:center;cursor:pointer;margin-right:4px;
+  transition:.2s;
+}
+.toggle:hover{background:var(--surface)}
+.toggle svg{width:17px;height:17px}
+.toggle .moon{display:none}
 
 /* NAV */
 .header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.91);backdrop-filter:blur(18px);border-bottom:1px solid rgba(228,231,236,.78)}
 .nav{height:72px;display:flex;align-items:center;justify-content:space-between}
 .logo{display:flex;align-items:center;gap:10px;font-family:Manrope,sans-serif;font-size:20px;font-weight:800;letter-spacing:-.04em}
-.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:0 6px 17px rgba(124,58,237,.25);color:#fff;font-weight:800;font-size:14px}
-.nav-center{display:flex;align-items:center;gap:28px;margin-left:50px}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:0 6px 17px rgba(124,58,237,.25);color:#fff;font-weight:800;font-size:16px}
+.nav-center{display:flex;align-items:center;gap:26px;margin-left:35px}
 .nav-center>a,.product-trigger{font-size:13px;font-weight:600;color:#475467}
 .nav-center>a:hover,.product-trigger:hover{color:var(--pouch)}
 .product-wrap{position:relative}
 .product-trigger{background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:5px}
 .product-trigger svg{transition:.2s}
 .product-wrap.open .product-trigger svg{transform:rotate(180deg)}
-.dropdown{position:absolute;top:38px;left:-22px;width:310px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);opacity:0;visibility:hidden;transform:translateY(-5px);transition:.18s}
+.dropdown{position:absolute;top:38px;left:-22px;width:320px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);opacity:0;visibility:hidden;transform:translateY(-5px);transition:.18s}
 .product-wrap.open .dropdown{opacity:1;visibility:visible;transform:none}
-.dropdown a{display:flex;gap:12px;padding:13px;border-radius:10px}
+.dropdown a{display:flex;gap:12px;padding:12px;border-radius:10px}
 .dropdown a:hover{background:var(--surface)}
 .dropdown-icon{width:36px;height:36px;border-radius:10px;background:#FFF1F2;color:#E11D48;display:grid;place-items:center;flex:none;font-weight:800;font-size:11px}
 .dropdown-icon.pouch{background:var(--pouch-light);color:var(--pouch)}
@@ -128,139 +180,151 @@ h1,h2,h3{letter-spacing:-.045em}
 .dropdown span{font-size:11px;color:var(--muted);display:block;margin-top:2px}
 .nav-right{display:flex;align-items:center;gap:8px}
 .nav-right .login{font-size:13px;font-weight:700;padding:10px 12px}
-.toggle{width:38px;height:38px;border:1px solid var(--line);background:#fff;color:#344054;border-radius:10px;display:grid;place-items:center;cursor:pointer;margin-right:4px;transition:.2s}
-.toggle:hover{background:var(--surface)}
-.toggle svg{width:17px;height:17px}
-.toggle .moon{display:none}
 .menu{display:none;border:0;background:none;font-size:24px;cursor:pointer}
 .mobile{display:none}
 
 /* HERO */
-.hero{position:relative;overflow:hidden;padding:85px 0 100px;background:radial-gradient(circle at 80% 18%,rgba(124,58,237,.12),transparent 27%),radial-gradient(circle at 8% 12%,rgba(49,87,232,.05),transparent 25%)}
-.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
-.hero h1{font-size:clamp(40px,4.8vw,64px);line-height:1.05;margin:15px 0 20px}
+.hero{position:relative;overflow:hidden;padding:75px 0 90px;background:
+radial-gradient(circle at 80% 18%,rgba(124,58,237,.14),transparent 27%),
+radial-gradient(circle at 8% 12%,rgba(49,87,232,.08),transparent 25%)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:55px;align-items:center}
+.hero h1{font-size:clamp(38px,4.5vw,62px);line-height:1.05;margin:16px 0 20px;max-width:720px}
 .hero h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero-desc{font-size:16px;color:var(--muted);max-width:580px;line-height:1.6}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
-.hero-note{display:flex;align-items:center;gap:18px;margin-top:24px;color:var(--muted);font-size:11px}
+.hero-desc{font-size:16px;color:var(--muted);max-width:620px;line-height:1.6}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.hero-note{display:flex;align-items:center;gap:16px;margin-top:22px;color:var(--muted);font-size:12px;flex-wrap:wrap}
 .hero-note b{color:#344054}
-.dot-green{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
+.dot-green{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
 
-/* MOCKUP - STRAIGHT & POLISHED */
-.pouch-mockup{background:#0F172A;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:12px;box-shadow:0 28px 75px rgba(0,0,0,.25);transform:none}
-.mockup-bar{height:30px;display:flex;align-items:center;gap:7px;padding:0 8px;margin-bottom:8px}
+/* PREVIEW BOARD */
+.hero-preview{position:relative}
+.window{background:#0F172A;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:12px;box-shadow:0 28px 75px rgba(0,0,0,.25)}
+.window-bar{height:28px;display:flex;align-items:center;gap:7px;padding:0 8px;margin-bottom:8px}
 .wdot{width:10px;height:10px;border-radius:50%;display:inline-block}
 .wdot.red{background:#FF5F56}
 .wdot.yellow{background:#FFBD2E}
 .wdot.green{background:#27C93F}
-.wtitle{font-size:11px;font-weight:600;color:#94A3B8;margin-left:8px;letter-spacing:.02em}
+.wtitle{font-size:11px;font-weight:600;color:#94A3B8;margin-left:8px}
 
-.mockup-body{background:#F8FAFC;border-radius:14px;overflow:hidden;display:grid;grid-template-columns:116px 1fr;min-height:390px}
-.mock-side{background:#111827;color:#98A2B3;padding:18px 10px}
-.mock-brand{font-family:Manrope;font-size:11px;font-weight:800;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:5px}
-.mock-link{font-size:9px;padding:8px 8px;border-radius:7px;margin:3px 0}
-.mock-link.active{background:#273449;color:#fff}
-.mock-content{padding:18px}
-.mock-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.mock-head h4{font-size:15px}
-.mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.mock-stat{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:10px}
-.mock-stat label{font-size:8px;color:#98A2B3;display:block}
-.mock-stat strong{font-family:Manrope;font-size:15px;display:block;margin-top:2px}
-.pipeline{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pipeline-col{background:#F1F5F9;border-radius:10px;padding:10px}
-.pipe-title{font-size:9px;font-weight:800;color:#64748B;margin-bottom:6px;text-transform:uppercase}
-.order-card{background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.order-card strong{font-size:10px;display:block}
-.order-card span{font-size:8px;color:#64748B}
-.tag-paid{background:#DCFCE7;color:#15803D;font-size:7px;font-weight:700;padding:2px 5px;border-radius:4px;display:inline-block;margin-top:4px}
-.tag-ready{background:#FEF3C7;color:#B45309;font-size:7px;font-weight:700;padding:2px 5px;border-radius:4px;display:inline-block;margin-top:4px}
+.app{background:#F8FAFC;border-radius:14px;overflow:hidden;padding:18px}
+.app-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.app-top h3{font-size:15px;color:#111827}
+.badge-live{font-size:9px;background:#ECFDF3;color:#027A48;padding:3px 8px;border-radius:12px;font-weight:700}
+.kanban-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.k-col{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:10px}
+.k-head{font-size:10px;font-weight:700;color:#64748B;display:block;margin-bottom:6px}
+.k-card{background:var(--pouch-light);border-left:3px solid var(--pouch);border-radius:4px;padding:6px 8px;font-size:9px;margin-bottom:5px}
+.k-card strong{color:#5B21B6;display:block}
+.k-card small{color:#64748B}
 
-/* TRUST */
-.trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;background:#fff}
-.trust-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
-.trust-label{font-size:10px;color:var(--muted2);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.trust-points{display:flex;gap:24px;flex-wrap:wrap}
-.trust-points span{font-size:11px;color:#475467;font-weight:600}
-.trust-points span:before{content:"✓";color:var(--pouch);margin-right:6px;font-weight:800}
+.live-feed{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:12px}
+.feed-head{font-size:10px;font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between}
+.feed-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F1F5F9;font-size:9px}
+.feed-row:last-child{border:0}
+.feed-tag{background:#EDE9FE;color:#5B21B6;font-weight:700;padding:2px 6px;border-radius:4px}
+
+/* TRUST STRIP */
+.trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;background:#fff}
+.trust-row{display:flex;align-items:center;justify-content:space-between;gap:25px}
+.trust-label{font-size:11px;color:var(--muted2);font-weight:800;text-transform:uppercase;letter-spacing:.08em;flex:none}
+.trust-points{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+.trust-points span{font-size:12px;color:#344054;font-weight:700;display:inline-flex;align-items:center;gap:6px}
 
 /* SECTIONS */
-.section{padding:96px 0}
+.section{padding:90px 0}
 .section.alt{background:var(--surface)}
-.section-head{max-width:680px;margin-bottom:48px}
+.section-head{max-width:720px;margin-bottom:45px}
 .section-head.center{text-align:center;margin-left:auto;margin-right:auto}
 .section-head h2{font-size:clamp(30px,3.8vw,44px);line-height:1.1;margin:12px 0 14px}
 .section-head p{font-size:15px;color:var(--muted)}
 
-/* CREATOR AUDIENCE */
-.audience-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px}
-.audience-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 18px;text-align:center;transition:.2s}
-.audience-box:hover{transform:translateY(-2px);box-shadow:var(--shadow2)}
-.aud-emoji{font-size:32px;display:block;margin-bottom:10px}
-.audience-box h4{font-size:15px;margin-bottom:4px}
-.audience-box p{font-size:11px;color:var(--muted)}
+/* SELLERS WE EMPOWER */
+.sellers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.seller-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px;text-align:center;transition:.2s}
+.seller-card:hover{transform:translateY(-3px);box-shadow:var(--shadow2)}
+.seller-emoji{font-size:32px;margin-bottom:12px}
+.seller-card h3{font-size:16px;margin-bottom:6px}
+.seller-card p{font-size:12px;color:var(--muted);line-height:1.5}
 
-/* FEATURES GRID */
+/* FEATURES */
 .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.feature-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;transition:.2s}
-.feature-card:hover{transform:translateY(-3px);box-shadow:var(--shadow2)}
-.feat-icon{width:46px;height:46px;border-radius:14px;background:var(--pouch-light);color:var(--pouch);display:grid;place-items:center;margin-bottom:18px}
-.feat-icon svg{width:22px;height:22px}
-.feature-card h3{font-size:18px;margin-bottom:8px}
-.feature-card p{font-size:13px;color:var(--muted);line-height:1.55}
+.feature-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;transition:.2s}
+.feature-card:hover{box-shadow:var(--shadow2);transform:translateY(-2px)}
+.f-icon{width:44px;height:44px;border-radius:12px;background:var(--pouch-light);color:var(--pouch);display:grid;place-items:center;margin-bottom:16px}
+.f-icon svg{width:20px;height:20px}
+.feature-card h3{font-size:17px;margin-bottom:8px}
+.feature-card p{font-size:13px;color:var(--muted);line-height:1.5}
 
-/* WORKFLOW GRID */
-.workflow-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:22px;background:#fff;overflow:hidden}
+/* WORKFLOW */
+.workflow-grid{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden}
 .wf-step{padding:28px 24px;border-right:1px solid var(--line)}
 .wf-step:last-child{border:0}
 .wf-num{font-family:Manrope;font-size:11px;color:var(--pouch);font-weight:800}
-.wf-step h3{font-size:16px;margin:16px 0 6px}
-.wf-step p{font-size:12px;color:var(--muted)}
+.wf-step h3{font-size:16px;margin:18px 0 8px}
+.wf-step p{font-size:12px;color:var(--muted);line-height:1.5}
 
 /* PRICING */
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1050px;margin:auto}
-.pricing-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 28px;position:relative}
+.pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;max-width:780px;margin:auto}
+.pricing-card{
+  background:#fff;border:1px solid var(--line);border-radius:22px;
+  padding:36px 28px;position:relative;display:flex;flex-direction:column;
+  justify-content:space-between;transition:.2s;
+}
 .pricing-card.featured{border-color:var(--pouch);box-shadow:var(--shadow)}
-.popular-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:.06em}
+.popular-tag{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:var(--grad);color:#fff;font-size:10px;font-weight:800;
+  padding:4px 14px;border-radius:20px;letter-spacing:.06em;white-space:nowrap;
+}
 .pricing-card h3{font-size:20px;margin-bottom:6px}
-.pricing-card .price{font-family:Manrope;font-size:38px;font-weight:800;margin:18px 0 6px}
+.pricing-card .price{font-family:Manrope;font-size:38px;font-weight:800;margin:16px 0 6px;color:var(--pouch)}
 .pricing-card .price small{font-size:13px;color:var(--muted);font-weight:500}
-.pricing-card .p-desc{font-size:12px;color:var(--muted);margin-bottom:24px}
+.pricing-card .p-desc{font-size:13px;color:var(--muted);margin-bottom:22px}
 .p-features{list-style:none;margin-bottom:28px}
-.p-features li{font-size:12px;padding:6px 0;display:flex;align-items:center;gap:8px;color:#475467}
-.p-features li:before{content:"✓";color:var(--pouch);font-weight:800}
+.p-features li{font-size:13px;padding:7px 0;display:flex;align-items:flex-start;gap:9px;color:#475467;line-height:1.4}
+.p-features li:before{content:"✓";color:var(--pouch);font-weight:800;flex:none}
 
 /* CTA */
-.cta-wrap{padding:0 0 96px}
-.cta{position:relative;overflow:hidden;background:var(--grad);color:#fff;border-radius:28px;padding:60px 40px;text-align:center;box-shadow:0 28px 70px rgba(124,58,237,.25)}
-.cta h2{font-size:clamp(30px,3.8vw,44px);line-height:1.1}
-.cta p{max-width:620px;margin:12px auto 25px;color:rgba(255,255,255,.85);font-size:14px}
-.cta .btn-primary{background:#fff;color:var(--pouch);box-shadow:none}
+.cta-wrap{padding:0 0 90px}
+.cta{position:relative;overflow:hidden;background:var(--grad);color:#fff;border-radius:28px;padding:60px 40px;text-align:center;box-shadow:var(--shadow)}
+.cta h2{font-size:clamp(30px,4vw,44px);margin-bottom:12px}
+.cta p{font-size:16px;opacity:.92;max-width:580px;margin:0 auto 26px}
 
 /* FOOTER */
-.footer{border-top:1px solid var(--line);padding:55px 0 25px}
-.footer-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:40px}
-.footer-copy{font-size:12px;color:var(--muted);max-width:320px;margin-top:13px}
-.footer h4{font-family:"DM Sans";font-size:10px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
-.footer a:not(.logo){display:block;font-size:12px;color:var(--muted);margin:9px 0}
-.footer a:not(.logo):hover{color:var(--pouch)}
-.footer-bottom{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:42px;padding-top:20px;font-size:10px;color:var(--muted2)}
+.footer{border-top:1px solid var(--line);padding:70px 0 35px;background:#F8FAFC}
+.footer-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1.2fr;gap:40px;margin-bottom:50px}
+.footer h4{font-size:13px;margin-bottom:15px;color:#0F172A;text-transform:uppercase;letter-spacing:.05em}
+.footer a{display:block;color:var(--muted);font-size:13px;margin:8px 0;transition:.2s}
+.footer a:hover{color:var(--pouch)}
+.footer-copy{font-size:13px;color:var(--muted);max-width:320px;margin-top:14px;line-height:1.6}
+.footer-bottom{display:flex;justify-content:space-between;color:var(--muted2);font-size:12px;padding-top:25px;border-top:1px solid var(--line);flex-wrap:wrap;gap:10px}
 
 /* RESPONSIVE */
-@media(max-width:950px){
-  .nav-center{display:none}.menu{display:block}.nav-right .login,.nav-right .btn{display:none}
-  .mobile.open{display:block;padding:12px 22px 22px;border-bottom:1px solid var(--line);background:#fff}
-  .mobile a{display:block;padding:10px 0;font-size:13px;font-weight:600}.mobile .sub{padding-left:14px;color:var(--muted)}
-  .hero-grid{grid-template-columns:1fr;gap:50px}.audience-grid{grid-template-columns:1fr 1fr}
-  .features-grid,.pricing-grid{grid-template-columns:1fr}.workflow-grid{grid-template-columns:1fr 1fr}
+@media(max-width:980px){
+  .nav-center{display:none}
+  .menu{display:block}
+  .mobile.open{display:block;position:fixed;top:72px;left:0;right:0;bottom:0;z-index:99;padding:24px;background:#fff;border-top:1px solid var(--line);overflow-y:auto}
+  .mobile a{display:block;padding:12px 0;font-size:14px;font-weight:600;border-bottom:1px solid #F2F4F7}
+  .hero-grid{grid-template-columns:1fr;gap:40px}.hero{padding:60px 0 75px}
+  .sellers-grid{grid-template-columns:1fr 1fr}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .workflow-grid{grid-template-columns:1fr 1fr}
   .wf-step:nth-child(2){border-right:0}.wf-step:nth-child(-n+2){border-bottom:1px solid var(--line)}
-  .footer-grid{grid-template-columns:1fr 1fr}
+  .pricing-grid{grid-template-columns:1fr;max-width:440px}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:30px}
 }
 @media(max-width:650px){
-  .container{width:calc(100% - 30px)}.hero h1{font-size:38px}
-  .audience-grid{grid-template-columns:1fr}.workflow-grid{grid-template-columns:1fr}
-  .wf-step{border-right:0!important;border-bottom:1px solid var(--line)!important}
-  .mockup-body{grid-template-columns:75px 1fr}
+  .container{width:calc(100% - 30px)}.nav{height:65px}.hero{padding:50px 0 65px}
+  .hero h1{font-size:36px}.hero-desc{font-size:15px}
+  .hero-actions .btn{width:100%}
+  .hero-note{flex-direction:column;align-items:flex-start;gap:8px}
+  .sellers-grid{grid-template-columns:1fr}
+  .features-grid{grid-template-columns:1fr}
+  .workflow-grid .wf-step{border-right:0!important;border-bottom:1px solid var(--line)!important}.workflow-grid .wf-step:last-child{border-bottom:0!important}
+  .kanban-grid{grid-template-columns:1fr}
+  .wa-float{bottom:18px;right:18px;padding:12px;border-radius:50%}
+  .wa-float-text{display:none}
+  .footer-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -270,7 +334,7 @@ h1,h2,h3{letter-spacing:-.045em}
   <div class="container nav">
     <a class="logo" href="index.html">
       <span class="logo-mark">P</span>
-      POUCH <span style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px">by Kangro</span>
+      Kangro <span style="color:var(--pouch);margin-left:4px">POUCH</span>
     </a>
 
     <nav class="nav-center">
@@ -279,27 +343,33 @@ h1,h2,h3{letter-spacing:-.045em}
         <div class="dropdown">
           <a href="sal.html">
             <div class="dropdown-icon">SAL</div>
-            <div><strong>SAL</strong><span>End-to-end software for salons</span></div>
+            <div><strong>SAL for Salons</strong><span>Operating software & Instagram AI for salons</span></div>
           </a>
           <a href="pouch.html">
             <div class="dropdown-icon pouch">P</div>
-            <div><strong>POUCH</strong><span>Operations software for Instagram-first sellers</span></div>
+            <div><strong>POUCH for Sellers</strong><span>Operations for Instagram-first sellers</span></div>
           </a>
         </div>
       </div>
-      <a href="#sellers">Who It's For</a>
+      <a href="#sellers">Who it's for</a>
       <a href="#features">Features</a>
-      <a href="#workflow">How It Works</a>
+      <a href="#workflow">How it works</a>
       <a href="#pricing">Pricing</a>
     </nav>
 
     <div class="nav-right">
-      <button class="toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
+      <button class="toggle" id="themeToggle" aria-label="Toggle theme">
         <span class="sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
         <span class="moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"/></svg></span>
       </button>
-      <a class="login" href="login.html">Log in</a>
-      <a class="btn btn-primary" href="register.html?product=pouch">Get started with POUCH</a>
+
+      <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+      <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20POUCH" target="_blank" rel="noopener" class="btn btn-wa-nav">
+        💬 Book Demo
+      </a>
+
+      <a class="login" href="login.html">Log In</a>
+      <a class="btn btn-primary" href="register.html?product=pouch">Start Free Trial</a>
       <button class="menu" id="menuBtn" aria-label="Menu">☰</button>
     </div>
   </div>
@@ -307,84 +377,81 @@ h1,h2,h3{letter-spacing:-.045em}
 
 <div class="mobile" id="mobile">
   <div class="container">
-    <a href="index.html">Kangro Home</a>
-    <a class="sub" href="sal.html">→ SAL for Salons</a>
-    <a class="sub" href="pouch.html">→ POUCH for Sellers</a>
-    <a href="#sellers">Who It's For</a>
+    <a href="sal.html">✂️ SAL for Salons & Spas</a>
+    <a href="pouch.html" style="font-weight:700;color:var(--pouch)">📦 POUCH for Instagram Sellers</a>
+    <a href="#sellers">Who it's for</a>
     <a href="#features">Features</a>
-    <a href="#workflow">How It Works</a>
+    <a href="#workflow">How it works</a>
     <a href="#pricing">Pricing</a>
-    <a href="login.html">Log in</a>
-    <a class="btn btn-primary" href="register.html?product=pouch" style="margin-top:8px">Get started with POUCH</a>
+    <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+    <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20POUCH" target="_blank" rel="noopener" style="color:#25D366;font-weight:700">💬 Book Demo on WhatsApp</a>
+    <a href="login.html">Log In</a>
+    <a class="btn btn-primary" href="register.html?product=pouch" style="margin-top:12px;width:100%">Start Free Trial</a>
   </div>
 </div>
 
 <main>
+<!-- HERO -->
 <section class="hero">
   <div class="container hero-grid">
     <div>
-      <span class="badge-pouch">INSTAGRAM-FIRST BUSINESS OS</span>
-      <h1>Turn messy Instagram DMs into <span>organized revenue.</span></h1>
-      <p class="hero-desc">POUCH is the dedicated operations platform for home bakers, crochet artists, DIY creators, and Instagram vendors. Manage inquiries, track custom orders, collect payments via UPI/Razorpay, and ship with confidence.</p>
+      <div class="eyebrow"><i></i> Dedicated Software for Instagram-First Businesses</div>
+      <h1>Turn chaotic Instagram DMs into <span>organized, paid orders.</span></h1>
+      <p class="hero-desc">POUCH brings order intake, product catalog, UPI payment tracking, and WhatsApp delivery updates into one unified workspace — so you never lose an order or forget a payment again.</p>
+
       <div class="hero-actions">
-        <a href="register.html?product=pouch" class="btn btn-primary btn-lg">Start Free Trial <span>→</span></a>
-        <a href="#features" class="btn btn-outline btn-lg">Explore Features</a>
+        <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20POUCH" target="_blank" rel="noopener" class="btn btn-wa btn-lg">
+          💬 Book a demo on WhatsApp <span>→</span>
+        </a>
+        <a href="register.html?product=pouch" class="btn btn-primary btn-lg">Start 14-day free trial</a>
       </div>
+
       <div class="hero-note">
-        <span><span class="dot-green"></span><b>Built for Independent Creators</b></span>
+        <span><span class="dot-green"></span><b>No credit card required</b></span>
         <span>•</span>
-        <span>No complex ERP setup required</span>
+        <span>Set up in 5 minutes</span>
+        <span>•</span>
+        <span>Made for Indian Creators 🇮🇳</span>
       </div>
     </div>
 
-    <div>
-      <div class="pouch-mockup">
-        <div class="mockup-bar">
+    <!-- POUCH Kanban Order Console -->
+    <div class="hero-preview">
+      <div class="window">
+        <div class="window-bar">
           <span class="wdot red"></span>
           <span class="wdot yellow"></span>
           <span class="wdot green"></span>
-          <span class="wtitle">POUCH Seller OS — Active Orders</span>
+          <span class="wtitle">POUCH Order Console — Sweet Crumbs Bakehouse</span>
         </div>
-        <div class="mockup-body">
-          <div class="mock-side">
-            <div class="mock-brand">📦 POUCH</div>
-            <div class="mock-link active">Orders</div>
-            <div class="mock-link">Catalog</div>
-            <div class="mock-link">DMs / Inquiries</div>
-            <div class="mock-link">Payments</div>
-            <div class="mock-link">Customers</div>
-            <div class="mock-link">Analytics</div>
+        <div class="app">
+          <div class="app-top">
+            <h3>Active Orders Pipeline</h3>
+            <span class="badge-live">● 18 ACTIVE ORDERS</span>
           </div>
-          <div class="mock-content">
-            <div class="mock-head"><h4>Order Pipeline</h4><span style="font-size:9px;color:#7C3AED;font-weight:700">14 Orders Today</span></div>
-            <div class="mock-grid">
-              <div class="mock-stat"><label>Revenue (Aug)</label><strong>₹54,200</strong></div>
-              <div class="mock-stat"><label>Pending Orders</label><strong>8</strong></div>
-              <div class="mock-stat"><label>Ready to Ship</label><strong>5</strong></div>
+          <div class="kanban-grid">
+            <div class="k-col">
+              <span class="k-head">📥 Inquiries (4)</span>
+              <div class="k-card"><strong>Chocolate Bento Cake</strong><small>@riya_bakes • ₹650</small></div>
+              <div class="k-card"><strong>Custom Crochet Bag</strong><small>@tanvi_c • ₹1,200</small></div>
             </div>
-            <div class="pipeline">
-              <div class="pipeline-col">
-                <div class="pipe-title">In Baking / Crafting</div>
-                <div class="order-card">
-                  <strong>#P-104 · Chocolate Bento Cake</strong>
-                  <span>Custom text: "Happy 21st Maya"</span>
-                  <div><span class="tag-paid">✓ Paid ₹650</span></div>
-                </div>
-                <div class="order-card">
-                  <strong>#P-106 · Lavender Crochet Bag</strong>
-                  <span>Custom strap length</span>
-                  <div><span class="tag-paid">✓ Paid ₹1,200</span></div>
-                </div>
-              </div>
-              <div class="pipeline-col">
-                <div class="pipe-title">Packed & Ready</div>
-                <div class="order-card">
-                  <strong>#P-102 · Sourdough Loaf (x2)</strong>
-                  <span>Delivery via Dunzo @ 4 PM</span>
-                  <div><span class="tag-ready">📦 Ready for Pickup</span></div>
-                </div>
-              </div>
+            <div class="k-col">
+              <span class="k-head">💳 Payment Verified (8)</span>
+              <div class="k-card" style="border-color:#10B981;background:#ECFDF3"><strong>Truffle Box (Pack of 12)</strong><small>Paid via UPI • ₹850 ✓</small></div>
+              <div class="k-card" style="border-color:#10B981;background:#ECFDF3"><strong>Custom Scented Candle</strong><small>Paid via GPay • ₹450 ✓</small></div>
             </div>
+            <div class="k-col">
+              <span class="k-head">🚚 Dispatched (6)</span>
+              <div class="k-card" style="border-color:#3B82F6;background:#EFF6FF"><strong>Birthday Hamper</strong><small>Delhivery #98421</small></div>
+              <div class="k-card" style="border-color:#3B82F6;background:#EFF6FF"><strong>Macaron Box (6 pcs)</strong><small>Dunzo Out for Delivery</small></div>
+            </div>
+          </div>
+          <div class="live-feed">
+            <div class="feed-head"><span>Live Activity</span><small style="color:#64748B">Just now</small></div>
+            <div class="feed-row"><span>Instagram DM from @ananya.k</span><span class="feed-tag">Order Captured</span></div>
+            <div class="feed-row"><span>UPI GPay Confirmation</span><strong style="color:#027A48">₹1,200 Received</strong></div>
+            <div class="feed-row"><span>WhatsApp Tracking Sent</span><span>Delivered ✓</span></div>
           </div>
         </div>
       </div>
@@ -392,130 +459,125 @@ h1,h2,h3{letter-spacing:-.045em}
   </div>
 </section>
 
+<!-- TRUST STRIP -->
 <section class="trust">
   <div class="container trust-row">
-    <span class="trust-label">Powering Independent Businesses</span>
+    <span class="trust-label">Built for modern Indian sellers</span>
     <div class="trust-points">
-      <span>Instagram DM Capture</span><span>Product Catalogs</span><span>Order Tracking</span><span>Instant Payment Links</span><span>WhatsApp Receipts</span><span>Delivery Coordination</span>
+      <span>🇮🇳 Made in India</span>
+      <span>🧾 GST-ready invoices</span>
+      <span>⚡ UPI & Razorpay payments</span>
+      <span>💬 WhatsApp & Instagram integrated</span>
     </div>
   </div>
 </section>
 
-<section class="section" id="sellers">
+<!-- WHO IT'S FOR -->
+<section class="section alt" id="sellers">
   <div class="container">
     <div class="section-head center">
-      <div class="eyebrow"><i></i> Designed for Sellers</div>
-      <h2>Built for the way Instagram creators work.</h2>
-      <p>Whether you bake from home, craft handmade crochet pieces, or curate DIY gifts, POUCH eliminates manual DM spreadsheets.</p>
+      <div class="eyebrow"><i></i> Designed for Independent Creators</div>
+      <h2>Built around the way Instagram sellers actually work.</h2>
+      <p>Whether you're selling custom bakes or handmade jewelry, POUCH eliminates the chaos of DMs.</p>
     </div>
 
-    <div class="audience-grid">
-      <div class="audience-box">
-        <span class="aud-emoji">🎂</span>
-        <h4>Home Bakers</h4>
-        <p>Track customized cakes, flavor choices, delivery dates, and advance slot payments.</p>
+    <div class="sellers-grid">
+      <div class="seller-card">
+        <div class="seller-emoji">🎂</div>
+        <h3>Home Bakers</h3>
+        <p>Capture custom flavors, eggless options, delivery dates, and advance UPI payments.</p>
       </div>
-      <div class="audience-box">
-        <span class="aud-emoji">🧶</span>
-        <h4>Crochet & Fiber Artists</h4>
-        <p>Manage custom orders, color selections, production queues, and dispatch tracking.</p>
+
+      <div class="seller-card">
+        <div class="seller-emoji">🧶</div>
+        <h3>Craft & Crochet Artists</h3>
+        <p>Manage custom made-to-order requests, dispatch queues, and material costs.</p>
       </div>
-      <div class="audience-box">
-        <span class="aud-emoji">🎨</span>
-        <h4>DIY & Handmade Sellers</h4>
-        <p>Organize custom resin, stationery, candles, jewelry, and personalized gift hampers.</p>
+
+      <div class="seller-card">
+        <div class="seller-emoji">✨</div>
+        <h3>Handmade Jewelry</h3>
+        <p>Showcase product variants, stock levels, and instant UPI checkout QR codes.</p>
       </div>
-      <div class="audience-box">
-        <span class="aud-emoji">🛍️</span>
-        <h4>Instagram Vendors</h4>
-        <p>Automate product availability queries, collect addresses, and verify payments instantly.</p>
+
+      <div class="seller-card">
+        <div class="seller-emoji">📦</div>
+        <h3>Thrift & Boutiques</h3>
+        <p>Track unique single-piece drops, instant reservations, and courier tracking numbers.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section alt" id="features">
+<!-- FEATURES -->
+<section class="section" id="features">
   <div class="container">
     <div class="section-head center">
-      <div class="eyebrow"><i></i> Core Features</div>
-      <h2>Everything you need to scale your Instagram store.</h2>
-      <p>From the first DM inquiry to package delivery, keep every order in clear view.</p>
+      <div class="eyebrow"><i></i> Core POUCH Features</div>
+      <h2>Everything to run your Instagram brand smoothly.</h2>
+      <p>From the first customer inquiry to the final delivery confirmation.</p>
     </div>
 
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-        <h3>Instagram DM Inquiries</h3>
-        <p>Automatically turn DM messages into clean order cards with customer name, handle, requested product, and custom notes.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Instagram DM Capture</h3>
+        <p>Convert DMs into structured orders with client name, handle, address, and product choices.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-        <h3>Visual Product Catalog</h3>
-        <p>Keep your prices, sizes, flavors, and stock clear. Share beautiful digital catalog links with instant checkout buttons.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+        <h3>Digital Product Catalog</h3>
+        <p>Share a beautiful mobile-friendly catalog link where customers can view items and customize.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-        <h3>Order Status Pipeline</h3>
-        <p>Drag and drop orders across stages: New Inquiries, Payment Confirmed, In Production, Packed, and Shipped.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+        <h3>UPI Payment QR & Links</h3>
+        <p>Collect payments via your own GPay, PhonePe, or Paytm UPI ID with zero platform deductions.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-        <h3>UPI & Razorpay Links</h3>
-        <p>Generate one-tap UPI QR codes or Razorpay payment links. Automatically verify payment proofs before you start crafting.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/></svg></div>
+        <h3>Order Status Board</h3>
+        <p>Visual pipeline: New Request → Advance Paid → In Making → Dispatched → Delivered.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-        <h3>Simple Digital Invoicing</h3>
-        <p>Send professional PDF receipts with order summary, advance details, delivery date, and your brand logo directly via WhatsApp.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        <h3>WhatsApp Delivery Updates</h3>
+        <p>Send 1-click order receipts, tracking numbers, and delivery notifications straight to customer WhatsApp.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <h3>Customer Database</h3>
-        <p>Remember your best repeat buyers, their favorite custom orders, addresses, and delivery preferences for quick repeat sales.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Repeat Buyer CRM</h3>
+        <p>Recognize repeat buyers, see their total spend, and build loyal customer relationships.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section" id="workflow">
+<!-- WORKFLOW -->
+<section class="section alt" id="workflow">
   <div class="container">
     <div class="section-head center">
       <div class="eyebrow"><i></i> How POUCH Works</div>
-      <h2>From DM inquiry to delivered package.</h2>
-      <p>No more forgotten orders in message requests or unverified payment screenshots.</p>
+      <h2>Simple 4-step workflow for every order.</h2>
+      <p>Spend less time managing chats and more time creating your products.</p>
     </div>
 
     <div class="workflow-grid">
-      <div class="wf-step">
-        <span class="wf-num">01 / INQUIRY</span>
-        <h3>Customer DMs on Instagram</h3>
-        <p>Customer asks about a product, custom design, or delivery date. POUCH organizes the request into an order card.</p>
-      </div>
-      <div class="wf-step">
-        <span class="wf-num">02 / PAYMENT</span>
-        <h3>1-Tap Payment Link</h3>
-        <p>Send a pre-filled UPI QR or Razorpay link. Order automatically moves to 'Paid' upon confirmation.</p>
-      </div>
-      <div class="wf-step">
-        <span class="wf-num">03 / CREATION</span>
-        <h3>You Bake / Craft / Pack</h3>
-        <p>Track your production queue, delivery dates, and required materials without missing deadlines.</p>
-      </div>
-      <div class="wf-step">
-        <span class="wf-num">04 / DISPATCH</span>
-        <h3>WhatsApp Tracking & Receipt</h3>
-        <p>Notify your customer with delivery tracking details and a clean digital invoice in one tap.</p>
-      </div>
+      <div class="wf-step"><span class="wf-num">01 / CAPTURE</span><h3>Inquiry enters DM</h3><p>Customer DMs asking to place an order or select product options.</p></div>
+      <div class="wf-step"><span class="wf-num">02 / BILL</span><h3>Share payment link</h3><p>POUCH generates a clean bill with your GPay/UPI QR code.</p></div>
+      <div class="wf-step"><span class="wf-num">03 / TRACK</span><h3>Move on board</h3><p>Verify payment, mark as "In Making", and update order progress.</p></div>
+      <div class="wf-step"><span class="wf-num">04 / DISPATCH</span><h3>WhatsApp receipt</h3><p>Share tracking details and a clean digital invoice in one tap.</p></div>
     </div>
   </div>
 </section>
 
-<section class="section alt" id="pricing">
+<!-- PRICING (Requirement 1) -->
+<section class="section" id="pricing">
   <div class="container">
     <div class="section-head center">
       <div class="eyebrow"><i></i> Creator-Friendly Pricing</div>
@@ -524,76 +586,133 @@ h1,h2,h3{letter-spacing:-.045em}
     </div>
 
     <div class="pricing-grid">
+      <!-- Starter Plan -->
+      <!-- TODO: Edit POUCH Starter price -->
       <div class="pricing-card">
-        <h3>Solo Creator</h3>
-        <div class="price">₹499 <small>/ month</small></div>
-        <p class="p-desc">For home bakers and hobbyists starting their seller journey.</p>
-        <ul class="p-features">
-          <li>Up to 50 Orders / month</li>
-          <li>Product Catalog (Up to 25 items)</li>
-          <li>Order Status Board</li>
-          <li>UPI Payment Tracking</li>
-          <li>Digital WhatsApp Invoices</li>
-        </ul>
-        <a href="register.html?product=pouch" class="btn btn-outline" style="width:100%">Get Started</a>
+        <div>
+          <h3>POUCH Starter</h3>
+          <div class="price">₹299 <small>/ month</small></div>
+          <p class="p-desc">For home bakers and hobbyists starting their seller journey.</p>
+          <ul class="p-features">
+            <li>Up to 50 Monthly Orders</li>
+            <li>Digital Product Catalog (Up to 25 items)</li>
+            <li>Order Status Kanban Board</li>
+            <li>UPI Payment QR & Link Collection</li>
+            <li>Digital WhatsApp Receipts</li>
+          </ul>
+        </div>
+        <a href="register.html?product=pouch" class="btn btn-outline" style="width:100%">Start 14-Day Free Trial</a>
       </div>
 
+      <!-- Growth Plan (Most Popular) -->
+      <!-- TODO: Edit POUCH Growth price -->
       <div class="pricing-card featured">
-        <span class="popular-tag">BEST FOR GROWING SELLERS</span>
-        <h3>Pro Instagram Store</h3>
-        <div class="price">₹1,299 <small>/ month</small></div>
-        <p class="p-desc">For active home businesses and established independent creators.</p>
-        <ul class="p-features">
-          <li>Unlimited Monthly Orders</li>
-          <li>Unlimited Product Catalog</li>
-          <li>Instagram DM Auto-Capture</li>
-          <li>Razorpay & UPI Integration</li>
-          <li>Customer History & Repeat Insights</li>
-          <li>Priority Support</li>
-        </ul>
+        <span class="popular-tag">MOST POPULAR FOR SELLERS</span>
+        <div>
+          <h3>POUCH Growth</h3>
+          <div class="price">₹699 <small>/ month</small></div>
+          <p class="p-desc">For active Instagram stores, boutiques, and independent makers.</p>
+          <ul class="p-features">
+            <li><strong>Unlimited Monthly Orders & Products</strong></li>
+            <li><strong>Instagram DM Order Auto-Capture</strong></li>
+            <li>WhatsApp Delivery Status Notifications</li>
+            <li>Customer History & Repeat Buyer CRM</li>
+            <li>Razorpay & UPI Instant Settlement</li>
+            <li>Priority Customer Support</li>
+          </ul>
+        </div>
         <a href="register.html?product=pouch" class="btn btn-primary" style="width:100%">Start 14-Day Free Trial</a>
       </div>
+    </div>
 
-      <div class="pricing-card">
-        <h3>Studio & Brand</h3>
-        <div class="price">₹2,999 <small>/ month</small></div>
-        <p class="p-desc">For high-volume bakeries, multiple craft teams, and boutique workshops.</p>
-        <ul class="p-features">
-          <li>Multiple Staff Logins</li>
-          <li>Bulk Order Invoicing & GST</li>
-          <li>Custom Courier & Shipping Sync</li>
-          <li>Dedicated Account Support</li>
-          <li>Advanced Analytics & Sales Forecasts</li>
-        </ul>
-        <a href="mailto:hello@kangro.in?subject=POUCH Studio Plan" class="btn btn-outline" style="width:100%">Contact Us</a>
-      </div>
+    <div style="text-align:center;margin-top:28px">
+      <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+      <p style="font-size:13px;color:var(--muted)">
+        Need higher volume or custom team features?
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%20have%20an%20Instagram%20brand%20and%20need%20custom%20setup" target="_blank" rel="noopener" style="color:var(--pouch);font-weight:700;">
+          Talk to us on WhatsApp →
+        </a>
+      </p>
     </div>
   </div>
 </section>
 
+<!-- CTA -->
 <section class="cta-wrap">
   <div class="container">
     <div class="cta">
       <h2>Never lose track of an Instagram order again.</h2>
       <p>Join independent creators organizing orders, payments, and customer love with POUCH.</p>
-      <a class="btn btn-primary btn-lg" href="register.html?product=pouch">Get Started with POUCH Free →</a>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20POUCH" target="_blank" rel="noopener" class="btn btn-wa btn-lg">
+          💬 Book a Demo on WhatsApp
+        </a>
+        <a href="register.html?product=pouch" class="btn btn-outline btn-lg" style="background:#fff;color:#111827">
+          Start 14-Day Free Trial →
+        </a>
+      </div>
     </div>
   </div>
 </section>
 </main>
+
+<!-- FLOATING WHATSAPP BUTTON (Requirement 3) -->
+<!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+<a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20POUCH" target="_blank" rel="noopener" class="wa-float" aria-label="Book a demo on WhatsApp">
+  <svg viewBox="0 0 32 32" fill="#fff">
+    <path d="M16 2a13.9 13.9 0 0 0-12 21l-1.9 7 7.2-1.9A13.9 13.9 0 1 0 16 2zm0 25.5a11.6 11.6 0 0 1-5.9-1.6l-.4-.3-4.4 1.1 1.2-4.2-.3-.4A11.6 11.6 0 1 1 16 27.5zm6.4-8.6c-.3-.2-2-.9-2.3-1s-.6-.2-.8.2-.9 1.1-1.1 1.3-.4.2-.7 0a9.2 9.2 0 0 1-2.7-1.7 10.2 10.2 0 0 1-1.9-2.3c-.2-.3 0-.5.1-.7s.3-.4.5-.6l.3-.5c.1-.2 0-.4 0-.5s-.8-2-1.1-2.7c-.3-.7-.6-.6-.8-.6h-.7a1.4 1.4 0 0 0-1 1 5.3 5.3 0 0 0 1.6 3.9 12.3 12.3 0 0 0 5.2 4.6c2.4 1 2.9.8 3.5.8a3 3 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.1-.4-.2-.7-.4z"/>
+  </svg>
+  <span class="wa-float-text">Book Demo on WhatsApp</span>
+</a>
 
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
       <div>
         <a class="logo" href="index.html"><span class="logo-mark">P</span>Kangro</a>
-        <p class="footer-copy">POUCH is the dedicated business management platform for Instagram-first sellers, powered by Kangro.</p>
+        <p class="footer-copy">
+          <strong>About Kangro:</strong> Kangro builds purpose-built business management software for small businesses, salons, and modern creators across India.
+        </p>
+        <p style="margin-top:12px;font-size:13px;color:var(--muted)">
+          📧 <a href="mailto:hello@kangro.in" style="color:var(--pouch);font-weight:600;">hello@kangro.in</a>
+          <br>
+          <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+          💬 WhatsApp: <a href="https://wa.me/91XXXXXXXXXX" target="_blank" rel="noopener" style="color:#25D366;font-weight:700;">+91 XXXXXXXXXX</a>
+        </p>
       </div>
-      <div><h4>Products</h4><a href="sal.html">SAL for Salons</a><a href="pouch.html">POUCH for Sellers</a></div>
-      <div><h4>POUCH Features</h4><a href="#features">Order Pipeline</a><a href="#features">Instagram Inquiries</a><a href="#features">Product Catalog</a><a href="#features">UPI Payments</a></div>
-      <div><h4>Company</h4><a href="index.html">Kangro Home</a><a href="index.html#pricing">Pricing</a><a href="login.html">Sign In</a></div>
+
+      <div>
+        <h4>Products</h4>
+        <a href="sal.html">✂️ SAL for Salons</a>
+        <a href="pouch.html">📦 POUCH for Sellers</a>
+        <a href="register.html?product=pouch">Start 14-Day Free Trial</a>
+        <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20POUCH" target="_blank" rel="noopener" style="color:#25D366;font-weight:700;">Book WhatsApp Demo</a>
+      </div>
+
+      <div>
+        <h4>POUCH Features</h4>
+        <a href="#features">Instagram DM Capture</a>
+        <a href="#features">Product Catalog</a>
+        <a href="#features">UPI Payments</a>
+        <a href="#features">Order Status Board</a>
+        <a href="#features">WhatsApp Tracking</a>
+      </div>
+
+      <div>
+        <h4>Company & Legal</h4>
+        <a href="#pricing">Pricing Plans</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="login.html">Sign In</a>
+      </div>
     </div>
-    <div class="footer-bottom"><span>© 2026 Kangro Technologies. All rights reserved.</span><span>POUCH — Business Management for Sellers.</span></div>
+
+    <div class="footer-bottom">
+      <span>© 2026 Kangro (kangro.in). All rights reserved. Made in India 🇮🇳</span>
+      <span>POUCH — Business Management for Sellers.</span>
+    </div>
   </div>
 </footer>
 

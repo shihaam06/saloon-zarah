@@ -3,8 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kangro | Create Account</title>
+<title>Start Your 14-Day Free Trial — Kangro</title>
+<meta name="description" content="Sign up for Kangro SAL (for salons & spas) or POUCH (for Instagram sellers). Start your 14-day free trial. No credit card required. Set up in 10 minutes.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<!-- Open Graph / SEO -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Start Your 14-Day Free Trial — Kangro">
+<meta property="og:description" content="Manage appointments, GST billing, staff commissions, and 24/7 Instagram DMs. No credit card required.">
+<meta property="og:url" content="https://kangro.in/register.html">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<!-- Analytics Placeholder -->
+<!-- TODO: Replace G-XXXXXXXXXX with your Google Analytics Measurement ID -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script> -->
+
+<!-- TODO: Replace YOUR_PIXEL_ID with your Meta Pixel ID -->
+<!-- <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', 'YOUR_PIXEL_ID');
+  fbq('track', 'PageView');
+</script> -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:"DM Sans",system-ui,sans-serif}
@@ -18,24 +51,26 @@ body{
   color:white;
 }
 .container{
-  width:440px;
+  width:460px;
+  max-width:100%;
   background:#111827;
-  padding:40px 36px;
+  padding:36px 32px;
   border-radius:24px;
   border:1px solid rgba(255,255,255,.08);
   box-shadow:0 20px 50px rgba(0,0,0,.5);
 }
-.logo{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.logo{display:flex;align-items:center;justify-content:center;margin-bottom:18px}
 .logoBox{
-  width:58px;height:58px;border-radius:18px;
+  width:52px;height:52px;border-radius:16px;
   background:linear-gradient(135deg,#3157E8,#5146E5);
   display:flex;align-items:center;justify-content:center;
-  font-size:26px;box-shadow:0 12px 30px rgba(49,87,232,.35);
+  box-shadow:0 12px 30px rgba(49,87,232,.35);
 }
-h1{text-align:center;font-size:26px;font-family:Manrope;font-weight:800;letter-spacing:-.03em}
-.subtitle{text-align:center;margin-top:6px;color:#94A3B8;font-size:13px;margin-bottom:26px}
+.logoBox svg{width:28px;height:28px}
+h1{text-align:center;font-size:24px;font-family:Manrope;font-weight:800;letter-spacing:-.03em}
+.subtitle{text-align:center;margin-top:6px;color:#94A3B8;font-size:13px;margin-bottom:22px}
 
-.product-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.product-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
 .product-option{
   border:1px solid #1F2937;background:#182234;border-radius:12px;padding:12px 10px;
   cursor:pointer;text-align:center;transition:.2s;
@@ -44,37 +79,61 @@ h1{text-align:center;font-size:26px;font-family:Manrope;font-weight:800;letter-s
 .product-option strong{display:block;font-size:14px;font-family:Manrope;color:#fff}
 .product-option small{font-size:10px;color:#94A3B8;display:block;margin-top:2px}
 
-label{display:block;margin-bottom:6px;font-size:13px;color:#CBD5E1;font-weight:600}
+.form-group{margin-bottom:14px}
+label{display:block;margin-bottom:5px;font-size:12px;color:#CBD5E1;font-weight:600}
+label span{color:#F43F5E}
 input,select{
-  width:100%;padding:13px 15px;border-radius:12px;
+  width:100%;padding:12px 14px;border-radius:10px;
   border:1px solid #1F2937;background:#1F2937;color:white;
-  font-size:14px;margin-bottom:16px;outline:none;transition:.2s;
+  font-size:14px;outline:none;transition:.2s;
 }
 input:focus,select:focus{border-color:#3157E8;box-shadow:0 0 0 3px rgba(49,87,232,.25)}
+
+.phone-wrap{display:flex;gap:8px}
+.phone-prefix{
+  padding:12px 12px;background:#182234;border:1px solid #1F2937;
+  border-radius:10px;font-size:13px;font-weight:600;color:#94A3B8;
+  display:flex;align-items:center;gap:4px;flex:none;
+}
+.phone-wrap input{flex:1}
 
 button{
   width:100%;padding:14px;border:none;border-radius:12px;
   background:linear-gradient(135deg,#3157E8,#5146E5);color:white;
-  font-size:15px;font-weight:700;cursor:pointer;transition:.2s;margin-top:8px;
+  font-size:15px;font-weight:700;cursor:pointer;transition:.2s;margin-top:6px;
 }
 button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(49,87,232,.35)}
 
-.footer{margin-top:22px;text-align:center;color:#94A3B8;font-size:13px}
+.reassurance{
+  text-align:center;color:#12B76A;font-size:11px;font-weight:600;
+  margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.reassurance svg{width:14px;height:14px;fill:currentColor}
+
+.footer{margin-top:20px;text-align:center;color:#94A3B8;font-size:12px;line-height:1.6}
 .footer a{color:#5B8CFF;text-decoration:none;font-weight:600}
 .footer a:hover{text-decoration:underline}
+
+.wa-help{
+  margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:#94A3B8;
+}
+.wa-help a{color:#25D366;font-weight:700;display:inline-flex;align-items:center;gap:4px}
 </style>
 </head>
 
 <body>
 <div class="container">
   <div class="logo">
-    <div class="logoBox">✨</div>
+    <a href="index.html" class="logoBox" title="Kangro Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 8l8 4 8-4-8-5Z"/><path d="m4 13 8 5 8-5"/></svg>
+    </a>
   </div>
 
-  <h1>Create Kangro Account</h1>
-  <p class="subtitle">Select your specialized product to get started</p>
+  <h1>Start Your 14-Day Free Trial</h1>
+  <p class="subtitle">Select your business type and get started in under 10 minutes</p>
 
-  <label>Select Your Platform Product</label>
+  <label>Choose Your Product <span>*</span></label>
   <div class="product-selector">
     <div class="product-option selected" id="optSal" onclick="selectProduct('SAL')">
       <strong>✂️ SAL</strong>
@@ -87,22 +146,57 @@ button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(49,87,232,.3
   </div>
   <input type="hidden" id="selectedProduct" value="SAL">
 
-  <label>Business Name *</label>
-  <input type="text" id="businessName" placeholder="e.g. Bella Salon / Sweet Crumbs Bakehouse">
+  <div class="form-group">
+    <label>Your Full Name <span>*</span></label>
+    <input type="text" id="fullName" placeholder="e.g. Priya Sharma" required autocomplete="name">
+  </div>
 
-  <label>Email *</label>
-  <input type="email" id="email" placeholder="owner@example.com">
+  <div class="form-group">
+    <label>WhatsApp / Mobile Number <span>*</span></label>
+    <div class="phone-wrap">
+      <div class="phone-prefix">🇮🇳 +91</div>
+      <input type="tel" id="phone" placeholder="98765 43210" required autocomplete="tel" pattern="[0-9]{10}">
+    </div>
+  </div>
 
-  <label>Account Password *</label>
-  <input type="password" id="password" placeholder="••••••••">
+  <div class="form-group">
+    <label>Business Name <span>*</span></label>
+    <input type="text" id="businessName" placeholder="e.g. Glow Salon & Spa / Velvet Nails" required>
+  </div>
 
-  <label>Owner Security PIN (for Analytics & Settings)</label>
-  <input type="password" id="ownerPin" placeholder="4-digit PIN or password">
+  <div class="form-group">
+    <label>Email Address <span>*</span></label>
+    <input type="email" id="email" placeholder="owner@example.com" required autocomplete="email">
+  </div>
 
-  <button id="registerBtn">Create Account & Launch</button>
+  <div class="form-group">
+    <label>Account Password <span>*</span></label>
+    <input type="password" id="password" placeholder="At least 6 characters" required autocomplete="new-password">
+  </div>
+
+  <div class="form-group">
+    <label>Owner Security PIN <small style="color:#94A3B8;font-weight:400;">(4-digit PIN for reports & settings)</small></label>
+    <input type="password" id="ownerPin" placeholder="e.g. 1234 (Optional)" maxlength="6">
+  </div>
+
+  <button id="registerBtn">Start Free 14-Day Trial →</button>
+
+  <div class="reassurance">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    No credit card required. Set up in 10 minutes. Cancel anytime.
+  </div>
 
   <div class="footer">
-    Already have an account? <a href="login.html">Login</a>
+    Already have an account? <a href="login.html">Log In</a>
+  </div>
+
+  <!-- WhatsApp Quick Support CTA -->
+  <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+  <div class="wa-help">
+    Prefer talking to a human first?
+    <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20help%20setting%20up%20my%20Kangro%20account" target="_blank" rel="noopener">
+      💬 Chat on WhatsApp
+    </a>
   </div>
 </div>
 
@@ -118,7 +212,7 @@ function selectProduct(prod) {
   document.getElementById("optPouch").classList.toggle("selected", prod === "POUCH");
 }
 
-// Check URL query param
+// Check URL query param e.g. register.html?product=pouch
 const urlParams = new URLSearchParams(window.location.search);
 const prodParam = (urlParams.get("product") || "").toUpperCase();
 if (prodParam === "POUCH") {

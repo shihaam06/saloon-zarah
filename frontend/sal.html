@@ -3,12 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAL by Kangro — Complete Management Software for Salons</title>
-<meta name="description" content="SAL is the complete operating system for modern salons — online bookings, staff scheduling, billing, UPI advance payments, GST invoices, and 24/7 Instagram AI receptionist.">
+<title>SAL by Kangro — #1 Salon Management Software & 24/7 Instagram AI in India</title>
+<meta name="description" content="Never miss a salon booking. SAL by Kangro gives your salon a 24/7 Instagram AI receptionist, calendar scheduling, staff commission tracking, UPI advance deposits, and fast WhatsApp GST billing.">
+<meta name="keywords" content="salon management software India, salon appointment booking app, salon POS software, salon billing software, Instagram DM booking salon, salon software WhatsApp India, beauty parlour billing software, spa management software India">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 
+<!-- Open Graph / Social Sharing -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="SAL by Kangro — Complete Operating System for Modern Salons">
+<meta property="og:description" content="Never miss a salon booking. 24/7 Instagram AI receptionist, live calendar, staff commissions, and WhatsApp GST billing.">
+<meta property="og:url" content="https://kangro.in/sal.html">
+<meta property="og:image" content="https://kangro.in/images/sal-og-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SAL by Kangro — Salon Management & Instagram AI">
+<meta name="twitter:description" content="Turn Instagram enquiries into paid salon appointments with automated UPI advances and WhatsApp GST invoices.">
+
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<!-- Analytics Placeholders -->
+<!-- TODO: Replace G-XXXXXXXXXX with your Google Analytics Measurement ID -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script> -->
+
+<!-- TODO: Replace YOUR_PIXEL_ID with your Meta Pixel ID -->
+<!-- <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', 'YOUR_PIXEL_ID');
+  fbq('track', 'PageView');
+</script> -->
 
 <style>
 :root{
@@ -25,6 +59,8 @@
   --grad:linear-gradient(135deg,#E11D48 0%,#BE123C 100%);
   --blue:#3157E8;
   --green:#12B76A;
+  --wa:#25D366;
+  --wa-dark:#1EBE5D;
   --shadow:0 24px 70px rgba(16,24,40,.10);
   --shadow2:0 12px 35px rgba(16,24,40,.08);
 }
@@ -63,21 +99,15 @@ body.dark .section.alt{background:#0F172A}
 body.dark .trust{background:#0F172A;border-color:#334155}
 body.dark .trust-label{color:#94A3B8}
 body.dark .trust-points span{color:#CBD5E1}
-body.dark .feature-card,body.dark .pricing-card{background:#111827;border-color:#334155}
-body.dark .feature-card h3,body.dark .pricing-card h3{color:#F8FAFC}
-body.dark .feature-card p,body.dark .pricing-card .p-desc,body.dark .section-head p{color:#CBD5E1}
+body.dark .feature-card,body.dark .pricing-card,body.dark .problem-card,body.dark .comp-col,body.dark .faq-item,body.dark .test-card{background:#111827;border-color:#334155}
+body.dark .feature-card h3,body.dark .pricing-card h3,body.dark .problem-card h3,body.dark .comp-col h3,body.dark .faq-q,body.dark .test-card h4{color:#F8FAFC}
+body.dark .feature-card p,body.dark .pricing-card .p-desc,body.dark .section-head p,body.dark .problem-card p,body.dark .comp-list li,body.dark .faq-a,body.dark .test-card blockquote{color:#CBD5E1}
 body.dark .p-features li{color:#CBD5E1}
 body.dark .pricing-card .price{color:#F8FAFC}
 body.dark .workflow-grid{background:#111827;border-color:#334155}
 body.dark .wf-step{border-color:#334155}
 body.dark .wf-step h3{color:#F8FAFC}
 body.dark .wf-step p{color:#CBD5E1}
-body.dark .mock-stat{background:#182234;border-color:#334155}
-body.dark .mock-stat strong{color:#F8FAFC}
-body.dark .mock-stat label{color:#94A3B8}
-body.dark .mock-table{background:#182234;border-color:#334155}
-body.dark .mock-table-head{color:#F8FAFC}
-body.dark .mock-row{border-color:#263244;color:#E2E8F0}
 body.dark .footer{border-color:#334155;background:#0B1220}
 body.dark .footer h4{color:#F8FAFC}
 body.dark .footer-copy,body.dark .footer a:not(.logo),body.dark .footer-bottom{color:#94A3B8}
@@ -85,6 +115,7 @@ body.dark .footer a:not(.logo):hover{color:var(--primary2)}
 body.dark .toggle{background:#182234;border-color:#334155;color:#E2E8F0}
 body.dark .toggle .sun{display:none}
 body.dark .toggle .moon{display:block}
+body.dark .video-box{background:#182234;border-color:#334155}
 
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -96,29 +127,54 @@ button{font:inherit}
 .eyebrow i{display:block;width:7px;height:7px;border-radius:50%;background:var(--primary)}
 h1,h2,h3,h4{font-family:Manrope,Inter,sans-serif}
 h1,h2,h3{letter-spacing:-.045em}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:10px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:10px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
 .btn-primary{background:var(--grad);color:#fff;box-shadow:0 8px 22px rgba(225,29,72,.22)}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(225,29,72,.30)}
 .btn-outline{background:#fff;border-color:var(--line);color:#344054}
 .btn-outline:hover{border-color:#C7D0E0;background:var(--surface)}
 .btn-lg{padding:14px 22px;font-size:14px}
-.badge-sal{display:inline-block;padding:4px 10px;border-radius:20px;background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:800;letter-spacing:.05em}
+.btn-wa{background:var(--wa);color:#fff;box-shadow:0 8px 22px rgba(37,211,102,.28)}
+.btn-wa:hover{background:var(--wa-dark);transform:translateY(-2px);box-shadow:0 14px 30px rgba(37,211,102,.38);color:#fff}
+.btn-wa-nav{background:#E8F8F0;border:1px solid #B7EBCE;color:#0F7642;padding:9px 14px;font-size:12px;font-weight:700}
+.btn-wa-nav:hover{background:#25D366;color:#fff;border-color:#25D366}
+
+/* FLOATING WHATSAPP CTA */
+.wa-float{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  display:inline-flex;align-items:center;gap:9px;
+  background:#25D366;color:#fff;padding:12px 18px;
+  border-radius:50px;box-shadow:0 10px 30px rgba(37,211,102,.42);
+  font-size:13px;font-weight:700;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+}
+.wa-float:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 14px 35px rgba(37,211,102,.55);color:#fff}
+.wa-float svg{flex:none;width:24px;height:24px}
+
+.toggle{
+  width:38px;height:38px;border:1px solid var(--line);background:#fff;color:#344054;
+  border-radius:10px;display:grid;place-items:center;cursor:pointer;margin-right:4px;
+  transition:.2s;
+}
+.toggle:hover{background:var(--surface)}
+.toggle svg{width:17px;height:17px}
+.toggle .moon{display:none}
 
 /* NAV */
 .header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.91);backdrop-filter:blur(18px);border-bottom:1px solid rgba(228,231,236,.78)}
 .nav{height:72px;display:flex;align-items:center;justify-content:space-between}
 .logo{display:flex;align-items:center;gap:10px;font-family:Manrope,sans-serif;font-size:20px;font-weight:800;letter-spacing:-.04em}
-.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:0 6px 17px rgba(225,29,72,.25);color:#fff;font-weight:800;font-size:13px}
-.nav-center{display:flex;align-items:center;gap:28px;margin-left:50px}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:0 6px 17px rgba(225,29,72,.25)}
+.logo-mark svg{width:19px;height:19px}
+.nav-center{display:flex;align-items:center;gap:26px;margin-left:35px}
 .nav-center>a,.product-trigger{font-size:13px;font-weight:600;color:#475467}
 .nav-center>a:hover,.product-trigger:hover{color:var(--primary)}
 .product-wrap{position:relative}
 .product-trigger{background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:5px}
 .product-trigger svg{transition:.2s}
 .product-wrap.open .product-trigger svg{transform:rotate(180deg)}
-.dropdown{position:absolute;top:38px;left:-22px;width:310px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);opacity:0;visibility:hidden;transform:translateY(-5px);transition:.18s}
+.dropdown{position:absolute;top:38px;left:-22px;width:320px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);opacity:0;visibility:hidden;transform:translateY(-5px);transition:.18s}
 .product-wrap.open .dropdown{opacity:1;visibility:visible;transform:none}
-.dropdown a{display:flex;gap:12px;padding:13px;border-radius:10px}
+.dropdown a{display:flex;gap:12px;padding:12px;border-radius:10px}
 .dropdown a:hover{background:var(--surface)}
 .dropdown-icon{width:36px;height:36px;border-radius:10px;background:var(--primary-light);color:var(--primary);display:grid;place-items:center;flex:none;font-weight:800;font-size:11px}
 .dropdown-icon.pouch{background:#F5F3FF;color:#7C3AED}
@@ -126,138 +182,226 @@ h1,h2,h3{letter-spacing:-.045em}
 .dropdown span{font-size:11px;color:var(--muted);display:block;margin-top:2px}
 .nav-right{display:flex;align-items:center;gap:8px}
 .nav-right .login{font-size:13px;font-weight:700;padding:10px 12px}
-.toggle{width:38px;height:38px;border:1px solid var(--line);background:#fff;color:#344054;border-radius:10px;display:grid;place-items:center;cursor:pointer;margin-right:4px;transition:.2s}
-.toggle:hover{background:var(--surface)}
-.toggle svg{width:17px;height:17px}
-.toggle .moon{display:none}
 .menu{display:none;border:0;background:none;font-size:24px;cursor:pointer}
 .mobile{display:none}
 
 /* HERO */
-.hero{position:relative;overflow:hidden;padding:85px 0 100px;background:radial-gradient(circle at 80% 18%,rgba(225,29,72,.10),transparent 27%),radial-gradient(circle at 8% 12%,rgba(49,87,232,.05),transparent 25%)}
-.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
-.hero h1{font-size:clamp(40px,4.8vw,64px);line-height:1.05;margin:15px 0 20px}
+.hero{position:relative;overflow:hidden;padding:75px 0 90px;background:
+radial-gradient(circle at 80% 18%,rgba(225,29,72,.14),transparent 27%),
+radial-gradient(circle at 8% 12%,rgba(49,87,232,.08),transparent 25%)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:55px;align-items:center}
+.hero h1{font-size:clamp(38px,4.5vw,62px);line-height:1.05;margin:16px 0 20px;max-width:720px}
 .hero h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero-desc{font-size:16px;color:var(--muted);max-width:580px;line-height:1.6}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
-.hero-note{display:flex;align-items:center;gap:18px;margin-top:24px;color:var(--muted);font-size:11px}
+.hero-desc{font-size:16px;color:var(--muted);max-width:620px;line-height:1.6}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.hero-note{display:flex;align-items:center;gap:16px;margin-top:22px;color:var(--muted);font-size:12px;flex-wrap:wrap}
 .hero-note b{color:#344054}
-.dot-green{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
+.dot-green{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
 
-/* AI PHONE BOOKING CHAT SIMULATOR */
-.chat-sim-wrapper{position:relative;max-width:440px;margin:auto;width:100%}
-.chat-sim-phone{background:#0B0F19;border:1px solid rgba(255,255,255,.14);border-radius:28px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 50px rgba(225,29,72,.15);position:relative}
-.chat-sim-header{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:16px}
-.chat-sim-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#E11D48,#BE123C);display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff;box-shadow:0 4px 14px rgba(225,29,72,.45)}
-.chat-sim-title{font-size:13.5px;font-weight:700;color:#F8FAFC}
-.chat-sim-status{font-size:11px;color:#22C55E;display:flex;align-items:center;gap:5px;margin-top:1px}
-.chat-sim-pulse{width:6px;height:6px;border-radius:50%;background:#22C55E;animation:pulseDot 2s infinite}
+/* DASHBOARD PREVIEW */
+.hero-preview{position:relative}
+.window{background:#0F172A;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:12px;box-shadow:0 28px 75px rgba(0,0,0,.25)}
+.window-bar{height:28px;display:flex;align-items:center;gap:7px;padding:0 8px;margin-bottom:8px}
+.wdot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.wdot.red{background:#FF5F56}
+.wdot.yellow{background:#FFBD2E}
+.wdot.green{background:#27C93F}
+.wtitle{font-size:11px;font-weight:600;color:#94A3B8;margin-left:8px}
 
-.chat-sim-messages{display:flex;flex-direction:column;gap:10px;min-height:300px}
-.sim-msg{padding:10px 14px;font-size:12.5px;line-height:1.45;opacity:0;transform:translateY(12px);transition:all .35s cubic-bezier(0.16, 1, 0.3, 1)}
-.sim-msg.show{opacity:1;transform:translateY(0)}
-.sim-msg.user{background:#1E293B;color:#E2E8F0;border-radius:16px 16px 16px 4px;align-self:flex-start;max-width:82%;border:1px solid rgba(255,255,255,.06)}
-.sim-msg.ai{background:linear-gradient(135deg,#E11D48,#BE123C);color:#fff;border-radius:16px 16px 4px 16px;align-self:flex-end;max-width:85%;box-shadow:0 4px 16px rgba(225,29,72,.35)}
+.app{background:#F8FAFC;border-radius:14px;overflow:hidden;padding:18px}
+.app-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.app-top h3{font-size:15px;color:#111827}
+.badge-live{font-size:9px;background:#ECFDF3;color:#027A48;padding:3px 8px;border-radius:12px;font-weight:700}
+.cal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.chair{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:10px}
+.chair-name{font-size:10px;font-weight:700;color:#64748B;display:block;margin-bottom:6px}
+.slot{background:#FFF1F2;border-left:3px solid var(--primary);border-radius:4px;padding:5px 8px;font-size:9px;margin-bottom:4px}
+.slot strong{color:#9F1239;display:block}
+.slot small{color:#64748B}
+.slot.free{background:#F8FAFC;border-left:3px solid #CBD5E1}
+.slot.free small{color:#94A3B8}
 
-/* TYPING INDICATOR */
-.sim-typing{display:none;align-self:flex-start;background:#1E293B;padding:10px 14px;border-radius:14px;gap:5px;align-items:center;border:1px solid rgba(255,255,255,.06);margin-bottom:4px}
-.sim-typing.show{display:inline-flex}
-.sim-dot{width:6px;height:6px;background:#94A3B8;border-radius:50%;animation:simBounce 1.2s infinite ease-in-out}
-.sim-dot:nth-child(2){animation-delay:.2s}
-.sim-dot:nth-child(3){animation-delay:.4s}
+.live-feed{background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:12px}
+.feed-head{font-size:10px;font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between}
+.feed-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F1F5F9;font-size:9px}
+.feed-row:last-child{border:0}
+.feed-tag{background:#E0E7FF;color:#3730A3;font-weight:700;padding:2px 6px;border-radius:4px}
 
-/* CONFIRMATION CARD */
-.sim-confirm{background:rgba(15,23,42,.95);border:1px solid rgba(34,197,94,.4);border-radius:14px;padding:14px;margin-top:6px;opacity:0;transform:scale(0.95);transition:all .4s ease}
-.sim-confirm.show{opacity:1;transform:scale(1)}
-.sim-confirm-head{display:flex;align-items:center;gap:6px;color:#22C55E;font-size:12.5px;font-weight:700;margin-bottom:8px}
-.sim-confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px}
-.sim-confirm-row{color:#94A3B8}
-.sim-confirm-row b{color:#F1F5F9;font-weight:600;display:block}
-
-/* FLOATING BADGES */
-.sim-float-top{position:absolute;top:-12px;left:-16px;background:#0F172A;border:1px solid rgba(34,197,94,.4);color:#F8FAFC;padding:7px 14px;border-radius:12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 12px 30px rgba(0,0,0,.4);z-index:2}
-.sim-float-bottom{position:absolute;bottom:14px;right:-18px;background:#0F172A;border:1px solid rgba(225,29,72,.4);color:#F8FAFC;padding:8px 14px;border-radius:12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 12px 30px rgba(0,0,0,.4);z-index:2}
-
-@keyframes simBounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
-
-/* TRUST */
-.trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;background:#fff}
-.trust-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
-.trust-label{font-size:10px;color:var(--muted2);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.trust-points{display:flex;gap:24px;flex-wrap:wrap}
-.trust-points span{font-size:11px;color:#475467;font-weight:600}
-.trust-points span:before{content:"✓";color:var(--primary);margin-right:6px;font-weight:800}
+/* TRUST STRIP */
+.trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;background:#fff}
+.trust-row{display:flex;align-items:center;justify-content:space-between;gap:25px}
+.trust-label{font-size:11px;color:var(--muted2);font-weight:800;text-transform:uppercase;letter-spacing:.08em;flex:none}
+.trust-points{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+.trust-points span{font-size:12px;color:#344054;font-weight:700;display:inline-flex;align-items:center;gap:6px}
 
 /* SECTIONS */
-.section{padding:96px 0}
+.section{padding:90px 0}
 .section.alt{background:var(--surface)}
-.section-head{max-width:680px;margin-bottom:48px}
+.section-head{max-width:720px;margin-bottom:45px}
 .section-head.center{text-align:center;margin-left:auto;margin-right:auto}
 .section-head h2{font-size:clamp(30px,3.8vw,44px);line-height:1.1;margin:12px 0 14px}
 .section-head p{font-size:15px;color:var(--muted)}
 
+/* PROBLEM SECTION */
+.problem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.problem-card{
+  background:#fff;border:1px solid #FECDD3;border-radius:18px;
+  padding:24px;position:relative;box-shadow:0 8px 20px rgba(225,29,72,.03);
+}
+.problem-icon{width:42px;height:42px;border-radius:12px;background:#FFF1F2;color:var(--primary);display:grid;place-items:center;font-size:18px;margin-bottom:14px}
+.problem-card h3{font-size:16px;margin-bottom:8px;color:#9F1239}
+.problem-card p{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* AI SPOTLIGHT & VIDEO DEMO */
+.ai-spotlight{
+  display:grid;grid-template-columns:1fr 1fr;gap:45px;align-items:center;
+  background:linear-gradient(135deg,#FFF1F2 0%,#FFF 60%);border:1px solid #FECDD3;
+  border-radius:24px;padding:45px;margin:30px 0;
+}
+.ai-spotlight-text h3{font-size:28px;margin-bottom:14px;color:#9F1239}
+.ai-spotlight-text p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.ai-perks{list-style:none;margin-bottom:24px}
+.ai-perks li{font-size:13px;padding:6px 0;display:flex;align-items:center;gap:10px;color:#334155}
+.ai-perks li:before{content:"✓";color:var(--primary);font-weight:800}
+
+.video-container{position:relative}
+.video-box{
+  background:#0F172A;border:2px solid #334155;border-radius:18px;
+  overflow:hidden;position:relative;aspect-ratio:16/9;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;text-align:center;padding:24px;
+}
+.video-badge{
+  position:absolute;top:12px;left:12px;background:rgba(225,29,72,.9);
+  color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;
+}
+.video-play-btn{
+  width:64px;height:64px;border-radius:50%;background:var(--grad);
+  display:grid;place-items:center;box-shadow:0 10px 30px rgba(225,29,72,.5);
+  margin-bottom:14px;cursor:pointer;transition:.2s;
+}
+.video-play-btn:hover{transform:scale(1.08)}
+.video-play-btn svg{width:26px;height:26px;margin-left:3px}
+.video-box h4{font-size:16px;margin-bottom:4px}
+.video-box p{font-size:12px;color:#94A3B8}
+
+/* BEFORE VS AFTER */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:30px}
+.comp-col{border-radius:20px;padding:32px;background:#fff;border:1px solid var(--line)}
+.comp-col.before{border-color:#FCA5A5;background:#FFFBFB}
+.comp-col.after{border-color:#86EFAC;background:#F0FDF4}
+.comp-col h3{font-size:18px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.comp-col.before h3{color:#B91C1C}
+.comp-col.after h3{color:#15803D}
+.comp-list{list-style:none}
+.comp-list li{font-size:13px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.comp-col.before .comp-list li:before{content:"✕";color:#DC2626;font-weight:800;flex:none}
+.comp-col.after .comp-list li:before{content:"✓";color:#16A34A;font-weight:800;flex:none}
+
 /* FEATURES GRID */
 .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.feature-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;transition:.2s}
-.feature-card:hover{transform:translateY(-3px);box-shadow:var(--shadow2)}
-.feat-icon{width:46px;height:46px;border-radius:14px;background:var(--primary-light);color:var(--primary);display:grid;place-items:center;margin-bottom:18px}
-.feat-icon svg{width:22px;height:22px}
-.feature-card h3{font-size:18px;margin-bottom:8px}
-.feature-card p{font-size:13px;color:var(--muted);line-height:1.55}
+.feature-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;transition:.2s}
+.feature-card:hover{box-shadow:var(--shadow2);transform:translateY(-2px)}
+.f-icon{width:44px;height:44px;border-radius:12px;background:var(--primary-light);color:var(--primary);display:grid;place-items:center;margin-bottom:16px}
+.f-icon svg{width:20px;height:20px}
+.feature-card h3{font-size:17px;margin-bottom:8px}
+.feature-card p{font-size:13px;color:var(--muted);line-height:1.5}
 
-/* WORKFLOW GRID */
-.workflow-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:22px;background:#fff;overflow:hidden}
+/* WORKFLOW */
+.workflow-grid{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden}
 .wf-step{padding:28px 24px;border-right:1px solid var(--line)}
 .wf-step:last-child{border:0}
 .wf-num{font-family:Manrope;font-size:11px;color:var(--primary);font-weight:800}
-.wf-step h3{font-size:16px;margin:16px 0 6px}
-.wf-step p{font-size:12px;color:var(--muted)}
+.wf-step h3{font-size:16px;margin:18px 0 8px}
+.wf-step p{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* TESTIMONIALS */
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:30px}
+.test-card{
+  background:#fff;border:1px solid var(--line);border-radius:20px;
+  padding:28px;display:flex;flex-direction:column;justify-content:space-between;
+  box-shadow:0 8px 20px rgba(0,0,0,.04);transition:.2s;
+}
+.test-card:hover{transform:translateY(-3px);box-shadow:var(--shadow2)}
+.test-stars{color:#F59E0B;font-size:15px;margin-bottom:12px;letter-spacing:2px}
+.test-card blockquote{font-size:14px;line-height:1.6;color:#334155;margin-bottom:20px;font-style:italic}
+.test-author{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.test-avatar{width:38px;height:38px;border-radius:50%;background:#FFF1F2;color:var(--primary);font-weight:800;font-size:12px;display:grid;place-items:center;flex:none}
+.test-author h4{font-size:13px;font-weight:700}
+.test-author small{color:var(--muted);font-size:11px;display:block}
 
 /* PRICING */
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1050px;margin:auto}
-.pricing-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 28px;position:relative}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1080px;margin:auto}
+.pricing-card{
+  background:#fff;border:1px solid var(--line);border-radius:22px;
+  padding:36px 28px;position:relative;display:flex;flex-direction:column;
+  justify-content:space-between;transition:.2s;
+}
 .pricing-card.featured{border-color:var(--primary);box-shadow:var(--shadow)}
-.popular-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10px;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:.06em}
+.popular-tag{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:var(--grad);color:#fff;font-size:10px;font-weight:800;
+  padding:4px 14px;border-radius:20px;letter-spacing:.06em;white-space:nowrap;
+}
 .pricing-card h3{font-size:20px;margin-bottom:6px}
-.pricing-card .price{font-family:Manrope;font-size:38px;font-weight:800;margin:18px 0 6px}
+.pricing-card .price{font-family:Manrope;font-size:38px;font-weight:800;margin:16px 0 6px;color:var(--primary)}
 .pricing-card .price small{font-size:13px;color:var(--muted);font-weight:500}
-.pricing-card .p-desc{font-size:12px;color:var(--muted);margin-bottom:24px}
+.pricing-card .p-desc{font-size:13px;color:var(--muted);margin-bottom:22px}
 .p-features{list-style:none;margin-bottom:28px}
-.p-features li{font-size:12px;padding:6px 0;display:flex;align-items:center;gap:8px;color:#475467}
-.p-features li:before{content:"✓";color:var(--primary);font-weight:800}
+.p-features li{font-size:13px;padding:7px 0;display:flex;align-items:flex-start;gap:9px;color:#475467;line-height:1.4}
+.p-features li:before{content:"✓";color:var(--primary);font-weight:800;flex:none}
+
+/* FAQ */
+.faq-grid{max-width:820px;margin:30px auto 0;display:grid;gap:14px}
+.faq-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.faq-q{font-size:16px;font-weight:700;color:#0F172A;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.faq-q:before{content:"Q.";color:var(--primary);font-weight:800}
+.faq-a{font-size:14px;color:var(--muted);line-height:1.6}
 
 /* CTA */
-.cta-wrap{padding:0 0 96px}
-.cta{position:relative;overflow:hidden;background:var(--grad);color:#fff;border-radius:28px;padding:60px 40px;text-align:center;box-shadow:0 28px 70px rgba(225,29,72,.25)}
-.cta h2{font-size:clamp(30px,3.8vw,44px);line-height:1.1}
-.cta p{max-width:620px;margin:12px auto 25px;color:rgba(255,255,255,.85);font-size:14px}
-.cta .btn-primary{background:#fff;color:var(--primary);box-shadow:none}
+.cta-wrap{padding:0 0 90px}
+.cta{position:relative;overflow:hidden;background:var(--grad);color:#fff;border-radius:28px;padding:60px 40px;text-align:center;box-shadow:var(--shadow)}
+.cta h2{font-size:clamp(30px,4vw,44px);margin-bottom:12px}
+.cta p{font-size:16px;opacity:.92;max-width:580px;margin:0 auto 26px}
 
 /* FOOTER */
-.footer{border-top:1px solid var(--line);padding:55px 0 25px}
-.footer-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:40px}
-.footer-copy{font-size:12px;color:var(--muted);max-width:320px;margin-top:13px}
-.footer h4{font-family:"DM Sans";font-size:10px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
-.footer a:not(.logo){display:block;font-size:12px;color:var(--muted);margin:9px 0}
-.footer a:not(.logo):hover{color:var(--primary)}
-.footer-bottom{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:42px;padding-top:20px;font-size:10px;color:var(--muted2)}
+.footer{border-top:1px solid var(--line);padding:70px 0 35px;background:#F8FAFC}
+.footer-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1.2fr;gap:40px;margin-bottom:50px}
+.footer h4{font-size:13px;margin-bottom:15px;color:#0F172A;text-transform:uppercase;letter-spacing:.05em}
+.footer a{display:block;color:var(--muted);font-size:13px;margin:8px 0;transition:.2s}
+.footer a:hover{color:var(--primary)}
+.footer-copy{font-size:13px;color:var(--muted);max-width:320px;margin-top:14px;line-height:1.6}
+.footer-bottom{display:flex;justify-content:space-between;color:var(--muted2);font-size:12px;padding-top:25px;border-top:1px solid var(--line);flex-wrap:wrap;gap:10px}
 
 /* RESPONSIVE */
-@media(max-width:950px){
-  .nav-center{display:none}.menu{display:block}.nav-right .login,.nav-right .btn{display:none}
-  .mobile.open{display:block;padding:12px 22px 22px;border-bottom:1px solid var(--line);background:#fff}
-  .mobile a{display:block;padding:10px 0;font-size:13px;font-weight:600}.mobile .sub{padding-left:14px;color:var(--muted)}
-  .hero-grid{grid-template-columns:1fr;gap:50px}.features-grid,.pricing-grid{grid-template-columns:1fr}
+@media(max-width:980px){
+  .nav-center{display:none}
+  .menu{display:block}
+  .mobile.open{display:block;position:fixed;top:72px;left:0;right:0;bottom:0;z-index:99;padding:24px;background:#fff;border-top:1px solid var(--line);overflow-y:auto}
+  .mobile a{display:block;padding:12px 0;font-size:14px;font-weight:600;border-bottom:1px solid #F2F4F7}
+  .hero-grid{grid-template-columns:1fr;gap:40px}.hero{padding:60px 0 75px}
+  .problem-grid{grid-template-columns:1fr 1fr}
+  .ai-spotlight{grid-template-columns:1fr;padding:30px}
+  .comp-grid{grid-template-columns:1fr}
+  .features-grid{grid-template-columns:1fr 1fr}
   .workflow-grid{grid-template-columns:1fr 1fr}
   .wf-step:nth-child(2){border-right:0}.wf-step:nth-child(-n+2){border-bottom:1px solid var(--line)}
-  .footer-grid{grid-template-columns:1fr 1fr}
+  .testimonials-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr;max-width:440px}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:30px}
 }
 @media(max-width:650px){
-  .container{width:calc(100% - 30px)}.hero h1{font-size:38px}
-  .workflow-grid{grid-template-columns:1fr}
-  .wf-step{border-right:0!important;border-bottom:1px solid var(--line)!important}
-  .mockup-body{grid-template-columns:75px 1fr}
+  .container{width:calc(100% - 30px)}.nav{height:65px}.hero{padding:50px 0 65px}
+  .hero h1{font-size:36px}.hero-desc{font-size:15px}
+  .hero-actions .btn{width:100%}
+  .hero-note{flex-direction:column;align-items:flex-start;gap:8px}
+  .problem-grid{grid-template-columns:1fr}
+  .features-grid{grid-template-columns:1fr}
+  .workflow-grid .wf-step{border-right:0!important;border-bottom:1px solid var(--line)!important}.workflow-grid .wf-step:last-child{border-bottom:0!important}
+  .cal-grid{grid-template-columns:1fr}
+  .wa-float{bottom:18px;right:18px;padding:12px;border-radius:50%}
+  .wa-float-text{display:none}
+  .footer-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -266,8 +410,8 @@ h1,h2,h3{letter-spacing:-.045em}
 <header class="header">
   <div class="container nav">
     <a class="logo" href="index.html">
-      <span class="logo-mark">SAL</span>
-      SAL <span style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px">by Kangro</span>
+      <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 8l8 4 8-4-8-5Z"/><path d="m4 13 8 5 8-5"/></svg></span>
+      Kangro <span style="color:var(--primary);margin-left:4px">SAL</span>
     </a>
 
     <nav class="nav-center">
@@ -276,26 +420,35 @@ h1,h2,h3{letter-spacing:-.045em}
         <div class="dropdown">
           <a href="sal.html">
             <div class="dropdown-icon">SAL</div>
-            <div><strong>SAL</strong><span>End-to-end software for salons</span></div>
+            <div><strong>SAL for Salons</strong><span>Complete salon operating system & AI</span></div>
           </a>
           <a href="pouch.html">
             <div class="dropdown-icon pouch">P</div>
-            <div><strong>POUCH</strong><span>Operations software for Instagram-first sellers</span></div>
+            <div><strong>POUCH for Sellers</strong><span>Operations for Instagram-first creators</span></div>
           </a>
         </div>
       </div>
+      <a href="#problem">The Problem</a>
+      <a href="#ai-demo">Instagram AI</a>
       <a href="#features">Features</a>
-      <a href="#workflow">How It Works</a>
+      <a href="#comparison">Before vs After</a>
       <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
     </nav>
 
     <div class="nav-right">
-      <button class="toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
+      <button class="toggle" id="themeToggle" aria-label="Toggle theme">
         <span class="sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
         <span class="moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"/></svg></span>
       </button>
-      <a class="login" href="login.html">Log in</a>
-      <a class="btn btn-primary" href="register.html?product=sal">Get started with SAL</a>
+
+      <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+      <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20SAL" target="_blank" rel="noopener" class="btn btn-wa-nav">
+        💬 Book Demo
+      </a>
+
+      <a class="login" href="login.html">Log In</a>
+      <a class="btn btn-primary" href="register.html?product=sal">Start Free Trial</a>
       <button class="menu" id="menuBtn" aria-label="Menu">☰</button>
     </div>
   </div>
@@ -303,267 +456,550 @@ h1,h2,h3{letter-spacing:-.045em}
 
 <div class="mobile" id="mobile">
   <div class="container">
-    <a href="index.html">Kangro Home</a>
-    <a class="sub" href="sal.html">→ SAL for Salons</a>
-    <a class="sub" href="pouch.html">→ POUCH for Sellers</a>
+    <a href="#problem">The Problem</a>
+    <a href="#ai-demo">Instagram AI Receptionist</a>
     <a href="#features">Features</a>
-    <a href="#workflow">How It Works</a>
+    <a href="#comparison">Before vs After Kangro</a>
     <a href="#pricing">Pricing</a>
-    <a href="login.html">Log in</a>
-    <a class="btn btn-primary" href="register.html?product=sal" style="margin-top:8px">Get started with SAL</a>
+    <a href="#faq">FAQ</a>
+    <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+    <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20SAL" target="_blank" rel="noopener" style="color:#25D366;font-weight:700">💬 Book Demo on WhatsApp</a>
+    <a href="login.html">Log In</a>
+    <a class="btn btn-primary" href="register.html?product=sal" style="margin-top:12px;width:100%">Start Free Trial</a>
   </div>
 </div>
 
 <main>
+<!-- 1. HERO -->
 <section class="hero">
   <div class="container hero-grid">
     <div>
-      <span class="badge-sal">SALON MANAGEMENT PLATFORM</span>
-      <h1>Complete operating software for <span>modern salons.</span></h1>
-      <p class="hero-desc">SAL gives you total control over appointments, walk-ins, staff scheduling, categorized services, automated GST billing, UPI advance payments, WhatsApp invoicing, and a 24/7 Instagram AI receptionist.</p>
+      <div class="eyebrow"><i></i> Complete Operating System for Salons & Spas</div>
+      <h1>Stop losing clients to unanswered DMs. <span>Fill your chairs on autopilot.</span></h1>
+      <p class="hero-desc">Kangro SAL is purpose-built for Indian salons: a 24/7 Instagram AI receptionist that quotes prices and collects UPI advance deposits, paired with live chair scheduling, staff commission payroll, and 15-second WhatsApp GST billing.</p>
+
       <div class="hero-actions">
-        <a href="register.html?product=sal" class="btn btn-primary btn-lg">Start Free Trial <span>→</span></a>
-        <a href="dashboard.html" class="btn btn-outline btn-lg">View Live Dashboard</a>
+        <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20SAL" target="_blank" rel="noopener" class="btn btn-wa btn-lg">
+          💬 Book a demo on WhatsApp <span>→</span>
+        </a>
+        <a href="register.html?product=sal" class="btn btn-primary btn-lg">Start 14-day free trial</a>
       </div>
+
       <div class="hero-note">
-        <span><span class="dot-green"></span><b>Live in Production</b></span>
+        <span><span class="dot-green"></span><b>No credit card required</b></span>
         <span>•</span>
-        <span>No credit card required to start</span>
+        <span>Set up in 10 minutes</span>
+        <span>•</span>
+        <span>Made for Indian Salons 🇮🇳</span>
       </div>
     </div>
 
-    <div>
-      <div class="chat-sim-wrapper">
-        <div class="sim-float-top">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>97% booked automatically</span>
+    <!-- Live Preview Console Mockup -->
+    <div class="hero-preview">
+      <div class="window">
+        <div class="window-bar">
+          <span class="wdot red"></span>
+          <span class="wdot yellow"></span>
+          <span class="wdot green"></span>
+          <span class="wtitle">Kangro SAL — Live Floor & DM Booking Console</span>
         </div>
-
-        <div class="chat-sim-phone">
-          <div class="chat-sim-header">
-            <div class="chat-sim-avatar">✂️</div>
-            <div>
-              <div class="chat-sim-title">SAL Receptionist</div>
-              <div class="chat-sim-status"><span class="chat-sim-pulse"></span> replies instantly</div>
+        <div class="app">
+          <div class="app-top">
+            <h3>Floor Schedule & Chairs</h3>
+            <span class="badge-live">● 24/7 AI ACTIVE</span>
+          </div>
+          <div class="cal-grid">
+            <div class="chair">
+              <span class="chair-name">Chair 1 • Rahul (Sr. Stylist)</span>
+              <div class="slot"><strong>Haircut & Beard</strong><small>3:00 - 3:45 PM • Amit K.</small></div>
+              <div class="slot"><strong>Keratin Treatment</strong><small>4:00 - 6:00 PM • Neha R.</small></div>
+            </div>
+            <div class="chair">
+              <span class="chair-name">Chair 2 • Priya (Colorist)</span>
+              <div class="slot"><strong>Balayage Color</strong><small>2:30 - 5:00 PM • Pooja S.</small></div>
+              <div class="slot free"><strong>Available Slot</strong><small>5:15 - 6:00 PM</small></div>
+            </div>
+            <div class="chair">
+              <span class="chair-name">Chair 3 • Salon Spa Room</span>
+              <div class="slot"><strong>Hydra Facial + Spa</strong><small>3:30 - 5:00 PM • Shweta M.</small></div>
+              <div class="slot"><strong>Hair Spa</strong><small>5:30 - 6:30 PM • Kavita G.</small></div>
             </div>
           </div>
-
-          <div class="chat-sim-messages" id="chatSimMessages">
-            <div class="sim-msg user" id="msg1">
-              Hi, I want to book a haircut tomorrow at 5pm.
-            </div>
-
-            <div class="sim-msg ai" id="msg2">
-              Sure! May I have your name and phone number for the booking?
-            </div>
-
-            <div class="sim-msg user" id="msg3">
-              John, 9876543210
-            </div>
-
-            <div class="sim-msg ai" id="msg4">
-              Perfect. Your haircut has been booked for tomorrow at 5:00 PM. If you have any queries feel free to ask. Thank you!
-            </div>
-
-            <div class="sim-typing" id="msgTyping">
-              <span class="sim-dot"></span>
-              <span class="sim-dot"></span>
-              <span class="sim-dot"></span>
-            </div>
-
-            <div class="sim-confirm" id="msgConfirm">
-              <div class="sim-confirm-head">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="16 9 10 15 7 12"/></svg>
-                <span>Booking confirmed</span>
-              </div>
-              <div class="sim-confirm-grid">
-                <div class="sim-confirm-row">Service <b>Haircut & Styling</b></div>
-                <div class="sim-confirm-row">Client <b>John (9876543210)</b></div>
-                <div class="sim-confirm-row">Time <b>Tomorrow, 5:00 PM</b></div>
-                <div class="sim-confirm-row">Reminder <b>WhatsApp · 2h before</b></div>
-              </div>
-            </div>
+          <div class="live-feed">
+            <div class="feed-head"><span>Live AI & Billing Feed</span><small style="color:#64748B">Updated 2m ago</small></div>
+            <div class="feed-row"><span>Instagram DM: "How much is Balayage?"</span><span class="feed-tag">AI Answered & Sent QR</span></div>
+            <div class="feed-row"><span>₹500 Advance Deposit Received</span><strong style="color:#027A48">Slot Confirmed ✓</strong></div>
+            <div class="feed-row"><span>GST Invoice sent to WhatsApp (Inv #418)</span><span>₹3,450 Paid (UPI)</span></div>
           </div>
-        </div>
-
-        <div class="sim-float-bottom">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>+38% fewer no-shows</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- TRUST STRIP -->
 <section class="trust">
   <div class="container trust-row">
-    <span class="trust-label">End-to-End Salon Infrastructure</span>
+    <span class="trust-label">Built for modern Indian salons</span>
     <div class="trust-points">
-      <span>Online Booking</span><span>Calendar Scheduling</span><span>GST Billing</span><span>UPI Advance Payments</span><span>Instagram AI</span><span>WhatsApp Receipts</span>
+      <span>🇮🇳 Made in India</span>
+      <span>🧾 GST-ready invoices</span>
+      <span>⚡ UPI & Razorpay payments</span>
+      <span>💬 WhatsApp & Instagram integrated</span>
     </div>
   </div>
 </section>
 
-<section class="section" id="features">
+<!-- 2. THE PROBLEM SECTION -->
+<section class="section alt" id="problem">
   <div class="container">
     <div class="section-head center">
-      <div class="eyebrow"><i></i> Complete Salon Features</div>
-      <h2>Everything required to run a 5-star salon.</h2>
-      <p>Built specifically around how salon owners, stylists, and clients interact every day.</p>
+      <div class="eyebrow"><i></i> The Everyday Salon Struggle</div>
+      <h2>Running a salon on WhatsApp and paper is costing you lakhs.</h2>
+      <p>Most salon owners lose high-ticket clients every week to four painful operational bottlenecks.</p>
+    </div>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">📵</div>
+        <h3>Missed Instagram DMs</h3>
+        <p>When you're busy with hair cuts or chemical treatments, potential clients message asking for prices. If you reply 3 hours later, they've already booked someone else.</p>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-icon">🚪</div>
+        <h3>Painful Weekend No-Shows</h3>
+        <p>Clients book prime Saturday 4 PM slots and simply don't show up. Without taking an advance deposit upfront, you sit with empty chairs and zero revenue.</p>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-icon">🧮</div>
+        <h3>Commission Confusion</h3>
+        <p>Sunday night hours wasted manually calculating 10%, 15%, or tiered commissions for 8 stylists across hundreds of service bills. Disputes cause staff friction.</p>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-icon">🧾</div>
+        <h3>Messy Paper & Lost Clients</h3>
+        <p>Paper bills or generic cash registers don't store client phone numbers, visit histories, or GST SAC codes. You have no way to re-engage past clients.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. INSTAGRAM AI RECEPTIONIST SPOTLIGHT & 60-SEC DEMO VIDEO (Requirement 4) -->
+<section class="section" id="ai-demo">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow"><i></i> 24/7 AI Receptionist</div>
+      <h2>Your salon's best employee never sleeps, eats, or misses a DM.</h2>
+      <p>Connect your salon's Instagram and watch inquiries turn into confirmed bookings with advance deposits.</p>
+    </div>
+
+    <div class="ai-spotlight">
+      <div class="ai-spotlight-text">
+        <h3>How Kangro AI Books Clients in 30 Seconds</h3>
+        <p>When a client DMs your salon asking <em>"What is the price for hair botox?"</em> or <em>"Do you have a slot tomorrow at 5 PM?"</em>, Kangro AI responds instantly in natural, polite English or Hinglish.</p>
+        <ul class="ai-perks">
+          <li><strong>Quotes accurate prices:</strong> Answers based on your actual service menu and length pricing.</li>
+          <li><strong>Checks live chair availability:</strong> Knows when your stylists are booked and offers available slots.</li>
+          <li><strong>Collects ₹500 advance deposit:</strong> Sends your GPay / PhonePe / UPI QR code and verifies payment before locking the chair.</li>
+          <li><strong>Captures name & phone number:</strong> Automatically saves customer details to your salon CRM and dashboard.</li>
+        </ul>
+
+        <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20show%20me%20a%20live%20demo%20of%20the%20Instagram%20AI%20Receptionist" target="_blank" rel="noopener" class="btn btn-wa">
+          💬 See Live AI Demo on WhatsApp →
+        </a>
+      </div>
+
+      <!-- 60-Second Video Demo Container Placeholder (Requirement 4) -->
+      <div class="video-container">
+        <!-- TODO: Embed your 60-second demo video URL here (YouTube/Vimeo iframe or HTML5 MP4 embed) -->
+        <div class="video-box">
+          <span class="video-badge">▶ 60-SEC WALKTHROUGH</span>
+          <div class="video-play-btn" title="Watch 60-Second Demo Video">
+            <svg viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+          <h4>Watch Kangro AI in Action</h4>
+          <p>See how Kangro answers DMs, quotes prices, and books a haircut with UPI advance in under 60 seconds.</p>
+          <!-- When ready, replace this box with:
+          <iframe width="100%" height="100%" src="YOUR_YOUTUBE_OR_MP4_URL" frameborder="0" allowfullscreen></iframe>
+          -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. CORE FEATURES -->
+<section class="section alt" id="features">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow"><i></i> Complete Salon Operating System</div>
+      <h2>Everything you need to run your salon like a five-star chain.</h2>
+      <p>Built specifically for Indian hair salons, unisex studios, nail lounges, and day spas.</p>
     </div>
 
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-        <h3>Smart Appointment Calendar</h3>
-        <p>Real-time booking calendar with multi-staff view, walk-in support, duration blocks, turnaround times, and automated conflict prevention.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>24/7 Instagram AI Receptionist</h3>
+        <p>Answers client queries, explains treatments, quotes prices, checks stylist slots, and secures bookings automatically.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 5 8 12 8 12s8-7 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg></div>
-        <h3>Instagram AI Receptionist</h3>
-        <p>Never miss an inquiry. The AI bot answers customer questions, checks live availability, sends the service menu, and confirms appointments 24/7.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <h3>Multi-Chair Calendar & Bookings</h3>
+        <p>Visual calendar with drag-and-drop rescheduling, buffer times, stylist color tags, and automated WhatsApp appointment reminders.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <h3>Staff & Stylist Management</h3>
-        <p>Track stylist working hours, assign appointments, manage commission rates, calculate performance, and prevent overbooking.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+        <h3>15-Second GST POS Billing</h3>
+        <p>Speed through billing at your front desk. Apply service discounts, calculate CGST/SGST with correct SAC codes, and send WhatsApp receipts.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-        <h3>Point of Sale & GST Invoicing</h3>
-        <p>Instant digital bills with custom GST/SAC codes, discount rules, itemized addons, and automatic balance calculation after advance deduction.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Stylist Commission Payroll</h3>
+        <p>Assign fixed or percentage commissions per service. Automatic daily and monthly payout reports eliminate staff disputes.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-        <h3>UPI & Razorpay Advance Payments</h3>
-        <p>Lock in bookings with automated advance payments. Support QR code screenshot verification and automated Razorpay payment links.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
+        <h3>Client Visit History & CRM</h3>
+        <p>See what haircut, color shade, or treatment a client had last time. Track repeat visits, average bill value, and birthdays.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-        <h3>1-Click WhatsApp Invoicing</h3>
-        <p>Send direct PDF invoice download links straight to your customer's WhatsApp chat with clean branding and receipt details.</p>
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+        <h3>Salon Inventory & Retail Sales</h3>
+        <p>Track retail shampoos, serums, and professional backbar colors. Get alerts when hair products or colors run low.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section alt" id="workflow">
+<!-- 5. BEFORE VS AFTER KANGRO (Requirement 4) -->
+<section class="section" id="comparison">
   <div class="container">
     <div class="section-head center">
-      <div class="eyebrow"><i></i> Salon Workflow</div>
-      <h2>Automated from first DM to final bill.</h2>
-      <p>How SAL handles client flow automatically without manual front-desk chaos.</p>
+      <div class="eyebrow"><i></i> Real Salon Transformation</div>
+      <h2>Running your salon before vs after Kangro SAL</h2>
+      <p>Compare the chaos of manual management with the clarity of a connected operating system.</p>
+    </div>
+
+    <div class="comp-grid">
+      <div class="comp-col before">
+        <h3><span>❌</span> Before Kangro SAL</h3>
+        <ul class="comp-list">
+          <li>Late-night Instagram DMs sit unanswered; clients book rival salons by morning.</li>
+          <li>Weekend prime slots wasted on no-shows because no advance deposit was taken.</li>
+          <li>Front desk chaos asking stylists <em>"Who did this haircut?"</em> to calculate commission.</li>
+          <li>Sunday nights spent with a calculator doing manual staff commission math.</li>
+          <li>Client phone numbers and service history lost inside paper registers.</li>
+          <li>No GST-compliant invoices; customer disputes over prices and payment proofs.</li>
+        </ul>
+      </div>
+
+      <div class="comp-col after">
+        <h3><span>✅</span> With Kangro SAL</h3>
+        <ul class="comp-list">
+          <li>24/7 AI answers DMs in 10 seconds with accurate prices, menu options, and slot availability.</li>
+          <li>₹500 advance deposit collected via UPI QR; no-shows drop by over 90%.</li>
+          <li>Clean POS interface where services are credited to stylists in one tap.</li>
+          <li>Automated 1-click commission payroll reports generated instantly with zero errors.</li>
+          <li>100% of customer phone numbers saved with complete past service and bill history.</li>
+          <li>Professional GST invoices sent directly to customer WhatsApp in under 15 seconds.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. HOW IT WORKS WORKFLOW -->
+<section class="section alt" id="how">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow"><i></i> Easy 4-Step Flow</div>
+      <h2>Simple setup. Zero technical headaches.</h2>
+      <p>Up and running in less than 10 minutes from any phone, tablet, or laptop.</p>
     </div>
 
     <div class="workflow-grid">
-      <div class="wf-step">
-        <span class="wf-num">01 / DISCOVERY</span>
-        <h3>Client Inquires on Instagram</h3>
-        <p>Customer DMs asking about prices or availability. AI responds instantly with categorized menu and available slots.</p>
+      <div class="wf-step"><span class="wf-num">01 / SETUP</span><h3>Add services & staff</h3><p>Enter your haircut, color, and spa services with prices and stylist names in 5 minutes.</p></div>
+      <div class="wf-step"><span class="wf-num">02 / CONNECT</span><h3>Link your Instagram</h3><p>Authorize your salon Instagram account in 1 click to activate your 24/7 AI receptionist.</p></div>
+      <div class="wf-step"><span class="wf-num">03 / AUTOMATE</span><h3>AI fills your calendar</h3><p>Clients book through DMs or walk-ins; advance deposits are logged automatically.</p></div>
+      <div class="wf-step"><span class="wf-num">04 / BILL & GROW</span><h3>WhatsApp GST invoices</h3><p>Generate bills in 15 seconds, collect balance via UPI, and monitor daily revenue.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. SOCIAL PROOF / TESTIMONIALS (Requirement 5) -->
+<section class="section" id="testimonials">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow"><i></i> Real Indian Salons</div>
+      <h2>Salon owners share their experience.</h2>
+      <p>Tested and trusted by independent studios, unisex salons, and multi-chair chains across India.</p>
+    </div>
+
+    <div class="testimonials-grid">
+      <!-- TODO: Replace with real customer testimonial -->
+      <div class="test-card">
+        <div>
+          <div class="test-stars">★★★★★</div>
+          <blockquote>"We used to wake up to 15 unanswered Instagram DMs every morning, and by noon those clients had booked elsewhere. Kangro's AI receptionist now books them immediately and collects the ₹500 advance. It paid for itself in week one."</blockquote>
+        </div>
+        <div class="test-author">
+          <div class="test-avatar">AR</div>
+          <div>
+            <h4>Ananya Roy</h4>
+            <small>Founder, Bella Unisex Salon & Spa • Bengaluru</small>
+          </div>
+        </div>
       </div>
-      <div class="wf-step">
-        <span class="wf-num">02 / ADVANCE</span>
-        <h3>Slot Booked & Advance Paid</h3>
-        <p>Client picks time, pays advance via UPI/Razorpay, and receives instant appointment confirmation.</p>
+
+      <!-- TODO: Replace with real customer testimonial -->
+      <div class="test-card">
+        <div>
+          <div class="test-stars">★★★★★</div>
+          <blockquote>"No-shows were costing us at least ₹8,000 every weekend. Since implementing Kangro SAL's UPI advance deposit system, no-shows dropped by 90%. Plus, calculating stylist commissions on Sunday takes 2 minutes instead of 2 hours."</blockquote>
+        </div>
+        <div class="test-author">
+          <div class="test-avatar" style="background:#EEF2FF;color:var(--blue)">RV</div>
+          <div>
+            <h4>Rajesh Verma</h4>
+            <small>Managing Director, Glam & Blade Studio • Mumbai</small>
+          </div>
+        </div>
       </div>
-      <div class="wf-step">
-        <span class="wf-num">03 / SERVICE</span>
-        <h3>Stylist Delivers Service</h3>
-        <p>Stylist marks service complete, adds any retail products or extra treatments to the live booking.</p>
-      </div>
-      <div class="wf-step">
-        <span class="wf-num">04 / CHECKOUT</span>
-        <h3>WhatsApp Invoice Generated</h3>
-        <p>1-click bill generation with advance deducted, balance settled, and clean PDF sent to client WhatsApp.</p>
+
+      <!-- TODO: Replace with real customer testimonial -->
+      <div class="test-card">
+        <div>
+          <div class="test-stars">★★★★★</div>
+          <blockquote>"Our clients love receiving clean GST invoices on WhatsApp with our logo and stylist details. The software is super fast on an iPad at our front desk. Setup took literally 10 minutes."</blockquote>
+        </div>
+        <div class="test-author">
+          <div class="test-avatar" style="background:#F5F3FF;color:#7C3AED">SK</div>
+          <div>
+            <h4>Simran Kaur</h4>
+            <small>Creative Head, Velvet Lash & Nail Lounge • New Delhi</small>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section" id="pricing">
+<!-- 8. SAL PRICING (Requirement 1) -->
+<section class="section alt" id="pricing">
   <div class="container">
     <div class="section-head center">
       <div class="eyebrow"><i></i> Transparent Pricing</div>
-      <h2>Simple plans for growing salons.</h2>
+      <h2>Simple plans for salons of all sizes.</h2>
       <p>All plans include full POS, calendar, customer records, and WhatsApp invoice sharing.</p>
     </div>
 
     <div class="pricing-grid">
+      <!-- Starter Plan -->
+      <!-- TODO: Edit SAL Starter price -->
       <div class="pricing-card">
-        <h3>Solo Stylist / Studio</h3>
-        <div class="price">₹999 <small>/ month</small></div>
-        <p class="p-desc">For independent stylists, barbers, and private studios.</p>
-        <ul class="p-features">
-          <li>1 Staff Account</li>
-          <li>Unlimited Appointments</li>
-          <li>Full POS & WhatsApp Invoices</li>
-          <li>UPI Advance Payments</li>
-          <li>Customer Visit History</li>
-        </ul>
-        <a href="register.html?product=sal" class="btn btn-outline" style="width:100%">Get Started</a>
+        <div>
+          <h3>SAL Starter</h3>
+          <div class="price">₹499 <small>/ month</small></div>
+          <p class="p-desc">For solo stylists, private barbers, and single-chair studios.</p>
+          <ul class="p-features">
+            <li>1 Staff / Stylist Account</li>
+            <li>Unlimited Appointments & Calendar</li>
+            <li>Full POS Billing & WhatsApp Invoices</li>
+            <li>UPI Advance Deposit Tracking</li>
+            <li>Client Visit History & Notes</li>
+            <li>Daily Revenue & Sales Report</li>
+          </ul>
+        </div>
+        <a href="register.html?product=sal" class="btn btn-outline" style="width:100%">Start 14-Day Free Trial</a>
       </div>
 
+      <!-- Growth Plan (Most Popular) -->
+      <!-- TODO: Edit SAL Growth price -->
       <div class="pricing-card featured">
-        <span class="popular-tag">MOST POPULAR</span>
-        <h3>Professional Salon</h3>
-        <div class="price">₹2,499 <small>/ month</small></div>
-        <p class="p-desc">For full-service unisex salons and multi-stylist teams.</p>
-        <ul class="p-features">
-          <li>Up to 10 Stylists & Staff</li>
-          <li>24/7 Instagram AI Receptionist</li>
-          <li>GST Invoicing & SAC Codes</li>
-          <li>Inventory & Product Sales</li>
-          <li>Advance Verification & Analytics</li>
-          <li>Priority Support</li>
-        </ul>
-        <a href="register.html?product=sal" class="btn btn-primary" style="width:100%">Start 14-Day Trial</a>
+        <span class="popular-tag">MOST POPULAR FOR SALONS</span>
+        <div>
+          <h3>SAL Growth</h3>
+          <div class="price">₹999 <small>/ month</small></div>
+          <p class="p-desc">For full-service salons, multi-stylist teams, and beauty studios.</p>
+          <ul class="p-features">
+            <li><strong>Up to 10 Stylists & Staff Accounts</strong></li>
+            <li><strong>24/7 Instagram AI Receptionist</strong> (DM Booking & Pricing)</li>
+            <li>Automated WhatsApp Appointment Confirmations</li>
+            <li>Stylist Commission Payroll & Performance Tracking</li>
+            <li>GST-Ready Invoices with SAC Codes</li>
+            <li>Inventory & Product Stock Alerts</li>
+            <li>Priority WhatsApp & Phone Support</li>
+          </ul>
+        </div>
+        <a href="register.html?product=sal" class="btn btn-primary" style="width:100%">Start 14-Day Free Trial</a>
       </div>
 
+      <!-- Pro Plan -->
+      <!-- TODO: Edit SAL Pro price -->
       <div class="pricing-card">
-        <h3>Salon Chains</h3>
-        <div class="price">Custom</div>
-        <p class="p-desc">For multi-branch salons, luxury spas, and franchise groups.</p>
-        <ul class="p-features">
-          <li>Unlimited Branches & Staff</li>
-          <li>Centralized Revenue Dashboard</li>
-          <li>Custom AI Training & Workflows</li>
-          <li>Dedicated Account Manager</li>
-          <li>Custom POS & Hardware Integrations</li>
-        </ul>
-        <a href="mailto:hello@kangro.in?subject=SAL Enterprise Chain Inquiry" class="btn btn-outline" style="width:100%">Contact Enterprise</a>
+        <div>
+          <h3>SAL Pro</h3>
+          <div class="price">₹1,999 <small>/ month</small></div>
+          <p class="p-desc">For multi-chair salon chains, luxury wellness spas, and franchises.</p>
+          <ul class="p-features">
+            <li>Unlimited Staff Accounts & Multi-Chair</li>
+            <li>Custom AI Rules & Multi-Language (Hindi/English)</li>
+            <li>Package & Membership Treatment Billing</li>
+            <li>Detailed Revenue & Retention Analytics</li>
+            <li>Dedicated WhatsApp Account Manager</li>
+            <li>Custom POS & Thermal Printer Hardware Sync</li>
+          </ul>
+        </div>
+        <a href="register.html?product=sal" class="btn btn-outline" style="width:100%">Start 14-Day Free Trial</a>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:28px">
+      <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+      <p style="font-size:13px;color:var(--muted)">
+        Need custom multi-branch chain setup?
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%20have%20a%20multi-branch%20salon%20and%20would%20like%20custom%20pricing" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700;">
+          Chat with our founder on WhatsApp →
+        </a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 9. FAQ SECTION (Requirement 4) -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow"><i></i> Common Questions</div>
+      <h2>Everything salon owners ask before getting started.</h2>
+      <p>Have questions about setup, billing, or security? We've got answers.</p>
+    </div>
+
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q">How long does it take to set up my salon on Kangro SAL?</div>
+        <div class="faq-a">Under 10 minutes. Just create an account, add your main services (haircut, color, facial, spa) with prices, and connect your Instagram. Our team also provides free WhatsApp onboarding to help you upload your full service menu.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Do I need a GST number to use Kangro SAL?</div>
+        <div class="faq-a">No. Kangro SAL works seamlessly for both unregistered small studios (generating regular retail receipts) and GST-registered salons (with automated CGST/SGST and SAC 999721 codes). You can turn GST on or off with a single toggle.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Is my salon and customer data safe?</div>
+        <div class="faq-a">100% safe and confidential. Your customer phone numbers, visit histories, and revenue data belong entirely to your salon. We never sell or share client data. All databases are protected by encrypted cloud infrastructure.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can I cancel my subscription anytime?</div>
+        <div class="faq-a">Yes. There are no lock-in contracts or cancellation penalties. You can cancel with 1 click directly from your dashboard or by messaging us on WhatsApp.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Does Kangro SAL work if my salon doesn't have a website?</div>
+        <div class="faq-a">Yes! Over 80% of our salon partners do not have a website. Kangro works through your existing Instagram page (via our AI receptionist) and provides a direct booking link you can put in your Instagram bio or WhatsApp profile.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Does the Instagram AI receptionist support Hindi or regional languages?</div>
+        <div class="faq-a">Yes. Kangro's AI understands natural Indian conversational style — including Hindi, Hinglish, and regional terms (e.g. <em>"bhaiya kal 4 baje haircut ka slot milega kya?"</em> or <em>"keratin treatment ka kitna charges hai?"</em>) and replies politely and accurately.</div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- 10. FINAL CTA (Requirement 4) -->
 <section class="cta-wrap">
   <div class="container">
     <div class="cta">
-      <h2>Transform your salon operations today.</h2>
-      <p>Join top salons running online bookings, staff, billing, and Instagram automation with SAL.</p>
-      <a class="btn btn-primary btn-lg" href="register.html?product=sal">Get Started with SAL Free →</a>
+      <h2>Transform your salon front desk today.</h2>
+      <p>Start your 14-day free trial or see a live 10-minute demo with our salon specialist on WhatsApp.</p>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20SAL" target="_blank" rel="noopener" class="btn btn-wa btn-lg">
+          💬 Book a Demo on WhatsApp
+        </a>
+        <a href="register.html?product=sal" class="btn btn-outline btn-lg" style="background:#fff;color:#111827">
+          Start 14-Day Free Trial →
+        </a>
+      </div>
     </div>
   </div>
 </section>
 </main>
 
+<!-- FLOATING WHATSAPP BUTTON (Requirement 3) -->
+<!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+<a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20SAL" target="_blank" rel="noopener" class="wa-float" aria-label="Book a demo on WhatsApp">
+  <svg viewBox="0 0 32 32" fill="#fff">
+    <path d="M16 2a13.9 13.9 0 0 0-12 21l-1.9 7 7.2-1.9A13.9 13.9 0 1 0 16 2zm0 25.5a11.6 11.6 0 0 1-5.9-1.6l-.4-.3-4.4 1.1 1.2-4.2-.3-.4A11.6 11.6 0 1 1 16 27.5zm6.4-8.6c-.3-.2-2-.9-2.3-1s-.6-.2-.8.2-.9 1.1-1.1 1.3-.4.2-.7 0a9.2 9.2 0 0 1-2.7-1.7 10.2 10.2 0 0 1-1.9-2.3c-.2-.3 0-.5.1-.7s.3-.4.5-.6l.3-.5c.1-.2 0-.4 0-.5s-.8-2-1.1-2.7c-.3-.7-.6-.6-.8-.6h-.7a1.4 1.4 0 0 0-1 1 5.3 5.3 0 0 0 1.6 3.9 12.3 12.3 0 0 0 5.2 4.6c2.4 1 2.9.8 3.5.8a3 3 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.1-.4-.2-.7-.4z"/>
+  </svg>
+  <span class="wa-float-text">Book Demo on WhatsApp</span>
+</a>
+
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a class="logo" href="index.html"><span class="logo-mark">SAL</span>Kangro</a>
-        <p class="footer-copy">SAL is the specialized salon operating platform powered by Kangro Business Infrastructure.</p>
+        <a class="logo" href="index.html">
+          <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 3 4 8l8 4 8-4-8-5Z"/><path d="m4 13 8 5 8-5"/></svg></span>
+          Kangro <span style="color:var(--primary);margin-left:4px">SAL</span>
+        </a>
+        <p class="footer-copy">
+          <strong>About Kangro:</strong> Kangro builds purpose-built business management software for modern salons, spas, and independent businesses across India.
+        </p>
+        <p style="margin-top:12px;font-size:13px;color:var(--muted)">
+          📧 <a href="mailto:hello@kangro.in" style="color:var(--primary);font-weight:600;">hello@kangro.in</a>
+          <br>
+          <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+          💬 WhatsApp: <a href="https://wa.me/91XXXXXXXXXX" target="_blank" rel="noopener" style="color:#25D366;font-weight:700;">+91 XXXXXXXXXX</a>
+        </p>
       </div>
-      <div><h4>Products</h4><a href="sal.html">SAL for Salons</a><a href="pouch.html">POUCH for Sellers</a></div>
-      <div><h4>Salon Features</h4><a href="#features">Online Booking</a><a href="#features">Instagram AI</a><a href="#features">POS & GST</a><a href="#features">Staff Schedules</a></div>
-      <div><h4>Company</h4><a href="index.html">Kangro Home</a><a href="index.html#pricing">Platform Pricing</a><a href="login.html">Sign In</a></div>
+
+      <div>
+        <h4>Products</h4>
+        <a href="sal.html">✂️ SAL for Salons</a>
+        <a href="pouch.html">📦 POUCH for Sellers</a>
+        <a href="register.html?product=sal">Start 14-Day Free Trial</a>
+        <!-- TODO: Replace 91XXXXXXXXXX with your actual WhatsApp business number -->
+        <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Kangro%2C%20I%27d%20like%20a%20demo%20of%20SAL" target="_blank" rel="noopener" style="color:#25D366;font-weight:700;">Book WhatsApp Demo</a>
+      </div>
+
+      <div>
+        <h4>Salon Features</h4>
+        <a href="#ai-demo">Instagram AI Receptionist</a>
+        <a href="#features">POS GST Billing</a>
+        <a href="#features">Stylist Commissions</a>
+        <a href="#features">Calendar & Scheduling</a>
+        <a href="#features">Inventory Management</a>
+      </div>
+
+      <div>
+        <h4>Company & Legal</h4>
+        <a href="#pricing">Pricing Plans</a>
+        <a href="#faq">Frequently Asked Questions</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="login.html">Sign In</a>
+      </div>
     </div>
-    <div class="footer-bottom"><span>© 2026 Kangro Technologies. All rights reserved.</span><span>SAL — Salon Operating System.</span></div>
+
+    <div class="footer-bottom">
+      <span>© 2026 Kangro (kangro.in). All rights reserved. Made in India 🇮🇳</span>
+      <span>With Us, You Can Grow.</span>
+    </div>
   </div>
 </footer>
 
@@ -587,66 +1023,6 @@ if(menuBtn){
   menuBtn.addEventListener("click",()=>mobile.classList.toggle("open"));
   document.querySelectorAll(".mobile a").forEach(a=>a.addEventListener("click",()=>mobile.classList.remove("open")));
 }
-
-// LIVE MESSAGE SEQUENCER ANIMATION
-function runChatSimulation() {
-  const m1 = document.getElementById("msg1");
-  const m2 = document.getElementById("msg2");
-  const m3 = document.getElementById("msg3");
-  const m4 = document.getElementById("msg4");
-  const typing = document.getElementById("msgTyping");
-  const confirm = document.getElementById("msgConfirm");
-
-  if (!m1 || !m2 || !m3 || !m4 || !typing || !confirm) return;
-
-  // Reset all states
-  [m1, m2, m3, m4, confirm].forEach(el => el.classList.remove("show"));
-  typing.classList.remove("show");
-
-  // Step 1: User message 1 appears
-  setTimeout(() => {
-    m1.classList.add("show");
-  }, 400);
-
-  // Step 2: AI Typing indicator starts
-  setTimeout(() => {
-    typing.classList.add("show");
-  }, 1200);
-
-  // Step 3: AI reply 1 appears
-  setTimeout(() => {
-    typing.classList.remove("show");
-    m2.classList.add("show");
-  }, 2300);
-
-  // Step 4: User message 2 (Name & Phone) appears
-  setTimeout(() => {
-    m3.classList.add("show");
-  }, 3500);
-
-  // Step 5: AI Typing indicator starts
-  setTimeout(() => {
-    typing.classList.add("show");
-  }, 4300);
-
-  // Step 6: AI reply 2 (Confirmation) appears
-  setTimeout(() => {
-    typing.classList.remove("show");
-    m4.classList.add("show");
-  }, 5500);
-
-  // Step 7: Booking Confirmation Card pops up
-  setTimeout(() => {
-    confirm.classList.add("show");
-  }, 6400);
-
-  // Step 8: Smooth loop after viewing
-  setTimeout(() => {
-    runChatSimulation();
-  }, 12500);
-}
-
-runChatSimulation();
 </script>
 </body>
 </html>

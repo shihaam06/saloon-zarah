@@ -9,6 +9,12 @@ if (registerBtn) {
 
     registerBtn.addEventListener("click", async () => {
 
+        const fullName =
+            document.getElementById("fullName") ? document.getElementById("fullName").value.trim() : "";
+
+        const phone =
+            document.getElementById("phone") ? document.getElementById("phone").value.trim() : "";
+
         const businessName =
             document.getElementById("businessName").value.trim();
 
@@ -29,11 +35,26 @@ if (registerBtn) {
             return;
         }
 
+        if (document.getElementById("phone") && !phone) {
+            alert("Please enter your mobile/WhatsApp number.");
+            return;
+        }
+
+        const signUpOptions = {
+            email,
+            password
+        };
+        if (fullName || phone) {
+            signUpOptions.options = {
+                data: {
+                    full_name: fullName,
+                    phone: phone
+                }
+            };
+        }
+
         const { data, error } =
-            await client.auth.signUp({
-                email,
-                password
-            });
+            await client.auth.signUp(signUpOptions);
 
 
         if (error) {
@@ -47,6 +68,7 @@ if (registerBtn) {
         const profilePayload = {
             id: data.user.id,
             business_name: businessName,
+            business_phone: phone || null,
             owner_pin: ownerPin || password,
             product: product
         };
